@@ -1,0 +1,120 @@
+{
+  "toques": [
+    {
+      "id": "angola",
+      "name": "Angola",
+      "category": "angola",
+      "description": "O toque mais antigo e fundamental da Capoeira Angola. Ritmo lento e profundo, tocado pelo berimbau gunga, que estabelece o tom filosófico e cauteloso do jogo.",
+      "tempo": "slow",
+      "tempoBPM": { "min": 40, "max": 70 },
+      "context": "Tocado no início de todo jogo de Angola. Define um jogo próximo ao chão, de grande malícia e contemplação. O mestre mais graduado toca o gunga e comanda a roda.",
+      "instruments": ["berimbau gunga", "berimbau médio", "berimbau viola", "pandeiro", "atabaque", "agogô", "reco-reco"],
+      "gameCharacter": "Lento, rasteiro, malicioso, filosófico",
+      "videoLinks": [],
+      "relatedToques": ["sao-bento-grande-angola", "sao-bento-pequeno"]
+    },
+    {
+      "id": "sao-bento-grande-angola",
+      "name": "São Bento Grande de Angola",
+      "category": "angola",
+      "description": "Ritmo rápido e expansivo da Capoeira Angola. Permite movimentos amplos e acrobáticos, mantendo a essência da mandinga angoleira.",
+      "tempo": "fast",
+      "tempoBPM": { "min": 100, "max": 140 },
+      "context": "Tocado para jogos mais abertos e rápidos dentro da tradição Angola. Amplia o espaço do jogo sem perder a filosofia angoleira.",
+      "instruments": ["berimbau gunga", "berimbau médio", "berimbau viola", "pandeiro", "atabaque", "agogô", "reco-reco"],
+      "gameCharacter": "Rápido, expansivo, movimentos amplos",
+      "videoLinks": [],
+      "relatedToques": ["angola", "sao-bento-grande-regional"]
+    },
+    {
+      "id": "sao-bento-pequeno",
+      "name": "São Bento Pequeno",
+      "category": "angola",
+      "description": "Também chamado de 'Angola Invertida'. As notas altas e baixas do gunga são trocadas, criando uma variação sutil que indica um jogo próximo e cuidadoso.",
+      "tempo": "medium",
+      "tempoBPM": { "min": 70, "max": 100 },
+      "context": "Jogo próximo, fechado, de muita atenção. Os capoeiristas ficam perto um do outro, lendo cada micro-movimento do adversário.",
+      "instruments": ["berimbau gunga", "berimbau médio", "berimbau viola", "pandeiro", "atabaque"],
+      "gameCharacter": "Próximo, fechado, atento, microscópico",
+      "videoLinks": [],
+      "relatedToques": ["angola"]
+    },
+    {
+      "id": "sao-bento-grande-regional",
+      "name": "São Bento Grande de Regional",
+      "category": "regional",
+      "description": "Criado por Mestre Bimba para a Capoeira Regional. Ritmo explosivo, rápido e marcado, que estimula um jogo dinâmico com golpes diretos e esquivas ágeis.",
+      "tempo": "fast",
+      "tempoBPM": { "min": 120, "max": 160 },
+      "context": "Toque principal da Capoeira Regional e muito usado em rodas de Capoeira Contemporânea, incluindo Abadá. Define um jogo rápido, atlético e de longa distância.",
+      "instruments": ["berimbau", "pandeiro", "pandeiro"],
+      "gameCharacter": "Explosivo, atlético, distância ampla, golpes diretos",
+      "videoLinks": [],
+      "relatedToques": ["sao-bento-grande-angola", "benguela"]
+    },
+    {
+      "id": "benguela",
+      "name": "Benguela",
+      "category": "angola",
+      "description": "Toque lento e fluido, originado na região de Benguela em Angola. Convida para o 'jogo de floreios' — um jogo bonito, cooperativo e de grande expressividade corporal.",
+      "tempo": "slow",
+      "tempoBPM": { "min": 50, "max": 80 },
+      "context": "Estimula um jogo próximo ao chão, cooperativo e esteticamente belo. Os capoeiristas mostram floreios, equilíbrio e criatividade. Não é um jogo de luta, mas de diálogo corporal.",
+      "instruments": ["berimbau gunga", "berimbau médio", "berimbau viola", "pandeiro", "atabaque"],
+      "gameCharacter": "Fluido, cooperativo, bonito, expressivo, próximo ao chão",
+      "videoLinks": [],
+      "relatedToques": ["angola", "iuna"]
+    },
+    {
+      "id": "iuna",
+      "name": "Iúna",
+      "category": "regional",
+      "description": "Toque de velocidade média, gracioso e elegante. Na Capoeira Regional, a Iúna é tocada exclusivamente para jogos de formados (alunos avançados) e mestres.",
+      "tempo": "medium",
+      "tempoBPM": { "min": 80, "max": 110 },
+      "context": "Reservado para jogadores graduados em rodas de Regional. Na Abadá, pode ser tocado em momentos especiais como batizados. Exige maturidade técnica e filosófica.",
+      "instruments": ["berimbau", "pandeiro", "pandeiro"],
+      "gameCharacter": "Gracioso, elegante, técnico, reservado aos graduados",
+      "videoLinks": [],
+      "relatedToques": ["benguela", "sao-bento-grande-regional"]
+    },
+    {
+      "id": "samba-de-roda",
+      "name": "Samba de Roda",
+      "category": "other",
+      "description": "Ritmo das tradicionais Sambas de Roda do Recôncavo Baiano, considerado um dos ritmos mais antigos do Brasil. Na capoeira, é tocado na viola como celebração após a roda.",
+      "tempo": "medium",
+      "tempoBPM": { "min": 90, "max": 120 },
+      "context": "Tocado ao fim de rodas de Angola para celebração. Os capoeiristas e músicos cantam e dançam samba de roda ao redor da bateria. Também pode aparecer em apresentações culturais.",
+      "instruments": ["berimbau viola", "pandeiro", "atabaque", "agogô"],
+      "gameCharacter": "Festivo, celebratório, dança coletiva",
+      "videoLinks": [],
+      "relatedToques": ["angola"]
+    },
+    {
+      "id": "maculele",
+      "name": "Maculelê",
+      "category": "other",
+      "description": "Ritmo da dança guerreira do Maculelê, originária de Santo Amaro da Purificação na Bahia. Usa paus (bastões de biriba) ou facões que se chocam no ritmo da música.",
+      "tempo": "fast",
+      "tempoBPM": { "min": 110, "max": 150 },
+      "context": "Tocado durante apresentações de Maculelê — a dança dos guerreiros com bastões. Frequentemente apresentado em batizados e eventos culturais da Abadá como complemento à capoeira.",
+      "instruments": ["atabaque", "agogô", "pandeiro"],
+      "gameCharacter": "Guerreiro, percussivo, teatral, ritmo marcado",
+      "videoLinks": [],
+      "relatedToques": []
+    },
+    {
+      "id": "cavalaria",
+      "name": "Cavalaria",
+      "category": "other",
+      "description": "Toque historicamente usado para avisar os capoeiristas da chegada da cavalaria policial durante o período em que a capoeira era proibida no Brasil (antes de 1937).",
+      "tempo": "variable",
+      "context": "Hoje é tocado em eventos especiais ou para fins educativos, como forma de lembrar a história de resistência da capoeira. Ao soar a Cavalaria, os capoeiristas paravam o jogo e simulavam trabalhar.",
+      "instruments": ["berimbau"],
+      "gameCharacter": "Histórico, alerta, sinal de perigo",
+      "videoLinks": [],
+      "relatedToques": []
+    }
+  ]
+}

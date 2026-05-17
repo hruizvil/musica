@@ -1,0 +1,96 @@
+{
+  "albums": [
+    {
+      "id": "abada-capoeira-vol-1",
+      "title": "Abadá Capoeira Vol. 1",
+      "year": 1993,
+      "mestre": "mestre-camisa",
+      "contributors": ["mestre-camisa"],
+      "description": "O primeiro álbum oficial da Abadá Capoeira, reunindo ladainhas, corridos e louvações fundamentais do repertório da organização. Uma referência histórica para todos os praticantes.",
+      "trackList": [
+        { "trackNumber": 1, "songId": "paranue-paranua", "title": "Paranauê, Paranauá" },
+        { "trackNumber": 2, "songId": "sou-angoleiro", "title": "Sou Angoleiro" },
+        { "trackNumber": 3, "songId": "volta-do-mundo", "title": "Volta do Mundo" },
+        { "trackNumber": 4, "songId": "vai-camara", "title": "Vai Camará" },
+        { "trackNumber": 5, "songId": "zum-zum-zum", "title": "Zum Zum Zum" },
+        { "trackNumber": 6, "songId": "apanha-laranja-no-chao", "title": "Apanha Laranja no Chão" },
+        { "trackNumber": 7, "songId": "capoeira-mandinga", "title": "Capoeira é Mandinga" },
+        { "trackNumber": 8, "songId": "berimbau-instrumento", "title": "Berimbau é Instrumento" }
+      ]
+    },
+    {
+      "id": "abada-capoeira-vol-2",
+      "title": "Abadá Capoeira Vol. 2",
+      "year": 1997,
+      "mestre": "mestre-camisa",
+      "contributors": ["mestre-camisa"],
+      "description": "Segundo volume da série oficial da Abadá Capoeira, expandindo o repertório com novas ladainhas e corridos. Disponível no Internet Archive para streaming gratuito.",
+      "trackList": [],
+      "spotifyUrl": ""
+    },
+    {
+      "id": "abada-capoeira-vol-3",
+      "title": "Abadá Capoeira Vol. 3 — III Jogos Mundiais",
+      "year": 2001,
+      "mestre": "mestre-camisa",
+      "contributors": ["mestre-camisa"],
+      "description": "Gravado nos III Jogos Mundiais de Capoeira da Abadá em 2001. Captura a energia de um evento ao vivo com centenas de capoeiristas de todo o mundo.",
+      "trackList": []
+    },
+    {
+      "id": "toques-capoeira-abada-2021",
+      "title": "Toques Capoeira Abadá",
+      "year": 2021,
+      "mestre": "mestre-camisa",
+      "contributors": ["mestre-camisa"],
+      "description": "Álbum de 9 faixas lançado em 2021, focado nos toques de berimbau usados nas rodas da Abadá. Uma referência sonora essencial para estudo musical.",
+      "trackList": [
+        { "trackNumber": 1, "songId": null, "title": "Angola" },
+        { "trackNumber": 2, "songId": null, "title": "São Bento Grande de Angola" },
+        { "trackNumber": 3, "songId": null, "title": "São Bento Pequeno" },
+        { "trackNumber": 4, "songId": null, "title": "São Bento Grande de Regional" },
+        { "trackNumber": 5, "songId": null, "title": "Benguela" },
+        { "trackNumber": 6, "songId": null, "title": "Iúna" },
+        { "trackNumber": 7, "songId": null, "title": "Samba de Roda" },
+        { "trackNumber": 8, "songId": null, "title": "Maculelê" },
+        { "trackNumber": 9, "songId": null, "title": "Cavalaria" }
+      ],
+      "spotifyUrl": "https://open.spotify.com/album/7ELb4VGqQvQ3vgtNVbtWYe"
+    },
+    {
+      "id": "mestre-camisa-50-anos",
+      "title": "Mestre Camisa 50 Anos",
+      "year": 2024,
+      "mestre": "mestre-camisa",
+      "contributors": ["mestre-camisa"],
+      "description": "Álbum comemorativo dos 50 anos de Mestre Camisa na capoeira, lançado em 2024 com 14 músicas celebrando sua trajetória e legado para a capoeira mundial.",
+      "trackList": []
+    },
+    {
+      "id": "homenagem-bimba-pastinha",
+      "title": "Homenagem a Mestre Bimba e Mestre Pastinha",
+      "year": 2007,
+      "mestre": "mestre-camisa",
+      "contributors": ["mestre-camisa"],
+      "description": "Álbum tributo aos dois maiores mestres da história da capoeira — Mestre Bimba, criador da Capoeira Regional, e Mestre Pastinha, guardião da Capoeira Angola. Mestre Camisa presta sua homenagem através de ladainhas e corridos que celebram esses gigantes.",
+      "trackList": []
+    },
+    {
+      "id": "cd-mestre-cobra",
+      "title": "CD Mestre Cobra — Abadá Capoeira",
+      "year": 2010,
+      "mestre": "mestre-cobra",
+      "contributors": ["mestre-cobra"],
+      "description": "Álbum de Mestre Cobra reunindo suas composições originais e interpretações de clássicos da capoeira. Músicas como 'Nego Vai', 'Capim Amassado' e 'Estrela que Brilha no Céu da Bahia' estão presentes.",
+      "trackList": [
+        { "trackNumber": 1, "songId": null, "title": "Nego Vai" },
+        { "trackNumber": 2, "songId": null, "title": "Capim Amassado" },
+        { "trackNumber": 3, "songId": null, "title": "Estrela que Brilha no Céu da Bahia" },
+        { "trackNumber": 4, "songId": null, "title": "Dendê" },
+        { "trackNumber": 5, "songId": null, "title": "Madeira Boa" },
+        { "trackNumber": 6, "songId": null, "title": "Guerra do Paraguai" },
+        { "trackNumber": 7, "songId": null, "title": "Baraúna Caiu" }
+      ]
+    }
+  ]
+}

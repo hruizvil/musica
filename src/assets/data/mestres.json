@@ -1,0 +1,117 @@
+{
+  "mestres": [
+    {
+      "id": "mestre-camisa",
+      "name": "José Tadeu Carneiro Cardoso",
+      "nickname": "Mestre Camisa",
+      "graduacao": "Mestre",
+      "bio": "Fundador da Abadá Capoeira em 1988, Mestre Camisa é considerado um dos maiores mestres da Capoeira Contemporânea. Nascido em Salvador, Bahia, iniciou na capoeira com Mestre Camisa Roxa (seu irmão) e aprofundou-se com grandes mestres como Mestre Leopoldina e Mestre Canjiquinha. Com mais de 50 anos de capoeira, desenvolveu uma metodologia pedagógica que leva a Abadá a mais de 80 países e 80 mil alunos no mundo. Seu estilo enfatiza a eficiência técnica com slips, takedowns, velocidade e a beleza do jogo.",
+      "birthYear": 1948,
+      "birthPlace": "Salvador, Bahia, Brasil",
+      "lineage": "Formado por Mestre Camisa Roxa; aperfeiçoado com Mestre Canjiquinha e Mestre Leopoldina",
+      "studentOf": "mestre-camisa-roxa",
+      "mestreOf": ["mestre-cobra", "mestre-canguru", "mestre-morcego"],
+      "knownSongs": [],
+      "albums": ["abada-capoeira-vol-1", "abada-capoeira-vol-2", "abada-capoeira-vol-3", "toques-capoeira-abada-2021", "mestre-camisa-50-anos", "homenagem-bimba-pastinha"],
+      "links": {
+        "youtube": "https://www.youtube.com/@abadacapoeira",
+        "instagram": "https://www.instagram.com/abadacapoeira"
+      },
+      "activeAbada": true
+    },
+    {
+      "id": "mestre-camisa-roxa",
+      "name": "Reinaldo Carneiro Cardoso",
+      "nickname": "Grão Mestre Camisa Roxa",
+      "graduacao": "Grão Mestre",
+      "bio": "Irmão mais velho de Mestre Camisa e pioneiro na internacionalização da capoeira, Grão Mestre Camisa Roxa levou a capoeira ao mundo através do grupo Brasil Tropical na década de 1970. Viajou pela Europa e América apresentando a capoeira como manifestação cultural brasileira antes de qualquer outro grupo ter feito isso sistematicamente. Foi formador direto de Mestre Camisa e responsável por plantar as sementes do que viria a ser a Abadá Capoeira.",
+      "birthYear": 1944,
+      "birthPlace": "Salvador, Bahia, Brasil",
+      "lineage": "Discípulo da tradição baiana de capoeira",
+      "studentOf": null,
+      "mestreOf": ["mestre-camisa"],
+      "knownSongs": [],
+      "albums": [],
+      "links": {},
+      "activeAbada": false
+    },
+    {
+      "id": "mestre-cobra",
+      "name": "António Marcelo Rodrigues Trindade",
+      "nickname": "Mestre Cobra",
+      "graduacao": "Mestre",
+      "bio": "Reconhecido como Mestre em 2005, Mestre Cobra trabalhou estreitamente com Mestre Camisa no desenvolvimento de projetos sociais e pedagógicos da Abadá. É conhecido por suas ladainhas e corridos de profundo conteúdo poético, e por sua musicalidade refinada. Suas composições como 'Nego Vai', 'Capim Amassado' e 'Estrela que Brilha no Céu da Bahia' são referências nas rodas de todo o Brasil.",
+      "birthYear": 1963,
+      "birthPlace": "Bahia, Brasil",
+      "lineage": "Formado por Mestre Camisa",
+      "studentOf": "mestre-camisa",
+      "mestreOf": [],
+      "knownSongs": [],
+      "albums": ["cd-mestre-cobra"],
+      "links": {
+        "youtube": "https://www.youtube.com/results?search_query=mestre+cobra+abada+capoeira"
+      },
+      "activeAbada": true
+    },
+    {
+      "id": "mestre-canguru",
+      "name": "Canguru",
+      "nickname": "Mestre Canguru",
+      "graduacao": "Mestre",
+      "bio": "Mestre Canguru é um dos mestres mais ativos da Abadá Capoeira, conhecido pelo seu jogo ágil e suas contribuições para a expansão da Abadá no Brasil e no exterior. Formado diretamente por Mestre Camisa, representa a segunda geração de mestres da Abadá e contribui significativamente para a formação de novos professores.",
+      "birthPlace": "Brasil",
+      "lineage": "Formado por Mestre Camisa",
+      "studentOf": "mestre-camisa",
+      "mestreOf": [],
+      "knownSongs": [],
+      "albums": [],
+      "links": {},
+      "activeAbada": true
+    },
+    {
+      "id": "mestre-morcego",
+      "name": "Morcego",
+      "nickname": "Mestre Morcego",
+      "graduacao": "Mestre",
+      "bio": "Mestre Morcego é referência na Abadá Capoeira pelo seu trabalho pedagógico e pela expansão da organização internacionalmente. Formado por Mestre Camisa, carrega os ensinamentos da Abadá com excelência tanto no jogo quanto na musicalidade.",
+      "birthPlace": "Brasil",
+      "lineage": "Formado por Mestre Camisa",
+      "studentOf": "mestre-camisa",
+      "mestreOf": [],
+      "knownSongs": [],
+      "albums": [],
+      "links": {},
+      "activeAbada": true
+    },
+    {
+      "id": "mestra-cigarra",
+      "name": "Márcia Treidler",
+      "nickname": "Mestra Márcia 'Cigarra'",
+      "graduacao": "Mestra",
+      "bio": "Fundadora da Abadá Capoeira San Francisco em 1987, Mestra Cigarra iniciou na capoeira em 1982 sob a orientação de Mestre Camisa. Em 1990 atingiu o nível mais alto alcançado por uma mulher na Abadá até aquele momento. Com mais de 44 anos de capoeira, é uma das figuras mais importantes na internacionalização e na luta pela igualdade de gênero dentro da capoeira. Sua trajetória é fonte de inspiração para mulheres em todo o mundo da capoeira.",
+      "birthPlace": "Brasil",
+      "lineage": "Formada por Mestre Camisa",
+      "studentOf": "mestre-camisa",
+      "mestreOf": [],
+      "knownSongs": [],
+      "albums": [],
+      "links": {},
+      "activeAbada": true
+    },
+    {
+      "id": "mestra-edna-lima",
+      "name": "Edna Lima",
+      "nickname": "Mestra Edna Lima",
+      "graduacao": "Mestra",
+      "bio": "Mestra Edna Lima é uma das mestras mais respeitadas da capoeira brasileira, conhecida pelo seu trabalho de preservação da Capoeira Angola e por suas pesquisas sobre a história e cultura da capoeira. Contribui com a Abadá e com o universo da capoeira como um todo através de workshops, seminários e publicações.",
+      "birthPlace": "Brasil",
+      "lineage": "Tradição angoleira",
+      "studentOf": null,
+      "mestreOf": [],
+      "knownSongs": [],
+      "albums": [],
+      "links": {},
+      "activeAbada": true
+    }
+  ]
+}

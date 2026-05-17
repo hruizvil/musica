@@ -327,6 +327,9 @@ export class AdminComponent {
     this.saveError.set('');
     this.saveSuccess.set(false);
     try {
+      const audioLinks: Song['audioLinks'] = {};
+      if (this.editYoutube.trim()) audioLinks.youtube = extractYoutubeId(this.editYoutube);
+      if (this.editSpotify.trim()) audioLinks.spotify = normalizeSpotify(this.editSpotify);
       const newSong: Song = {
         id: slugify(this.editTitle),
         title: this.editTitle.trim(),
@@ -338,10 +341,7 @@ export class AdminComponent {
         lyrics: this.editLyrics.trim(),
         translation: this.editTranslation.trim() || null,
         themes: [],
-        audioLinks: {
-          youtube: this.editYoutube.trim() ? extractYoutubeId(this.editYoutube) : undefined,
-          spotify: this.editSpotify.trim() ? normalizeSpotify(this.editSpotify) : undefined,
-        },
+        audioLinks,
         notes: null,
         dateAdded: new Date().toISOString().split('T')[0],
       };

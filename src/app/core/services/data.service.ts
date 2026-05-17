@@ -28,11 +28,13 @@ export class DataService {
   );
 
   private overrides = signal<Map<string, SongOverride>>(new Map());
+  private extraSongs = signal<Song[]>([]);
 
-  readonly songs = computed(() =>
-    this.baseSongs().map(song => {
-      const ov = this.overrides().get(song.id);
-      if (!ov) return song;
+  readonly songs = computed(() => {
+    const overrides = this.overrides();
+    const merged: Song[] = this.baseSongs().map(song => {
+      const ov = overrides.get(song.id);
+      if (!ov || ov.deleted) return ov?.deleted ? null : song;
       return {
         ...song,
         type: (ov.type as Song['type']) ?? song.type,
@@ -43,11 +45,13 @@ export class DataService {
           spotify: ov.spotify ?? song.audioLinks.spotify,
         },
       };
-    })
-  );
+    }).filter((s): s is Song => s !== null);
+
+    const extraFiltered = this.extraSongs().filter(s => !overrides.get(s.id)?.deleted);
+    return [...merged, ...extraFiltered];
+  });
 
   readonly songsLoaded = computed(() => this.baseSongs().length > 0);
-
   readonly songById = computed(() => new Map(this.songs().map(s => [s.id, s])));
   readonly toqueById = computed(() => new Map(this.toques().map(t => [t.id, t])));
 
@@ -74,10 +78,14 @@ export class DataService {
 
   async refreshOverrides(): Promise<void> {
     try {
-      const map = await this.fb.getSongOverrides();
-      this.overrides.set(map);
+      const [overridesMap, extra] = await Promise.all([
+        this.fb.getSongOverrides(),
+        this.fb.getExtraSongs(),
+      ]);
+      this.overrides.set(overridesMap);
+      this.extraSongs.set(extra);
     } catch {
-      // Firebase not configured yet — app works fine with JSON-only data
+      // Firebase not configured — app works with JSON-only data
     }
   }
 }

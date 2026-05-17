@@ -5,9 +5,10 @@ import {
   onAuthStateChanged, User, Auth
 } from 'firebase/auth';
 import {
-  getFirestore, collection, getDocs, setDoc, doc, Firestore
+  getFirestore, collection, getDocs, setDoc, deleteDoc, doc, Firestore
 } from 'firebase/firestore';
 import { environment } from '../../../environments/environment';
+import { Song } from '../models/song.model';
 
 export interface SongOverride {
   youtube?: string;
@@ -15,6 +16,7 @@ export interface SongOverride {
   lyrics?: string;
   translation?: string;
   type?: string;
+  deleted?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -53,7 +55,23 @@ export class FirebaseService {
   }
 
   saveSongOverride(songId: string, fields: SongOverride): Promise<void> {
-    const ref = doc(this.db, 'song_overrides', songId);
-    return setDoc(ref, fields, { merge: true });
+    return setDoc(doc(this.db, 'song_overrides', songId), fields, { merge: true });
+  }
+
+  markDeleted(songId: string): Promise<void> {
+    return setDoc(doc(this.db, 'song_overrides', songId), { deleted: true }, { merge: true });
+  }
+
+  async getExtraSongs(): Promise<Song[]> {
+    const snap = await getDocs(collection(this.db, 'songs_extra'));
+    return snap.docs.map(d => d.data() as Song);
+  }
+
+  saveExtraSong(song: Song): Promise<void> {
+    return setDoc(doc(this.db, 'songs_extra', song.id), song);
+  }
+
+  deleteExtraSong(songId: string): Promise<void> {
+    return deleteDoc(doc(this.db, 'songs_extra', songId));
   }
 }

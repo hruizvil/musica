@@ -52,6 +52,9 @@ const TYPE_DOT: Record<string, string> = {
             <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide">{{ data.songs().length }} músicas — selecione uma</p>
           </div>
           <div class="divide-y divide-stone-100 dark:divide-stone-700 max-h-[75vh] overflow-y-auto">
+            @if (!data.songsLoaded()) {
+              <p class="px-4 py-6 text-sm text-stone-400 text-center">Carregando...</p>
+            }
             @for (song of data.songs(); track song.id) {
               <button
                 (click)="selectSong(song)"

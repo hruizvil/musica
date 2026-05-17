@@ -13,17 +13,17 @@ export class DataService {
   private fb = inject(FirebaseService);
 
   private baseSongs = toSignal(
-    this.http.get<{ songs: Song[] }>('/assets/data/songs.json').pipe(map(r => r.songs)),
+    this.http.get<{ songs: Song[] }>('assets/data/songs.json').pipe(map(r => r.songs)),
     { initialValue: [] as Song[] }
   );
 
   readonly toques = toSignal(
-    this.http.get<{ toques: Toque[] }>('/assets/data/toques.json').pipe(map(r => r.toques)),
+    this.http.get<{ toques: Toque[] }>('assets/data/toques.json').pipe(map(r => r.toques)),
     { initialValue: [] as Toque[] }
   );
 
   readonly videos = toSignal(
-    this.http.get<{ videos: Video[] }>('/assets/data/videos.json').pipe(map(r => r.videos)),
+    this.http.get<{ videos: Video[] }>('assets/data/videos.json').pipe(map(r => r.videos)),
     { initialValue: [] as Video[] }
   );
 
@@ -45,6 +45,8 @@ export class DataService {
       };
     })
   );
+
+  readonly songsLoaded = computed(() => this.baseSongs().length > 0);
 
   readonly songById = computed(() => new Map(this.songs().map(s => [s.id, s])));
   readonly toqueById = computed(() => new Map(this.toques().map(t => [t.id, t])));

@@ -43,15 +43,15 @@ const TYPE_DOT: Record<string, string> = {
         </button>
       </div>
 
-      <!-- Two-column layout -->
-      <div class="flex gap-4 items-start">
+      <!-- Two-column layout: stacks on mobile, side-by-side on md+ -->
+      <div class="flex flex-col md:flex-row gap-4 items-start">
 
-        <!-- LEFT: song list -->
-        <div class="w-72 shrink-0 bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
+        <!-- Song list -->
+        <div class="w-full md:w-72 md:shrink-0 bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
           <div class="px-4 py-2 border-b border-stone-100 dark:border-stone-700">
             <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide">{{ data.songs().length }} músicas — selecione uma</p>
           </div>
-          <div class="divide-y divide-stone-100 dark:divide-stone-700 max-h-[75vh] overflow-y-auto">
+          <div class="divide-y divide-stone-100 dark:divide-stone-700 max-h-64 md:max-h-[75vh] overflow-y-auto">
             @if (!data.songsLoaded()) {
               <p class="px-4 py-6 text-sm text-stone-400 text-center">Carregando...</p>
             }
@@ -71,8 +71,8 @@ const TYPE_DOT: Record<string, string> = {
           </div>
         </div>
 
-        <!-- RIGHT: edit panel -->
-        <div class="flex-1 min-w-0">
+        <!-- Edit panel -->
+        <div class="w-full md:flex-1 md:min-w-0">
           @if (!selectedSong()) {
             <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 p-10 text-center">
               <p class="text-stone-400 text-sm">← Selecione uma música na lista para editar</p>

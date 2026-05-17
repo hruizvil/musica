@@ -10,17 +10,17 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
   imports: [RouterLink, RouterLinkActive, SearchBarComponent],
   template: `
     <header class="sticky top-0 z-50 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 shadow-sm">
-      <div class="max-w-6xl mx-auto px-4 h-16 flex items-center gap-4">
+      <div class="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
 
         <!-- Logo -->
-        <a routerLink="/" class="flex items-center gap-2 shrink-0">
+        <a routerLink="/" class="flex items-center shrink-0">
           <span class="font-display text-lg font-bold text-capoeira-brown dark:text-capoeira-gold leading-tight">
-            Abadá<br class="hidden sm:block"><span class="text-capoeira-gold dark:text-capoeira-cream"> Música</span>
+            Abadá <span class="text-capoeira-gold dark:text-capoeira-cream">Música</span>
           </span>
         </a>
 
         <!-- Desktop nav -->
-        <nav class="hidden md:flex items-center gap-1 text-sm font-medium ml-4">
+        <nav class="hidden md:flex items-center gap-1 text-sm font-medium ml-2">
           @for (link of navLinks; track link.path) {
             <a [routerLink]="link.path" routerLinkActive="text-capoeira-gold"
                class="px-3 py-1.5 rounded-md text-stone-600 dark:text-stone-300 hover:text-capoeira-brown dark:hover:text-capoeira-cream hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
@@ -35,13 +35,15 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
           }
         </nav>
 
-        <!-- Search -->
-        <div class="flex-1 max-w-sm ml-auto">
+        <!-- Desktop search -->
+        <div class="hidden md:block flex-1 max-w-sm ml-auto">
           <app-search-bar />
         </div>
 
         <!-- Dark mode toggle -->
-        <button (click)="theme.toggle()" class="p-2 rounded-md text-stone-500 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors" aria-label="Alternar tema">
+        <button (click)="theme.toggle()"
+          class="ml-auto md:ml-0 p-2 rounded-md text-stone-500 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          aria-label="Alternar tema">
           @if (theme.isDark()) {
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
           } @else {
@@ -57,23 +59,29 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
         </button>
       </div>
 
-      <!-- Mobile nav -->
+      <!-- Mobile menu -->
       @if (mobileOpen()) {
-        <nav class="md:hidden border-t border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-4 py-2 flex flex-col gap-1">
-          @for (link of navLinks; track link.path) {
-            <a [routerLink]="link.path" routerLinkActive="text-capoeira-gold"
-               (click)="mobileOpen.set(false)"
-               class="px-3 py-2 rounded-md text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 text-sm font-medium">
-              {{ link.label }}
-            </a>
-          }
-          @if (firebase.currentUser()) {
-            <a routerLink="/admin" (click)="mobileOpen.set(false)"
-               class="px-3 py-2 rounded-md text-capoeira-gold hover:bg-capoeira-gold/10 text-sm font-semibold">
-              Admin
-            </a>
-          }
-        </nav>
+        <div class="md:hidden border-t border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-4 py-3 space-y-2">
+          <!-- Mobile search -->
+          <app-search-bar />
+
+          <!-- Mobile nav links -->
+          <nav class="flex flex-col gap-1 pt-1">
+            @for (link of navLinks; track link.path) {
+              <a [routerLink]="link.path" routerLinkActive="text-capoeira-gold"
+                 (click)="mobileOpen.set(false)"
+                 class="px-3 py-2 rounded-md text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 text-sm font-medium">
+                {{ link.label }}
+              </a>
+            }
+            @if (firebase.currentUser()) {
+              <a routerLink="/admin" (click)="mobileOpen.set(false)"
+                 class="px-3 py-2 rounded-md text-capoeira-gold hover:bg-capoeira-gold/10 text-sm font-semibold">
+                Admin
+              </a>
+            }
+          </nav>
+        </div>
       }
     </header>
   `,

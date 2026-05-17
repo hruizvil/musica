@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build -- --base-href /capoeira-musica-library/
+        run: npm run build -- --base-href /musica/
 
       - name: Fix SPA routing (copy index.html to 404.html)
         run: cp dist/capoeira-musica-library/browser/index.html dist/capoeira-musica-library/browser/404.html

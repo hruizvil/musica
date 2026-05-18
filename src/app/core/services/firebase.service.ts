@@ -11,6 +11,7 @@ import { environment } from '../../../environments/environment';
 import { Song } from '../models/song.model';
 
 export interface SongOverride {
+  title?: string;
   youtube?: string;
   spotify?: string;
   lyrics?: string;

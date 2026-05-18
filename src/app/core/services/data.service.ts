@@ -37,6 +37,7 @@ export class DataService {
       if (!ov || ov.deleted) return ov?.deleted ? null : song;
       return {
         ...song,
+        title: ov.title ?? song.title,
         type: (ov.type as Song['type']) ?? song.type,
         lyrics: ov.lyrics ?? song.lyrics,
         translation: ov.translation ?? song.translation,
@@ -52,6 +53,7 @@ export class DataService {
   });
 
   readonly songsLoaded = computed(() => this.baseSongs().length > 0);
+  readonly extraSongIds = computed(() => new Set(this.extraSongs().map(s => s.id)));
   readonly songById = computed(() => new Map(this.songs().map(s => [s.id, s])));
   readonly toqueById = computed(() => new Map(this.toques().map(t => [t.id, t])));
 

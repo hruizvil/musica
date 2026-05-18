@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -28,9 +28,6 @@ function slugify(title: string): string {
     + '-' + Date.now().toString(36);
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  ladainha: 'Ladainha', corrido: 'Corrido', louvacao: 'Louvação', quadra: 'Quadra'
-};
 const TYPE_DOT: Record<string, string> = {
   ladainha: 'bg-amber-400', corrido: 'bg-emerald-400',
   louvacao: 'bg-sky-400',   quadra:  'bg-purple-400',
@@ -65,18 +62,35 @@ type PanelMode = 'none' | 'edit' | 'add';
 
         <!-- Song list -->
         <div class="w-full md:w-72 md:shrink-0 bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
-          <div class="px-4 py-2 border-b border-stone-100 dark:border-stone-700">
-            <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide">{{ data.songs().length }} músicas</p>
+
+          <!-- Filter header -->
+          <div class="px-3 py-2 border-b border-stone-100 dark:border-stone-700 space-y-2">
+            <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide">
+              {{ filteredSongs().length === data.songs().length
+                  ? data.songs().length + ' músicas'
+                  : filteredSongs().length + ' / ' + data.songs().length + ' músicas' }}
+            </p>
+            <input
+              type="search"
+              [ngModel]="filterQuery()"
+              (ngModelChange)="filterQuery.set($event)"
+              placeholder="Filtrar..."
+              class="w-full px-2.5 py-1.5 rounded-md border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-xs placeholder-stone-300 focus:outline-none focus:ring-1 focus:ring-capoeira-gold"
+            />
           </div>
+
           <div class="divide-y divide-stone-100 dark:divide-stone-700 overflow-y-auto md:max-h-[75vh]">
             @if (!data.songsLoaded()) {
               <p class="px-4 py-6 text-sm text-stone-400 text-center">Carregando...</p>
             }
-            @for (song of data.songs(); track song.id) {
-              <div class="flex items-center group hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors"
-                   [class.bg-amber-50]="selectedSong()?.id === song.id"
-                   [class.dark:bg-stone-700]="selectedSong()?.id === song.id">
-                <button (click)="selectSong(song)" class="flex-1 flex items-center gap-3 px-4 py-2.5 text-left min-w-0">
+            @for (song of filteredSongs(); track song.id) {
+              <div class="flex items-center group transition-colors"
+                   [class]="selectedSong()?.id === song.id
+                     ? 'bg-amber-50 dark:bg-stone-700/60 border-l-2 border-capoeira-gold'
+                     : 'hover:bg-stone-50 dark:hover:bg-stone-700/50'">
+                <button (click)="selectSong(song)"
+                        [title]="song.title"
+                        class="flex-1 flex items-center gap-3 px-4 py-2.5 text-left min-w-0">
                   <span class="w-2 h-2 rounded-full shrink-0" [class]="dot(song.type)"></span>
                   <span class="flex-1 text-sm text-stone-700 dark:text-stone-200 truncate">{{ song.title }}</span>
                   <span class="text-xs shrink-0" [class]="song.audioLinks.youtube ? 'text-emerald-500' : 'text-stone-300'">
@@ -91,6 +105,10 @@ type PanelMode = 'none' | 'edit' | 'add';
                   </svg>
                 </button>
               </div>
+            } @empty {
+              @if (data.songsLoaded()) {
+                <p class="px-4 py-4 text-xs text-stone-400 text-center">Nenhum resultado.</p>
+              }
             }
           </div>
         </div>
@@ -106,12 +124,16 @@ type PanelMode = 'none' | 'edit' | 'add';
 
           @if (panelMode() === 'edit' && selectedSong()) {
             <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 p-6 space-y-5">
-              <div class="flex items-start justify-between gap-4">
-                <div>
-                  <p class="text-xs text-stone-400 mb-0.5">Editando</p>
-                  <h2 class="font-display text-xl font-bold text-capoeira-brown dark:text-capoeira-cream">{{ selectedSong()!.title }}</h2>
-                </div>
-                <button (click)="closePanel()" class="text-stone-300 hover:text-stone-500 text-xl leading-none shrink-0 mt-1">✕</button>
+              <div class="flex items-center justify-between gap-4">
+                <p class="text-xs text-stone-400">Editando música</p>
+                <button (click)="closePanel()" class="text-stone-300 hover:text-stone-500 text-xl leading-none shrink-0">✕</button>
+              </div>
+
+              <!-- Title field (edit-panel-only, not in shared template) -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Título</label>
+                <input type="text" [(ngModel)]="editTitle" name="editTitle"
+                  class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
               </div>
 
               <ng-container *ngTemplateOutlet="formFields" />
@@ -198,7 +220,7 @@ type PanelMode = 'none' | 'edit' | 'add';
       }
     </div>
 
-    <!-- Shared form fields template -->
+    <!-- Shared form fields (type, youtube, spotify, lyrics, translation) -->
     <ng-template #formFields>
       <div class="space-y-1.5">
         <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Tipo</label>
@@ -253,6 +275,13 @@ export class AdminComponent {
   panelMode = signal<PanelMode>('none');
   selectedSong = signal<Song | null>(null);
   deleteTarget = signal<Song | null>(null);
+  filterQuery = signal('');
+
+  readonly filteredSongs = computed(() => {
+    const q = this.filterQuery().toLowerCase().trim();
+    if (!q) return this.data.songs();
+    return this.data.songs().filter(s => s.title.toLowerCase().includes(q));
+  });
 
   editTitle = '';
   editType = 'corrido';
@@ -307,13 +336,33 @@ export class AdminComponent {
     this.saveError.set('');
     this.saveSuccess.set(false);
     try {
-      const override: SongOverride = { type: this.editType };
-      if (this.editYoutube.trim()) override.youtube = extractYoutubeId(this.editYoutube);
-      if (this.editSpotify.trim()) override.spotify = normalizeSpotify(this.editSpotify);
-      if (this.editLyrics.trim()) override.lyrics = this.editLyrics.trim();
-      if (this.editTranslation.trim()) override.translation = this.editTranslation.trim();
-      await this.fb.saveSongOverride(song.id, override);
+      if (this.data.extraSongIds().has(song.id)) {
+        const audioLinks: Song['audioLinks'] = {};
+        if (this.editYoutube.trim()) audioLinks.youtube = extractYoutubeId(this.editYoutube);
+        if (this.editSpotify.trim()) audioLinks.spotify = normalizeSpotify(this.editSpotify);
+        const updated: Song = {
+          ...song,
+          title: this.editTitle.trim() || song.title,
+          type: this.editType as Song['type'],
+          lyrics: this.editLyrics.trim(),
+          translation: this.editTranslation.trim() || null,
+          audioLinks,
+        };
+        await this.fb.saveExtraSong(updated);
+      } else {
+        const override: SongOverride = { type: this.editType };
+        if (this.editTitle.trim() && this.editTitle.trim() !== song.title) {
+          override.title = this.editTitle.trim();
+        }
+        if (this.editYoutube.trim()) override.youtube = extractYoutubeId(this.editYoutube);
+        if (this.editSpotify.trim()) override.spotify = normalizeSpotify(this.editSpotify);
+        if (this.editLyrics.trim()) override.lyrics = this.editLyrics.trim();
+        if (this.editTranslation.trim()) override.translation = this.editTranslation.trim();
+        await this.fb.saveSongOverride(song.id, override);
+      }
       await this.data.refreshOverrides();
+      const refreshed = this.data.songById().get(song.id);
+      if (refreshed) this.selectedSong.set(refreshed);
       this.saveSuccess.set(true);
     } catch {
       this.saveError.set('Erro ao salvar. Verifique sua conexão.');
@@ -370,13 +419,16 @@ export class AdminComponent {
     if (!song) return;
     this.saving.set(true);
     try {
-      const isExtra = !this.data['baseSongs' as never];
-      await this.fb.markDeleted(song.id);
-      await this.fb.deleteExtraSong(song.id).catch(() => {});
+      if (this.data.extraSongIds().has(song.id)) {
+        await this.fb.deleteExtraSong(song.id);
+      } else {
+        await this.fb.markDeleted(song.id);
+      }
       await this.data.refreshOverrides();
       this.deleteTarget.set(null);
       if (this.selectedSong()?.id === song.id) this.closePanel();
     } catch {
+      // silently ignore delete errors
     } finally {
       this.saving.set(false);
     }
@@ -387,6 +439,5 @@ export class AdminComponent {
     this.router.navigate(['/admin/login']);
   }
 
-  typeLabel(type: string) { return TYPE_LABELS[type] ?? type; }
   dot(type: string) { return TYPE_DOT[type] ?? 'bg-stone-300'; }
 }

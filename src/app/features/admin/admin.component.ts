@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
@@ -40,7 +41,7 @@ type PanelMode = 'none' | 'edit' | 'add';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, NgTemplateOutlet],
   template: `
     <div class="space-y-4">
 

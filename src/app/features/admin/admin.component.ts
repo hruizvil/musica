@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
@@ -38,7 +38,7 @@ type PanelMode = 'none' | 'edit' | 'add';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [FormsModule, NgTemplateOutlet],
+  imports: [FormsModule, NgClass, NgTemplateOutlet],
   template: `
     <div class="space-y-4">
 
@@ -85,7 +85,7 @@ type PanelMode = 'none' | 'edit' | 'add';
             }
             @for (song of filteredSongs(); track song.id) {
               <div class="flex items-center group transition-colors"
-                   [class]="selectedSong()?.id === song.id
+                   [ngClass]="selectedSong()?.id === song.id
                      ? 'bg-amber-50 dark:bg-stone-700/60 border-l-2 border-capoeira-gold'
                      : 'hover:bg-stone-50 dark:hover:bg-stone-700/50'">
                 <button (click)="selectSong(song)"
@@ -129,7 +129,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                 <button (click)="closePanel()" class="text-stone-300 hover:text-stone-500 text-xl leading-none shrink-0">✕</button>
               </div>
 
-              <!-- Title field (edit-panel-only, not in shared template) -->
+              <!-- Title (edit only — not in shared template) -->
               <div class="space-y-1.5">
                 <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Título</label>
                 <input type="text" [(ngModel)]="editTitle" name="editTitle"
@@ -220,8 +220,10 @@ type PanelMode = 'none' | 'edit' | 'add';
       }
     </div>
 
-    <!-- Shared form fields (type, youtube, spotify, lyrics, translation) -->
+    <!-- Shared form fields -->
     <ng-template #formFields>
+
+      <!-- Type -->
       <div class="space-y-1.5">
         <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Tipo</label>
         <select [(ngModel)]="editType" name="type"
@@ -233,6 +235,31 @@ type PanelMode = 'none' | 'edit' | 'add';
         </select>
       </div>
 
+      <!-- Toques -->
+      <div class="space-y-2">
+        <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Toques</label>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          @for (toque of data.toques(); track toque.id) {
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox"
+                [checked]="isToqueSelected(toque.id)"
+                (change)="toggleToque(toque.id)"
+                class="w-4 h-4 rounded border-stone-300 text-capoeira-gold accent-capoeira-gold cursor-pointer" />
+              <span class="text-sm text-stone-700 dark:text-stone-200">{{ toque.name }}</span>
+            </label>
+          }
+        </div>
+      </div>
+
+      <!-- Por (Mestre / Compositor) -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Por <span class="normal-case font-normal">(Mestre / Compositor)</span></label>
+        <input type="text" [(ngModel)]="editMestre" name="mestre"
+          placeholder="ex: Mestre Bimba, Professor Coala..."
+          class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
+      </div>
+
+      <!-- YouTube + Spotify -->
       <div class="grid sm:grid-cols-2 gap-4">
         <div class="space-y-1.5">
           <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">YouTube (URL ou ID)</label>
@@ -251,6 +278,7 @@ type PanelMode = 'none' | 'edit' | 'add';
         </div>
       </div>
 
+      <!-- Letra -->
       <div class="space-y-1.5">
         <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Letra</label>
         <textarea [(ngModel)]="editLyrics" name="lyrics" rows="8"
@@ -258,6 +286,7 @@ type PanelMode = 'none' | 'edit' | 'add';
         </textarea>
       </div>
 
+      <!-- Tradução -->
       <div class="space-y-1.5">
         <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Tradução <span class="normal-case font-normal">(opcional)</span></label>
         <textarea [(ngModel)]="editTranslation" name="translation" rows="4"
@@ -285,6 +314,8 @@ export class AdminComponent {
 
   editTitle = '';
   editType = 'corrido';
+  editToque: string[] = [];
+  editMestre = '';
   editYoutube = '';
   editSpotify = '';
   editLyrics = '';
@@ -294,11 +325,23 @@ export class AdminComponent {
   saveError = signal('');
   saveSuccess = signal(false);
 
+  isToqueSelected(id: string): boolean {
+    return this.editToque.includes(id);
+  }
+
+  toggleToque(id: string): void {
+    this.editToque = this.editToque.includes(id)
+      ? this.editToque.filter(t => t !== id)
+      : [...this.editToque, id];
+  }
+
   selectSong(song: Song) {
     this.panelMode.set('edit');
     this.selectedSong.set(song);
     this.editTitle = song.title;
     this.editType = song.type;
+    this.editToque = [...song.toque];
+    this.editMestre = song.mestre ?? '';
     this.editYoutube = song.audioLinks.youtube ?? '';
     this.editSpotify = song.audioLinks.spotify ?? '';
     this.editLyrics = song.lyrics ?? '';
@@ -312,6 +355,8 @@ export class AdminComponent {
     this.selectedSong.set(null);
     this.editTitle = '';
     this.editType = 'corrido';
+    this.editToque = [];
+    this.editMestre = '';
     this.editYoutube = '';
     this.editSpotify = '';
     this.editLyrics = '';
@@ -344,6 +389,8 @@ export class AdminComponent {
           ...song,
           title: this.editTitle.trim() || song.title,
           type: this.editType as Song['type'],
+          toque: this.editToque,
+          mestre: this.editMestre.trim() || null,
           lyrics: this.editLyrics.trim(),
           translation: this.editTranslation.trim() || null,
           audioLinks,
@@ -354,6 +401,8 @@ export class AdminComponent {
         if (this.editTitle.trim() && this.editTitle.trim() !== song.title) {
           override.title = this.editTitle.trim();
         }
+        if (this.editToque.length) override.toque = this.editToque;
+        if (this.editMestre.trim()) override.mestre = this.editMestre.trim();
         if (this.editYoutube.trim()) override.youtube = extractYoutubeId(this.editYoutube);
         if (this.editSpotify.trim()) override.spotify = normalizeSpotify(this.editSpotify);
         if (this.editLyrics.trim()) override.lyrics = this.editLyrics.trim();
@@ -384,8 +433,8 @@ export class AdminComponent {
         id: slugify(this.editTitle),
         title: this.editTitle.trim(),
         type: this.editType as Song['type'],
-        toque: [],
-        mestre: null,
+        toque: this.editToque,
+        mestre: this.editMestre.trim() || null,
         composer: null,
         album: null,
         lyrics: this.editLyrics.trim(),
@@ -399,6 +448,8 @@ export class AdminComponent {
       await this.data.refreshOverrides();
       this.saveSuccess.set(true);
       this.editTitle = '';
+      this.editToque = [];
+      this.editMestre = '';
       this.editLyrics = '';
       this.editYoutube = '';
       this.editSpotify = '';

@@ -12,11 +12,13 @@ import { Song } from '../models/song.model';
 
 export interface SongOverride {
   title?: string;
+  type?: string;
+  toque?: string[];
+  mestre?: string;
   youtube?: string;
   spotify?: string;
   lyrics?: string;
   translation?: string;
-  type?: string;
   deleted?: boolean;
 }
 

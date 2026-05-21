@@ -1,11 +1,13 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import {
   getAuth, signInWithEmailAndPassword, signOut as fbSignOut,
-  onAuthStateChanged, User, Auth
+  onAuthStateChanged, User, Auth,
+  GoogleAuthProvider, signInWithPopup,
+  createUserWithEmailAndPassword, updateProfile,
 } from 'firebase/auth';
 import {
-  getFirestore, collection, getDocs, setDoc, deleteDoc, doc, Firestore
+  getFirestore, collection, getDocs, setDoc, deleteDoc, doc, getDoc, Firestore
 } from 'firebase/firestore';
 import { environment } from '../../../environments/environment';
 import { Song } from '../models/song.model';
@@ -29,17 +31,28 @@ export class FirebaseService {
   private db: Firestore;
 
   readonly currentUser = signal<User | null>(null);
+  readonly membershipActive = signal<boolean>(false);
+  readonly isAdmin = computed(() => this.currentUser()?.email === environment.adminEmail);
 
   constructor() {
     this.app = initializeApp(environment.firebase);
     this.auth = getAuth(this.app);
     this.db = getFirestore(this.app);
-    onAuthStateChanged(this.auth, user => this.currentUser.set(user));
+    onAuthStateChanged(this.auth, async user => {
+      this.currentUser.set(user);
+      if (user && user.email !== environment.adminEmail) {
+        await this.loadMembership(user.uid);
+      } else {
+        this.membershipActive.set(false);
+      }
+    });
   }
 
   waitForAuthReady(): Promise<void> {
     return this.auth.authStateReady();
   }
+
+  // ── Admin auth ────────────────────────────────────────────────────────────
 
   signIn(password: string): Promise<void> {
     return signInWithEmailAndPassword(this.auth, environment.adminEmail, password)
@@ -49,6 +62,49 @@ export class FirebaseService {
   signOut(): Promise<void> {
     return fbSignOut(this.auth);
   }
+
+  // ── Public user auth ──────────────────────────────────────────────────────
+
+  async signInWithGoogle(): Promise<void> {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(this.auth, provider);
+    await this.ensureUserDoc(result.user);
+  }
+
+  async signInWithEmailPublic(email: string, password: string): Promise<void> {
+    const result = await signInWithEmailAndPassword(this.auth, email, password);
+    await this.ensureUserDoc(result.user);
+  }
+
+  async signUpWithEmailPublic(email: string, password: string, displayName: string): Promise<void> {
+    const result = await createUserWithEmailAndPassword(this.auth, email, password);
+    await updateProfile(result.user, { displayName });
+    await this.ensureUserDoc(result.user);
+  }
+
+  private async ensureUserDoc(user: User): Promise<void> {
+    const ref = doc(this.db, 'users', user.uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      await setDoc(ref, {
+        email: user.email ?? '',
+        displayName: user.displayName ?? '',
+        membershipActive: false,
+        createdAt: new Date().toISOString(),
+      });
+    }
+  }
+
+  private async loadMembership(uid: string): Promise<void> {
+    try {
+      const snap = await getDoc(doc(this.db, 'users', uid));
+      this.membershipActive.set(snap.data()?.['membershipActive'] === true);
+    } catch {
+      this.membershipActive.set(false);
+    }
+  }
+
+  // ── Firestore: song overrides & extra songs ───────────────────────────────
 
   async getSongOverrides(): Promise<Map<string, SongOverride>> {
     const snap = await getDocs(collection(this.db, 'song_overrides'));

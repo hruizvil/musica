@@ -54,6 +54,12 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
         <!-- User area (desktop) -->
         <div class="hidden md:flex items-center gap-2">
           @if (firebase.currentUser() && !firebase.isAdmin()) {
+            @if (!firebase.membershipActive()) {
+              <a routerLink="/membership"
+                 class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-capoeira-gold text-capoeira-brown hover:bg-capoeira-gold/90 transition-colors">
+                Seja Membro
+              </a>
+            }
             <span class="w-7 h-7 rounded-full bg-capoeira-gold/20 text-capoeira-brown dark:text-capoeira-gold text-xs font-bold flex items-center justify-center"
                   [title]="firebase.currentUser()?.displayName || firebase.currentUser()?.email || ''">
               {{ userInitial() }}
@@ -99,6 +105,12 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
               </a>
             }
             @if (firebase.currentUser() && !firebase.isAdmin()) {
+              @if (!firebase.membershipActive()) {
+                <a routerLink="/membership" (click)="mobileOpen.set(false)"
+                   class="px-3 py-2 rounded-md text-center bg-capoeira-gold text-capoeira-brown text-sm font-semibold">
+                  Seja Membro
+                </a>
+              }
               <div class="flex items-center justify-between px-3 py-2 border-t border-stone-100 dark:border-stone-700 mt-1 pt-2">
                 <span class="text-sm text-stone-600 dark:text-stone-300 flex items-center gap-2">
                   <span class="w-6 h-6 rounded-full bg-capoeira-gold/20 text-capoeira-brown dark:text-capoeira-gold text-xs font-bold flex items-center justify-center">

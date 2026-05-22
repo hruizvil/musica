@@ -32,6 +32,14 @@ export const routes: Routes = [
         loadComponent: () => import('./features/videos/video-list/video-list.component').then(m => m.VideoListComponent),
       },
       {
+        path: 'membership',
+        loadComponent: () => import('./features/membership/membership.component').then(m => m.MembershipComponent),
+      },
+      {
+        path: 'membership/success',
+        loadComponent: () => import('./features/membership/membership-success.component').then(m => m.MembershipSuccessComponent),
+      },
+      {
         path: 'login',
         loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent),
       },

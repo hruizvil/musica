@@ -22,6 +22,7 @@ export interface SongOverride {
   lyrics?: string;
   translation?: string;
   deleted?: boolean;
+  preview?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

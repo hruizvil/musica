@@ -293,6 +293,15 @@ type PanelMode = 'none' | 'edit' | 'add';
           class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold resize-y">
         </textarea>
       </div>
+
+      <!-- Preview -->
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" [(ngModel)]="editPreview" name="preview"
+          class="w-4 h-4 rounded accent-capoeira-gold cursor-pointer" />
+        <span class="text-sm text-stone-700 dark:text-stone-200">
+          Preview <span class="text-stone-400 font-normal">(visível sem assinatura)</span>
+        </span>
+      </label>
     </ng-template>
   `,
 })
@@ -320,6 +329,7 @@ export class AdminComponent {
   editSpotify = '';
   editLyrics = '';
   editTranslation = '';
+  editPreview = false;
 
   saving = signal(false);
   saveError = signal('');
@@ -346,6 +356,7 @@ export class AdminComponent {
     this.editSpotify = song.audioLinks.spotify ?? '';
     this.editLyrics = song.lyrics ?? '';
     this.editTranslation = song.translation ?? '';
+    this.editPreview = song.preview ?? false;
     this.saveError.set('');
     this.saveSuccess.set(false);
   }
@@ -361,6 +372,7 @@ export class AdminComponent {
     this.editSpotify = '';
     this.editLyrics = '';
     this.editTranslation = '';
+    this.editPreview = false;
     this.saveError.set('');
     this.saveSuccess.set(false);
   }
@@ -393,11 +405,12 @@ export class AdminComponent {
           mestre: this.editMestre.trim() || null,
           lyrics: this.editLyrics.trim(),
           translation: this.editTranslation.trim() || null,
+          preview: this.editPreview,
           audioLinks,
         };
         await this.fb.saveExtraSong(updated);
       } else {
-        const override: SongOverride = { type: this.editType };
+        const override: SongOverride = { type: this.editType, preview: this.editPreview };
         if (this.editTitle.trim() && this.editTitle.trim() !== song.title) {
           override.title = this.editTitle.trim();
         }
@@ -442,6 +455,7 @@ export class AdminComponent {
         themes: [],
         audioLinks,
         notes: null,
+        preview: this.editPreview,
         dateAdded: new Date().toISOString().split('T')[0],
       };
       await this.fb.saveExtraSong(newSong);
@@ -454,6 +468,7 @@ export class AdminComponent {
       this.editYoutube = '';
       this.editSpotify = '';
       this.editTranslation = '';
+      this.editPreview = false;
     } catch {
       this.saveError.set('Erro ao adicionar. Verifique sua conexão.');
     } finally {

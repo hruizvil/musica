@@ -19,4 +19,5 @@ export interface Song {
   audioLinks: AudioLinks;
   notes: string | null;
   dateAdded: string;
+  preview?: boolean;
 }

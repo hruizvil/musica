@@ -2,9 +2,10 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SearchService } from '../../../core/services/search.service';
 import { DataService } from '../../../core/services/data.service';
+import { FirebaseService } from '../../../core/services/firebase.service';
 import { FilterChipComponent } from '../../../shared/components/filter-chip/filter-chip.component';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
-import { SongType } from '../../../core/models/song.model';
+import { Song, SongType } from '../../../core/models/song.model';
 
 const SONG_TYPE_LABELS: Record<SongType, string> = {
   ladainha: 'Ladainha', corrido: 'Corrido', louvacao: 'Louvação', quadra: 'Quadra'
@@ -56,17 +57,33 @@ const SONG_TYPE_LABELS: Record<SongType, string> = {
       <!-- Song grid -->
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         @for (song of search.filteredSongs(); track song.id) {
-          <a [routerLink]="['/musicas', song.id]"
-             class="group flex flex-col gap-2 p-3 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:border-capoeira-gold hover:shadow-sm transition-all">
-            <div class="flex items-center justify-between">
-              <span class="w-2 h-2 rounded-full shrink-0" [class]="typeDot(song.type)"></span>
-              <span class="text-xs text-stone-400">{{ typeLabel(song.type) }}</span>
+          @if (isAccessible(song)) {
+            <a [routerLink]="['/musicas', song.id]"
+               class="group flex flex-col gap-2 p-3 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:border-capoeira-gold hover:shadow-sm transition-all">
+              <div class="flex items-center justify-between">
+                <span class="w-2 h-2 rounded-full shrink-0" [class]="typeDot(song.type)"></span>
+                <span class="text-xs text-stone-400">{{ typeLabel(song.type) }}</span>
+              </div>
+              <span class="text-sm font-semibold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug line-clamp-2">{{ song.title }}</span>
+              @if (song.toque.length) {
+                <span class="text-xs text-stone-400 truncate mt-auto">{{ toqueName(song.toque[0]) }}</span>
+              }
+            </a>
+          } @else {
+            <div class="flex flex-col gap-2 p-3 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 opacity-60 cursor-default">
+              <div class="flex items-center justify-between">
+                <svg class="w-3 h-3 text-stone-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                </svg>
+                <span class="text-xs text-stone-400">{{ typeLabel(song.type) }}</span>
+              </div>
+              <span class="text-sm font-semibold text-stone-600 dark:text-stone-400 leading-snug line-clamp-2">{{ song.title }}</span>
+              <a routerLink="/membership"
+                 class="text-xs text-capoeira-gold hover:underline mt-auto opacity-100 cursor-pointer">
+                Seja Membro →
+              </a>
             </div>
-            <span class="text-sm font-semibold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug line-clamp-2">{{ song.title }}</span>
-            @if (song.toque.length) {
-              <span class="text-xs text-stone-400 truncate mt-auto">{{ toqueName(song.toque[0]) }}</span>
-            }
-          </a>
+          }
         } @empty {
           <p class="col-span-full text-center text-stone-400 py-8">Nenhuma música encontrada.</p>
         }
@@ -77,8 +94,13 @@ const SONG_TYPE_LABELS: Record<SongType, string> = {
 export class SongListComponent {
   search = inject(SearchService);
   data = inject(DataService);
+  firebase = inject(FirebaseService);
 
   songTypes = Object.entries(SONG_TYPE_LABELS).map(([value, label]) => ({ value: value as SongType, label }));
+
+  isAccessible(song: Song): boolean {
+    return !!song.preview || this.firebase.membershipActive() || this.firebase.isAdmin();
+  }
 
   typeLabel(type: string): string {
     return SONG_TYPE_LABELS[type as SongType] ?? type;
@@ -86,12 +108,6 @@ export class SongListComponent {
 
   toqueName(id: string): string {
     return this.data.toqueById().get(id)?.name ?? id;
-  }
-
-  rowMeta(song: { type: string; toque: string[] }): string {
-    const parts = [this.typeLabel(song.type)];
-    if (song.toque.length) parts.push(this.toqueName(song.toque[0]));
-    return parts.join(' · ');
   }
 
   typeDot(type: string): string {

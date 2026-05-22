@@ -1,10 +1,15 @@
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env['STRIPE_SECRET_KEY'] as string);
-const PRICE_ID = process.env['STRIPE_PRICE_ID'] as string;
-
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).end();
+
+  const stripeKey = process.env['STRIPE_SECRET_KEY'];
+  const PRICE_ID = process.env['STRIPE_PRICE_ID'];
+
+  if (!stripeKey) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY env var' });
+  if (!PRICE_ID) return res.status(500).json({ error: 'Missing STRIPE_PRICE_ID env var' });
+
+  const stripe = new Stripe(stripeKey);
 
   const { uid, email } = req.body ?? {};
   if (!uid || !email) return res.status(400).json({ error: 'Missing uid or email' });

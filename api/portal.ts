@@ -2,16 +2,21 @@ import Stripe from 'stripe';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
-const stripe = new Stripe(process.env['STRIPE_SECRET_KEY'] as string);
-
-if (!getApps().length) {
-  initializeApp({
-    credential: cert(JSON.parse(process.env['FIREBASE_SERVICE_ACCOUNT'] as string)),
-  });
-}
-
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).end();
+
+  const stripeKey = process.env['STRIPE_SECRET_KEY'];
+  const serviceAccount = process.env['FIREBASE_SERVICE_ACCOUNT'];
+
+  if (!stripeKey || !serviceAccount) {
+    return res.status(500).json({ error: 'Missing required env vars' });
+  }
+
+  if (!getApps().length) {
+    initializeApp({ credential: cert(JSON.parse(serviceAccount)) });
+  }
+
+  const stripe = new Stripe(stripeKey);
 
   const { uid } = req.body ?? {};
   if (!uid) return res.status(400).json({ error: 'Missing uid' });

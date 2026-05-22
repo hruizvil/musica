@@ -2,14 +2,6 @@ import Stripe from 'stripe';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
-const stripe = new Stripe(process.env['STRIPE_SECRET_KEY'] as string);
-
-if (!getApps().length) {
-  initializeApp({
-    credential: cert(JSON.parse(process.env['FIREBASE_SERVICE_ACCOUNT'] as string)),
-  });
-}
-
 export const config = { api: { bodyParser: false } };
 
 function getRawBody(req: any): Promise<Buffer> {
@@ -24,16 +16,25 @@ function getRawBody(req: any): Promise<Buffer> {
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).end();
 
+  const stripeKey = process.env['STRIPE_SECRET_KEY'];
+  const webhookSecret = process.env['STRIPE_WEBHOOK_SECRET'];
+  const serviceAccount = process.env['FIREBASE_SERVICE_ACCOUNT'];
+
+  if (!stripeKey || !webhookSecret || !serviceAccount) {
+    return res.status(500).json({ error: 'Missing required env vars' });
+  }
+
+  if (!getApps().length) {
+    initializeApp({ credential: cert(JSON.parse(serviceAccount)) });
+  }
+
+  const stripe = new Stripe(stripeKey);
   const rawBody = await getRawBody(req);
   const sig = req.headers['stripe-signature'];
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(
-      rawBody,
-      sig,
-      process.env['STRIPE_WEBHOOK_SECRET'] as string
-    );
+    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err: any) {
     return res.status(400).json({ error: `Webhook error: ${err.message}` });
   }

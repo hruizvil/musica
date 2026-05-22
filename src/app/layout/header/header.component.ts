@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
 import { FirebaseService } from '../../core/services/firebase.service';
@@ -52,22 +52,56 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
         </button>
 
         <!-- User area (desktop) -->
-        <div class="hidden md:flex items-center gap-2">
+        <div class="relative hidden md:flex items-center">
           @if (firebase.currentUser() && !firebase.isAdmin()) {
-            @if (!firebase.membershipActive()) {
-              <a routerLink="/membership"
-                 class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-capoeira-gold text-capoeira-brown hover:bg-capoeira-gold/90 transition-colors">
-                Seja Membro
-              </a>
-            }
-            <span class="w-7 h-7 rounded-full bg-capoeira-gold/20 text-capoeira-brown dark:text-capoeira-gold text-xs font-bold flex items-center justify-center"
-                  [title]="firebase.currentUser()?.displayName || firebase.currentUser()?.email || ''">
+            <!-- Avatar button -->
+            <button (click)="toggleDropdown()"
+              class="w-8 h-8 rounded-full bg-capoeira-gold/20 text-capoeira-brown dark:text-capoeira-gold text-sm font-bold flex items-center justify-center hover:bg-capoeira-gold/30 transition-colors"
+              [title]="firebase.currentUser()?.displayName || firebase.currentUser()?.email || ''">
               {{ userInitial() }}
-            </span>
-            <button (click)="signOut()"
-              class="text-xs text-stone-400 hover:text-red-500 transition-colors">
-              Sair
             </button>
+
+            <!-- Dropdown panel -->
+            @if (dropdownOpen()) {
+              <div class="absolute right-0 top-10 z-50 w-64 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 shadow-xl py-1">
+
+                <!-- User info -->
+                <div class="px-4 py-3 border-b border-stone-100 dark:border-stone-700">
+                  <p class="text-sm font-semibold text-stone-800 dark:text-stone-100 truncate">
+                    {{ firebase.currentUser()?.displayName || 'Usuário' }}
+                  </p>
+                  <p class="text-xs text-stone-400 truncate">{{ firebase.currentUser()?.email }}</p>
+                </div>
+
+                <!-- Membership row -->
+                <div class="px-4 py-3 border-b border-stone-100 dark:border-stone-700 flex items-center justify-between gap-2">
+                  @if (firebase.membershipActive()) {
+                    <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full shrink-0">
+                      Membro ativo
+                    </span>
+                    <button (click)="openPortal()" [disabled]="portalLoading()"
+                      class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline disabled:opacity-50 transition-colors">
+                      {{ portalLoading() ? 'Aguarde...' : 'Gerenciar assinatura' }}
+                    </button>
+                  } @else {
+                    <span class="text-xs text-stone-400">Plano gratuito</span>
+                    <a routerLink="/membership" (click)="closeDropdown()"
+                      class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline transition-colors">
+                      Seja Membro
+                    </a>
+                  }
+                </div>
+
+                <!-- Sign out -->
+                <div class="px-4 py-2">
+                  <button (click)="signOut(); closeDropdown()"
+                    class="text-xs text-stone-400 hover:text-red-500 transition-colors w-full text-left">
+                    Sair
+                  </button>
+                </div>
+
+              </div>
+            }
           }
           @if (!firebase.currentUser()) {
             <a routerLink="/login"
@@ -105,24 +139,38 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
               </a>
             }
             @if (firebase.currentUser() && !firebase.isAdmin()) {
-              @if (!firebase.membershipActive()) {
-                <a routerLink="/membership" (click)="mobileOpen.set(false)"
-                   class="px-3 py-2 rounded-md text-center bg-capoeira-gold text-capoeira-brown text-sm font-semibold">
-                  Seja Membro
-                </a>
-              }
-              <div class="flex items-center justify-between px-3 py-2 border-t border-stone-100 dark:border-stone-700 mt-1 pt-2">
-                <span class="text-sm text-stone-600 dark:text-stone-300 flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-capoeira-gold/20 text-capoeira-brown dark:text-capoeira-gold text-xs font-bold flex items-center justify-center">
-                    {{ userInitial() }}
-                  </span>
+              <!-- User info row -->
+              <div class="flex items-center gap-2 px-3 py-2 border-t border-stone-100 dark:border-stone-700 mt-1 pt-2">
+                <span class="w-7 h-7 rounded-full bg-capoeira-gold/20 text-capoeira-brown dark:text-capoeira-gold text-xs font-bold flex items-center justify-center shrink-0">
+                  {{ userInitial() }}
+                </span>
+                <span class="text-sm text-stone-600 dark:text-stone-300 truncate">
                   {{ firebase.currentUser()?.displayName || firebase.currentUser()?.email }}
                 </span>
-                <button (click)="signOut(); mobileOpen.set(false)"
-                  class="text-xs text-stone-400 hover:text-red-500 transition-colors">
-                  Sair
-                </button>
               </div>
+              <!-- Membership row -->
+              <div class="flex items-center justify-between px-3 py-1">
+                @if (firebase.membershipActive()) {
+                  <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
+                    Membro ativo
+                  </span>
+                  <button (click)="openPortal(); mobileOpen.set(false)" [disabled]="portalLoading()"
+                    class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline disabled:opacity-50">
+                    {{ portalLoading() ? 'Aguarde...' : 'Gerenciar assinatura' }}
+                  </button>
+                } @else {
+                  <span class="text-xs text-stone-400">Plano gratuito</span>
+                  <a routerLink="/membership" (click)="mobileOpen.set(false)"
+                    class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline">
+                    Seja Membro
+                  </a>
+                }
+              </div>
+              <!-- Sign out -->
+              <button (click)="signOut(); mobileOpen.set(false)"
+                class="px-3 py-2 text-xs text-stone-400 hover:text-red-500 transition-colors text-left w-full">
+                Sair
+              </button>
             }
             @if (!firebase.currentUser()) {
               <a routerLink="/login" (click)="mobileOpen.set(false)"
@@ -139,13 +187,32 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
 export class HeaderComponent {
   theme = inject(ThemeService);
   firebase = inject(FirebaseService);
+  private el = inject(ElementRef);
+
   mobileOpen = signal(false);
+  dropdownOpen = signal(false);
+  portalLoading = signal(false);
 
   navLinks = [
     { path: '/musicas', label: 'Músicas' },
     { path: '/toques', label: 'Toques' },
     { path: '/videos', label: 'Vídeos' },
   ];
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.el.nativeElement.contains(event.target)) {
+      this.dropdownOpen.set(false);
+    }
+  }
+
+  toggleDropdown() {
+    this.dropdownOpen.update(v => !v);
+  }
+
+  closeDropdown() {
+    this.dropdownOpen.set(false);
+  }
 
   userInitial(): string {
     const user = this.firebase.currentUser();
@@ -155,5 +222,24 @@ export class HeaderComponent {
 
   async signOut() {
     await this.firebase.signOut();
+  }
+
+  async openPortal() {
+    const user = this.firebase.currentUser();
+    if (!user) return;
+    this.portalLoading.set(true);
+    try {
+      const res = await fetch('/api/portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: user.uid }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } finally {
+      this.portalLoading.set(false);
+    }
   }
 }

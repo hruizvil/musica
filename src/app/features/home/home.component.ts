@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
 import { FirebaseService } from '../../core/services/firebase.service';
@@ -10,7 +10,6 @@ import { FirebaseService } from '../../core/services/firebase.service';
   template: `
     <!-- Hero -->
     <section class="rounded-2xl bg-gradient-to-br from-capoeira-brown via-amber-900 to-stone-900 text-white px-8 py-12 mb-10 relative overflow-hidden">
-      <!-- decorative rings -->
       <div class="absolute -top-12 -right-12 w-64 h-64 rounded-full border border-white/5 pointer-events-none"></div>
       <div class="absolute -top-4 -right-4 w-40 h-40 rounded-full border border-white/5 pointer-events-none"></div>
 
@@ -87,7 +86,7 @@ import { FirebaseService } from '../../core/services/firebase.service';
 
     <!-- Membership CTA — non-members only -->
     @if (!firebase.membershipActive() && !firebase.isAdmin()) {
-      <section class="rounded-2xl border border-capoeira-gold/30 bg-capoeira-gold/5 dark:bg-capoeira-gold/10 p-8 text-center">
+      <section class="rounded-2xl border border-capoeira-gold/30 bg-capoeira-gold/5 dark:bg-capoeira-gold/10 p-8 text-center mb-6">
         <h2 class="font-display text-2xl font-bold text-capoeira-brown dark:text-capoeira-cream mb-2">
           Acesso completo ao repertório
         </h2>
@@ -105,11 +104,92 @@ import { FirebaseService } from '../../core/services/firebase.service';
         }
       </section>
     }
+
+    <!-- Add to Home Screen prompt -->
+    @if (showInstall()) {
+      <section class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 p-5 relative">
+        <button (click)="dismissInstall()"
+          class="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-full text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors text-sm"
+          aria-label="Fechar">✕</button>
+
+        <div class="flex items-start gap-4">
+          <span class="text-3xl shrink-0">📱</span>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-stone-800 dark:text-stone-100 mb-1">
+              Adicionar à tela inicial
+            </p>
+            @if (!isIOS()) {
+              <p class="text-sm text-stone-500 dark:text-stone-400 mb-3">
+                Instale o app para acesso rápido — funciona como um aplicativo nativo.
+              </p>
+              <button (click)="installApp()"
+                class="px-4 py-2 rounded-lg bg-capoeira-gold text-capoeira-brown font-semibold text-sm hover:bg-amber-400 transition-colors">
+                Instalar app
+              </button>
+            } @else {
+              <p class="text-sm text-stone-500 dark:text-stone-400 mb-3">
+                Abra no Safari e siga os passos:
+              </p>
+              <ol class="text-sm text-stone-600 dark:text-stone-300 space-y-1.5">
+                <li class="flex items-start gap-2">
+                  <span class="text-capoeira-gold font-bold shrink-0">1.</span>
+                  Toque em <strong>Compartilhar</strong>
+                  <svg class="w-4 h-4 inline mb-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                  </svg>
+                  no Safari
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-capoeira-gold font-bold shrink-0">2.</span>
+                  Role e toque em <strong>"Adicionar à tela de início"</strong>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-capoeira-gold font-bold shrink-0">3.</span>
+                  Toque em <strong>Adicionar</strong>
+                </li>
+              </ol>
+            }
+          </div>
+        </div>
+      </section>
+    }
   `,
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   data = inject(DataService);
   firebase = inject(FirebaseService);
+
+  showInstall = signal(false);
+  isIOS = signal(false);
+  private deferredPrompt: any = null;
+
+  ngOnInit() {
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
+    if (localStorage.getItem('install-banner-dismissed') === '1') return;
+    const ua = navigator.userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(ua) && /safari/.test(ua) && !/chrome/.test(ua)) {
+      this.isIOS.set(true);
+      this.showInstall.set(true);
+    }
+    window.addEventListener('beforeinstallprompt', (e: Event) => {
+      e.preventDefault();
+      this.deferredPrompt = e;
+      this.showInstall.set(true);
+    });
+  }
+
+  dismissInstall() {
+    localStorage.setItem('install-banner-dismissed', '1');
+    this.showInstall.set(false);
+  }
+
+  async installApp() {
+    if (!this.deferredPrompt) return;
+    this.deferredPrompt.prompt();
+    await this.deferredPrompt.userChoice;
+    this.deferredPrompt = null;
+    this.showInstall.set(false);
+  }
 
   stats = computed(() => [
     { path: '/musicas', icon: '🎵', label: 'músicas', count: computed(() => `${this.data.songs().length}`) },

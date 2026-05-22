@@ -30,7 +30,7 @@ import { FirebaseService } from '../../core/services/firebase.service';
       </div>
 
       <!-- CTA card -->
-      <div class="bg-capoeira-brown rounded-2xl p-8 text-center space-y-4">
+      <div class="bg-capoeira-brown rounded-2xl p-5 sm:p-8 text-center space-y-4">
         <div>
           <p class="text-capoeira-gold text-sm font-semibold uppercase tracking-widest">Plano mensal</p>
           <p class="text-white font-display text-5xl font-bold mt-1">$2.99<span class="text-xl font-normal text-white/60">/mês</span></p>

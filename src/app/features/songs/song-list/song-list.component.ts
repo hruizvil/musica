@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SearchService } from '../../../core/services/search.service';
 import { DataService } from '../../../core/services/data.service';
@@ -39,13 +39,21 @@ const SONG_TYPE_LABELS: Record<SongType, string> = {
 
         <!-- Toque -->
         <div class="flex flex-wrap gap-2 items-center">
-          <span class="text-xs font-semibold text-stone-400 uppercase tracking-wide w-full sm:w-auto">Toque</span>
-          @for (toque of data.toques(); track toque.id) {
-            <app-filter-chip
-              [label]="toque.name"
-              [active]="search.activeToqueFilter() === toque.id"
-              (toggle)="search.activeToqueFilter.set(search.activeToqueFilter() === toque.id ? null : toque.id)" />
-          }
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <span class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Toque</span>
+            <button (click)="toqueFilterOpen.set(!toqueFilterOpen())"
+              class="sm:hidden ml-auto text-xs text-stone-400 hover:text-capoeira-gold transition-colors px-2 py-1">
+              {{ toqueFilterOpen() ? '▴ Menos' : '▾ Ver toques' }}
+            </button>
+          </div>
+          <div class="contents sm:contents" [class.hidden]="!toqueFilterOpen()">
+            @for (toque of data.toques(); track toque.id) {
+              <app-filter-chip
+                [label]="toque.name"
+                [active]="search.activeToqueFilter() === toque.id"
+                (toggle)="search.activeToqueFilter.set(search.activeToqueFilter() === toque.id ? null : toque.id)" />
+            }
+          </div>
         </div>
 
         <!-- Themes -->
@@ -117,6 +125,7 @@ export class SongListComponent {
   search = inject(SearchService);
   data = inject(DataService);
   firebase = inject(FirebaseService);
+  toqueFilterOpen = signal(false);
 
   songTypes = Object.entries(SONG_TYPE_LABELS).map(([value, label]) => ({ value: value as SongType, label }));
 

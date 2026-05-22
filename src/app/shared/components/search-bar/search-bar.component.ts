@@ -20,7 +20,7 @@ import { SearchService } from '../../../core/services/search.service';
         (blur)="onBlur()"
         (keydown.escape)="close()"
         placeholder="Buscar músicas, toques..."
-        class="w-full pl-10 pr-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-800 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-capoeira-gold text-sm"
+        class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-800 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-capoeira-gold text-sm"
       />
 
       @if (open() && hasResults()) {
@@ -32,7 +32,7 @@ import { SearchService } from '../../../core/services/search.service';
             </div>
             @for (song of results().songs; track song.id) {
               <a [routerLink]="['/musicas', song.id]" (mousedown)="close()"
-                 class="flex items-center gap-3 px-3 py-2 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
+                 class="flex items-center gap-3 px-3 py-3 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
                 <span class="w-1.5 h-1.5 rounded-full shrink-0" [class]="typeDot(song.type)"></span>
                 <span class="text-sm text-stone-700 dark:text-stone-200 truncate">{{ song.title }}</span>
               </a>
@@ -45,7 +45,7 @@ import { SearchService } from '../../../core/services/search.service';
             </div>
             @for (toque of results().toques; track toque.id) {
               <a [routerLink]="['/toques', toque.id]" (mousedown)="close()"
-                 class="flex items-center gap-3 px-3 py-2 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
+                 class="flex items-center gap-3 px-3 py-3 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
                 <span class="text-base shrink-0">🪘</span>
                 <span class="text-sm text-stone-700 dark:text-stone-200 truncate">{{ toque.name }}</span>
               </a>

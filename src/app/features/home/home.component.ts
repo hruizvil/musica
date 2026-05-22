@@ -9,7 +9,7 @@ import { FirebaseService } from '../../core/services/firebase.service';
   imports: [RouterLink],
   template: `
     <!-- Hero -->
-    <section class="rounded-2xl bg-gradient-to-br from-capoeira-brown via-amber-900 to-stone-900 text-white px-8 py-12 mb-10 relative overflow-hidden">
+    <section class="rounded-2xl bg-gradient-to-br from-capoeira-brown via-amber-900 to-stone-900 text-white px-5 py-8 sm:px-8 sm:py-12 mb-10 relative overflow-hidden">
       <div class="absolute -top-12 -right-12 w-64 h-64 rounded-full border border-white/5 pointer-events-none"></div>
       <div class="absolute -top-4 -right-4 w-40 h-40 rounded-full border border-white/5 pointer-events-none"></div>
 

@@ -85,10 +85,10 @@ export class MembershipComponent {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        this.error.set('Erro ao iniciar pagamento. Tente novamente.');
+        this.error.set(data.error ?? 'Erro ao iniciar pagamento. Tente novamente.');
       }
-    } catch {
-      this.error.set('Erro ao iniciar pagamento. Tente novamente.');
+    } catch (e: any) {
+      this.error.set(e?.message ?? 'Erro ao iniciar pagamento. Tente novamente.');
     } finally {
       this.loading.set(false);
     }

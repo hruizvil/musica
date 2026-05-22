@@ -7,3 +7,23 @@
     font-family: theme('fontFamily.sans');
   }
 }
+
+@media print {
+  app-header,
+  app-search-bar,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  * {
+    color: black !important;
+    background: transparent !important;
+    border-color: #ccc !important;
+    box-shadow: none !important;
+  }
+}

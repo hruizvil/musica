@@ -7,7 +7,8 @@ import {
   createUserWithEmailAndPassword, updateProfile,
 } from 'firebase/auth';
 import {
-  getFirestore, collection, getDocs, setDoc, deleteDoc, doc, getDoc, Firestore
+  getFirestore, collection, getDocs, setDoc, deleteDoc, doc, getDoc,
+  updateDoc, arrayUnion, arrayRemove, Firestore,
 } from 'firebase/firestore';
 import { environment } from '../../../environments/environment';
 import { Song } from '../models/song.model';
@@ -33,6 +34,8 @@ export class FirebaseService {
 
   readonly currentUser = signal<User | null>(null);
   readonly membershipActive = signal<boolean>(false);
+  readonly favorites = signal<Set<string>>(new Set());
+  readonly learnedSongs = signal<Set<string>>(new Set());
   readonly isAdmin = computed(() => this.currentUser()?.email === environment.adminEmail);
 
   constructor() {
@@ -42,9 +45,11 @@ export class FirebaseService {
     onAuthStateChanged(this.auth, async user => {
       this.currentUser.set(user);
       if (user && user.email !== environment.adminEmail) {
-        await this.loadMembership(user.uid);
+        await this.loadUserData(user.uid);
       } else {
         this.membershipActive.set(false);
+        this.favorites.set(new Set());
+        this.learnedSongs.set(new Set());
       }
     });
   }
@@ -96,13 +101,50 @@ export class FirebaseService {
     }
   }
 
-  private async loadMembership(uid: string): Promise<void> {
+  private async loadUserData(uid: string): Promise<void> {
     try {
       const snap = await getDoc(doc(this.db, 'users', uid));
-      this.membershipActive.set(snap.data()?.['membershipActive'] === true);
+      const data = snap.data() ?? {};
+      this.membershipActive.set(data['membershipActive'] === true);
+      this.favorites.set(new Set(data['favorites'] ?? []));
+      this.learnedSongs.set(new Set(data['learnedSongs'] ?? []));
     } catch {
       this.membershipActive.set(false);
+      this.favorites.set(new Set());
+      this.learnedSongs.set(new Set());
     }
+  }
+
+  // ── Favorites & learned ───────────────────────────────────────────────────
+
+  async toggleFavorite(songId: string): Promise<void> {
+    const uid = this.currentUser()?.uid;
+    if (!uid) return;
+    const isFav = this.favorites().has(songId);
+    const next = new Set(this.favorites());
+    if (isFav) {
+      next.delete(songId);
+      await updateDoc(doc(this.db, 'users', uid), { favorites: arrayRemove(songId) });
+    } else {
+      next.add(songId);
+      await updateDoc(doc(this.db, 'users', uid), { favorites: arrayUnion(songId) });
+    }
+    this.favorites.set(next);
+  }
+
+  async toggleLearned(songId: string): Promise<void> {
+    const uid = this.currentUser()?.uid;
+    if (!uid) return;
+    const isLearned = this.learnedSongs().has(songId);
+    const next = new Set(this.learnedSongs());
+    if (isLearned) {
+      next.delete(songId);
+      await updateDoc(doc(this.db, 'users', uid), { learnedSongs: arrayRemove(songId) });
+    } else {
+      next.add(songId);
+      await updateDoc(doc(this.db, 'users', uid), { learnedSongs: arrayUnion(songId) });
+    }
+    this.learnedSongs.set(next);
   }
 
   // ── Firestore: song overrides & extra songs ───────────────────────────────

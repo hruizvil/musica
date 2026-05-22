@@ -1,4 +1,4 @@
-export type ToqueCategory = 'angola' | 'regional' | 'other';
+export type ToqueCategory = 'angola' | 'regional' | 'abada' | 'other';
 export type ToqueSpeed = 'slow' | 'medium' | 'fast' | 'variable';
 
 export interface VideoLink {

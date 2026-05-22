@@ -9,11 +9,13 @@ export class SearchService {
   readonly query = signal('');
   readonly activeSongType = signal<SongType | null>(null);
   readonly activeToqueFilter = signal<string | null>(null);
+  readonly activeThemeFilter = signal<string | null>(null);
 
   readonly filteredSongs = computed(() => {
     const q = this.query().toLowerCase().trim();
     const type = this.activeSongType();
     const toque = this.activeToqueFilter();
+    const theme = this.activeThemeFilter();
 
     return this.data.songs().filter(song => {
       const matchesQuery = !q ||
@@ -22,7 +24,8 @@ export class SearchService {
         (song.composer ?? '').toLowerCase().includes(q);
       const matchesType = !type || song.type === type;
       const matchesToque = !toque || song.toque.includes(toque);
-      return matchesQuery && matchesType && matchesToque;
+      const matchesTheme = !theme || (song.themes ?? []).includes(theme);
+      return matchesQuery && matchesType && matchesToque && matchesTheme;
     });
   });
 
@@ -42,5 +45,6 @@ export class SearchService {
   clearFilters(): void {
     this.activeSongType.set(null);
     this.activeToqueFilter.set(null);
+    this.activeThemeFilter.set(null);
   }
 }

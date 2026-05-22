@@ -95,7 +95,10 @@ export class ToqueDetailComponent {
 
   categoryLabel = computed(() => {
     const c = this.toque()?.category;
-    return c === 'angola' ? 'Angola' : c === 'regional' ? 'Regional' : 'Outro';
+    if (c === 'angola') return 'Angola';
+    if (c === 'regional') return 'Regional';
+    if (c === 'abada') return 'Abadá';
+    return 'Outro';
   });
 
   tempoClass = computed(() => {

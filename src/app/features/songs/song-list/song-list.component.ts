@@ -24,8 +24,9 @@ const SONG_TYPE_LABELS: Record<SongType, string> = {
 
       <app-search-bar />
 
-      <!-- Filters: type -->
+      <!-- Filters -->
       <div class="space-y-3">
+        <!-- Type -->
         <div class="flex flex-wrap gap-2 items-center">
           <span class="text-xs font-semibold text-stone-400 uppercase tracking-wide w-full sm:w-auto">Tipo</span>
           @for (type of songTypes; track type.value) {
@@ -36,7 +37,7 @@ const SONG_TYPE_LABELS: Record<SongType, string> = {
           }
         </div>
 
-        <!-- Filters: toque -->
+        <!-- Toque -->
         <div class="flex flex-wrap gap-2 items-center">
           <span class="text-xs font-semibold text-stone-400 uppercase tracking-wide w-full sm:w-auto">Toque</span>
           @for (toque of data.toques(); track toque.id) {
@@ -47,7 +48,20 @@ const SONG_TYPE_LABELS: Record<SongType, string> = {
           }
         </div>
 
-        @if (search.activeSongType() || search.activeToqueFilter()) {
+        <!-- Themes -->
+        @if (data.allThemes().length) {
+          <div class="flex flex-wrap gap-2 items-center">
+            <span class="text-xs font-semibold text-stone-400 uppercase tracking-wide w-full sm:w-auto">Tema</span>
+            @for (theme of data.allThemes(); track theme) {
+              <app-filter-chip
+                [label]="theme"
+                [active]="search.activeThemeFilter() === theme"
+                (toggle)="search.activeThemeFilter.set(search.activeThemeFilter() === theme ? null : theme)" />
+            }
+          </div>
+        }
+
+        @if (search.activeSongType() || search.activeToqueFilter() || search.activeThemeFilter()) {
           <button (click)="search.clearFilters()" class="text-xs text-stone-400 hover:text-capoeira-gold underline">
             Limpar filtros
           </button>
@@ -59,10 +73,18 @@ const SONG_TYPE_LABELS: Record<SongType, string> = {
         @for (song of search.filteredSongs(); track song.id) {
           @if (isAccessible(song)) {
             <a [routerLink]="['/musicas', song.id]"
-               class="group flex flex-col gap-2 p-3 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:border-capoeira-gold hover:shadow-sm transition-all">
+               class="group relative flex flex-col gap-2 p-3 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:border-capoeira-gold hover:shadow-sm transition-all">
               <div class="flex items-center justify-between">
                 <span class="w-2 h-2 rounded-full shrink-0" [class]="typeDot(song.type)"></span>
-                <span class="text-xs text-stone-400">{{ typeLabel(song.type) }}</span>
+                <div class="flex items-center gap-1.5">
+                  @if (firebase.learnedSongs().has(song.id)) {
+                    <span title="Aprendida" class="text-emerald-500 text-xs leading-none">✓</span>
+                  }
+                  @if (firebase.favorites().has(song.id)) {
+                    <span title="Favorita" class="text-red-400 text-xs leading-none">♥</span>
+                  }
+                  <span class="text-xs text-stone-400">{{ typeLabel(song.type) }}</span>
+                </div>
               </div>
               <span class="text-sm font-semibold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug line-clamp-2">{{ song.title }}</span>
               @if (song.toque.length) {

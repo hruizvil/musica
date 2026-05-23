@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -113,8 +113,8 @@ type PanelMode = 'none' | 'edit' | 'add';
           </div>
         </div>
 
-        <!-- Edit / Add panel — sticky on desktop, scrolled-to on mobile -->
-        <div #formPanel class="w-full md:flex-1 md:min-w-0 md:sticky md:top-4">
+        <!-- Edit / Add panel — fixed overlay on mobile, sticky side panel on desktop -->
+        <div [class]="formPanelClass()">
 
           @if (panelMode() === 'none') {
             <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 p-10 text-center">
@@ -322,12 +322,16 @@ export class AdminComponent {
   private fb = inject(FirebaseService);
   private router = inject(Router);
 
-  @ViewChild('formPanel') formPanel?: ElementRef<HTMLElement>;
-
   panelMode = signal<PanelMode>('none');
   selectedSong = signal<Song | null>(null);
   deleteTarget = signal<Song | null>(null);
   filterQuery = signal('');
+
+  readonly formPanelClass = computed(() =>
+    this.panelMode() === 'none'
+      ? 'hidden md:block md:flex-1 md:min-w-0 md:sticky md:top-4'
+      : 'fixed inset-0 z-50 overflow-y-auto bg-stone-50 dark:bg-stone-900 p-4 md:static md:inset-auto md:z-auto md:overflow-visible md:bg-transparent md:p-0 md:flex-1 md:min-w-0 md:sticky md:top-4'
+  );
 
   readonly filteredSongs = computed(() => {
     const q = this.filterQuery().toLowerCase().trim();
@@ -375,7 +379,6 @@ export class AdminComponent {
     this.editPreview = song.preview ?? false;
     this.saveError.set('');
     this.saveSuccess.set(false);
-    setTimeout(() => this.formPanel?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
   }
 
   startAdd() {
@@ -393,7 +396,6 @@ export class AdminComponent {
     this.editPreview = false;
     this.saveError.set('');
     this.saveSuccess.set(false);
-    setTimeout(() => this.formPanel?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
   }
 
   closePanel() {

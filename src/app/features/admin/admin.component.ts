@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, ViewChild, ElementRef } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -98,7 +98,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                   </span>
                 </button>
                 <button (click)="confirmDelete(song)"
-                  class="px-3 py-2.5 text-stone-300 hover:text-red-400 transition-colors shrink-0 opacity-0 group-hover:opacity-100"
+                  class="px-3 py-2.5 text-stone-300 hover:text-red-400 transition-colors shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100"
                   title="Apagar">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -113,8 +113,8 @@ type PanelMode = 'none' | 'edit' | 'add';
           </div>
         </div>
 
-        <!-- Edit / Add panel -->
-        <div class="w-full md:flex-1 md:min-w-0">
+        <!-- Edit / Add panel — sticky on desktop, scrolled-to on mobile -->
+        <div #formPanel class="w-full md:flex-1 md:min-w-0 md:sticky md:top-4">
 
           @if (panelMode() === 'none') {
             <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 p-10 text-center">
@@ -124,9 +124,12 @@ type PanelMode = 'none' | 'edit' | 'add';
 
           @if (panelMode() === 'edit' && selectedSong()) {
             <div class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 p-6 space-y-5">
-              <div class="flex items-center justify-between gap-4">
-                <p class="text-xs text-stone-400">Editando música</p>
-                <button (click)="closePanel()" class="text-stone-300 hover:text-stone-500 text-xl leading-none shrink-0">✕</button>
+              <div class="flex items-start justify-between gap-4">
+                <div class="min-w-0">
+                  <p class="text-xs text-stone-400">Editando música</p>
+                  <p class="text-sm font-semibold text-stone-700 dark:text-stone-200 truncate">{{ selectedSong()!.title }}</p>
+                </div>
+                <button (click)="closePanel()" class="text-stone-300 hover:text-stone-500 text-xl leading-none shrink-0 mt-0.5">✕</button>
               </div>
 
               <!-- Title (edit only — not in shared template) -->
@@ -294,6 +297,15 @@ type PanelMode = 'none' | 'edit' | 'add';
         </textarea>
       </div>
 
+      <!-- Notas -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Notas <span class="normal-case font-normal">(opcional)</span></label>
+        <textarea [(ngModel)]="editNotes" name="notes" rows="3"
+          placeholder="Contexto histórico, dicas de pronúncia..."
+          class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold resize-y">
+        </textarea>
+      </div>
+
       <!-- Preview -->
       <label class="flex items-center gap-2 cursor-pointer">
         <input type="checkbox" [(ngModel)]="editPreview" name="preview"
@@ -309,6 +321,8 @@ export class AdminComponent {
   data = inject(DataService);
   private fb = inject(FirebaseService);
   private router = inject(Router);
+
+  @ViewChild('formPanel') formPanel?: ElementRef<HTMLElement>;
 
   panelMode = signal<PanelMode>('none');
   selectedSong = signal<Song | null>(null);
@@ -329,6 +343,7 @@ export class AdminComponent {
   editSpotify = '';
   editLyrics = '';
   editTranslation = '';
+  editNotes = '';
   editPreview = false;
 
   saving = signal(false);
@@ -356,9 +371,11 @@ export class AdminComponent {
     this.editSpotify = song.audioLinks.spotify ?? '';
     this.editLyrics = song.lyrics ?? '';
     this.editTranslation = song.translation ?? '';
+    this.editNotes = song.notes ?? '';
     this.editPreview = song.preview ?? false;
     this.saveError.set('');
     this.saveSuccess.set(false);
+    setTimeout(() => this.formPanel?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
   }
 
   startAdd() {
@@ -372,9 +389,11 @@ export class AdminComponent {
     this.editSpotify = '';
     this.editLyrics = '';
     this.editTranslation = '';
+    this.editNotes = '';
     this.editPreview = false;
     this.saveError.set('');
     this.saveSuccess.set(false);
+    setTimeout(() => this.formPanel?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
   }
 
   closePanel() {
@@ -405,6 +424,7 @@ export class AdminComponent {
           mestre: this.editMestre.trim() || null,
           lyrics: this.editLyrics.trim(),
           translation: this.editTranslation.trim() || null,
+          notes: this.editNotes.trim() || null,
           preview: this.editPreview,
           audioLinks,
         };
@@ -420,12 +440,14 @@ export class AdminComponent {
         if (this.editSpotify.trim()) override.spotify = normalizeSpotify(this.editSpotify);
         if (this.editLyrics.trim()) override.lyrics = this.editLyrics.trim();
         if (this.editTranslation.trim()) override.translation = this.editTranslation.trim();
+        if (this.editNotes.trim()) override.notes = this.editNotes.trim();
         await this.fb.saveSongOverride(song.id, override);
       }
       await this.data.refreshOverrides();
       const refreshed = this.data.songById().get(song.id);
       if (refreshed) this.selectedSong.set(refreshed);
       this.saveSuccess.set(true);
+      setTimeout(() => this.saveSuccess.set(false), 3000);
     } catch {
       this.saveError.set('Erro ao salvar. Verifique sua conexão.');
     } finally {
@@ -452,15 +474,16 @@ export class AdminComponent {
         album: null,
         lyrics: this.editLyrics.trim(),
         translation: this.editTranslation.trim() || null,
+        notes: this.editNotes.trim() || null,
         themes: [],
         audioLinks,
-        notes: null,
         preview: this.editPreview,
         dateAdded: new Date().toISOString().split('T')[0],
       };
       await this.fb.saveExtraSong(newSong);
       await this.data.refreshOverrides();
       this.saveSuccess.set(true);
+      setTimeout(() => this.saveSuccess.set(false), 3000);
       this.editTitle = '';
       this.editToque = [];
       this.editMestre = '';
@@ -468,6 +491,7 @@ export class AdminComponent {
       this.editYoutube = '';
       this.editSpotify = '';
       this.editTranslation = '';
+      this.editNotes = '';
       this.editPreview = false;
     } catch {
       this.saveError.set('Erro ao adicionar. Verifique sua conexão.');

@@ -22,6 +22,7 @@ export interface SongOverride {
   spotify?: string;
   lyrics?: string;
   translation?: string;
+  notes?: string | null;
   deleted?: boolean;
   preview?: boolean;
 }

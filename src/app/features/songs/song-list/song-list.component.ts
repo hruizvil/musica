@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SearchService } from '../../../core/services/search.service';
 import { DataService } from '../../../core/services/data.service';
@@ -24,8 +24,29 @@ const SONG_TYPE_LABELS: Record<SongType, string> = {
 
       <app-search-bar />
 
-      <!-- Filters -->
-      <div class="space-y-3">
+      <!-- Mobile filter toggle — hidden on sm+ -->
+      <div class="flex items-center gap-3 sm:hidden">
+        <button (click)="filtersOpen.set(!filtersOpen())"
+          class="flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 text-sm text-stone-600 dark:text-stone-300 hover:border-capoeira-gold transition-colors">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+          </svg>
+          Filtros
+          @if (activeFilterCount() > 0) {
+            <span class="w-4 h-4 rounded-full bg-capoeira-gold text-white text-xs font-bold flex items-center justify-center leading-none">
+              {{ activeFilterCount() }}
+            </span>
+          }
+        </button>
+        @if (activeFilterCount() > 0) {
+          <button (click)="search.clearFilters()" class="text-xs text-stone-400 hover:text-capoeira-gold underline">
+            Limpar
+          </button>
+        }
+      </div>
+
+      <!-- Filter rows: always visible on sm+, toggled on mobile -->
+      <div [class.hidden]="!filtersOpen()" class="sm:block space-y-3">
         <!-- Type -->
         <div class="flex flex-wrap gap-2 items-center">
           <span class="text-xs font-semibold text-stone-400 uppercase tracking-wide w-full sm:w-auto">Tipo</span>
@@ -39,21 +60,13 @@ const SONG_TYPE_LABELS: Record<SongType, string> = {
 
         <!-- Toque -->
         <div class="flex flex-wrap gap-2 items-center">
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <span class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Toque</span>
-            <button (click)="toqueFilterOpen.set(!toqueFilterOpen())"
-              class="sm:hidden ml-auto text-xs text-stone-400 hover:text-capoeira-gold transition-colors px-2 py-1">
-              {{ toqueFilterOpen() ? '▴ Menos' : '▾ Ver toques' }}
-            </button>
-          </div>
-          <div class="contents sm:contents" [class.hidden]="!toqueFilterOpen()">
-            @for (toque of data.toques(); track toque.id) {
-              <app-filter-chip
-                [label]="toque.name"
-                [active]="search.activeToqueFilter() === toque.id"
-                (toggle)="search.activeToqueFilter.set(search.activeToqueFilter() === toque.id ? null : toque.id)" />
-            }
-          </div>
+          <span class="text-xs font-semibold text-stone-400 uppercase tracking-wide w-full sm:w-auto">Toque</span>
+          @for (toque of data.toques(); track toque.id) {
+            <app-filter-chip
+              [label]="toque.name"
+              [active]="search.activeToqueFilter() === toque.id"
+              (toggle)="search.activeToqueFilter.set(search.activeToqueFilter() === toque.id ? null : toque.id)" />
+          }
         </div>
 
         <!-- Themes -->
@@ -69,8 +82,9 @@ const SONG_TYPE_LABELS: Record<SongType, string> = {
           </div>
         }
 
+        <!-- Desktop clear filters -->
         @if (search.activeSongType() || search.activeToqueFilter() || search.activeThemeFilter()) {
-          <button (click)="search.clearFilters()" class="text-xs text-stone-400 hover:text-capoeira-gold underline">
+          <button (click)="search.clearFilters()" class="hidden sm:block text-xs text-stone-400 hover:text-capoeira-gold underline">
             Limpar filtros
           </button>
         }
@@ -125,7 +139,13 @@ export class SongListComponent {
   search = inject(SearchService);
   data = inject(DataService);
   firebase = inject(FirebaseService);
-  toqueFilterOpen = signal(false);
+  filtersOpen = signal(false);
+
+  activeFilterCount = computed(() =>
+    (this.search.activeSongType() ? 1 : 0) +
+    (this.search.activeToqueFilter() ? 1 : 0) +
+    (this.search.activeThemeFilter() ? 1 : 0)
+  );
 
   songTypes = Object.entries(SONG_TYPE_LABELS).map(([value, label]) => ({ value: value as SongType, label }));
 

@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../../core/services/data.service';
 import { Toque } from '../../../core/models/toque.model';
@@ -16,26 +16,48 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const CATEGORY_ORDER = ['angola', 'regional', 'abada', 'other'];
 
+const TAB_LABELS: Record<string, string> = {
+  angola: 'Angola',
+  regional: 'Regional',
+  abada: 'Abadá',
+  other: 'Outros',
+};
+
 @Component({
   selector: 'app-toque-list',
   standalone: true,
   imports: [RouterLink],
   template: `
-    <div class="space-y-8">
+    <div class="space-y-6">
       <div>
         <h1 class="font-display text-3xl font-bold text-capoeira-brown dark:text-capoeira-cream">Toques de Capoeira</h1>
         <p class="text-stone-400 text-sm mt-1">Os ritmos do berimbau que comandam o jogo</p>
       </div>
 
-      @for (group of grouped(); track group.category) {
+      <!-- Tabs -->
+      <div class="flex gap-0 border-b border-stone-200 dark:border-stone-700 overflow-x-auto">
+        @for (tab of allTabs(); track tab.key) {
+          <button (click)="activeTab.set(tab.key)"
+            class="px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px shrink-0"
+            [class]="activeTab() === tab.key
+              ? 'border-capoeira-gold text-capoeira-brown dark:text-capoeira-gold'
+              : 'border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'">
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+
+      @for (group of visibleGroups(); track group.category) {
         <section class="space-y-3">
-          <div class="flex items-center gap-3">
-            <h2 class="font-display text-lg font-semibold text-capoeira-brown dark:text-capoeira-cream">
-              {{ group.label }}
-            </h2>
-            <div class="flex-1 h-px bg-stone-200 dark:bg-stone-700"></div>
-            <span class="text-xs text-stone-400">{{ group.toques.length }} toque(s)</span>
-          </div>
+          @if (activeTab() === 'all') {
+            <div class="flex items-center gap-3">
+              <h2 class="font-display text-lg font-semibold text-capoeira-brown dark:text-capoeira-cream">
+                {{ group.label }}
+              </h2>
+              <div class="flex-1 h-px bg-stone-200 dark:bg-stone-700"></div>
+              <span class="text-xs text-stone-400">{{ group.toques.length }} toque(s)</span>
+            </div>
+          }
 
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @for (toque of group.toques; track toque.id) {
@@ -63,6 +85,7 @@ const CATEGORY_ORDER = ['angola', 'regional', 'abada', 'other'];
 })
 export class ToqueListComponent {
   data = inject(DataService);
+  activeTab = signal<string>('angola');
 
   grouped = computed(() => {
     const byCategory = new Map<string, Toque[]>();
@@ -75,6 +98,19 @@ export class ToqueListComponent {
       .filter(c => byCategory.has(c))
       .map(c => ({ category: c, label: CATEGORY_LABELS[c] ?? c, toques: byCategory.get(c)! }));
   });
+
+  allTabs = computed(() => [
+    { key: 'all', label: 'Todos' },
+    ...CATEGORY_ORDER
+      .filter(c => this.grouped().some(g => g.category === c))
+      .map(c => ({ key: c, label: TAB_LABELS[c] ?? c })),
+  ]);
+
+  visibleGroups = computed(() =>
+    this.activeTab() === 'all'
+      ? this.grouped()
+      : this.grouped().filter(g => g.category === this.activeTab())
+  );
 
   tempoLabel(t: string): string { return TEMPO_LABELS[t] ?? t; }
 

@@ -6,9 +6,16 @@ import { FirebaseService } from '../../../core/services/firebase.service';
 import { FilterChipComponent } from '../../../shared/components/filter-chip/filter-chip.component';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { Song, SongType } from '../../../core/models/song.model';
+import { Toque } from '../../../core/models/toque.model';
 
 const SONG_TYPE_LABELS: Record<SongType, string> = {
   ladainha: 'Ladainha', corrido: 'Corrido', louvacao: 'Louvação', quadra: 'Quadra'
+};
+
+const TOQUE_CATEGORY_ORDER = ['angola', 'regional', 'abada', 'other'];
+const TOQUE_CATEGORY_LABELS: Record<string, string> = {
+  angola: 'Capoeira Angola', regional: 'Capoeira Regional',
+  abada: 'Capoeira Abadá', other: 'Outros Ritmos',
 };
 
 @Component({
@@ -114,22 +121,16 @@ export class SongListComponent {
 
   songTypes = Object.entries(SONG_TYPE_LABELS).map(([value, label]) => ({ value: value as SongType, label }));
 
-  private static readonly TOQUE_CATEGORY_ORDER = ['angola', 'regional', 'abada', 'other'];
-  private static readonly TOQUE_CATEGORY_LABELS: Record<string, string> = {
-    angola: 'Capoeira Angola', regional: 'Capoeira Regional',
-    abada: 'Capoeira Abadá', other: 'Outros Ritmos',
-  };
-
   groupedToques = computed(() => {
-    const byCategory = new Map<string, typeof this.data.toques()[number][]>();
+    const byCategory = new Map<string, Toque[]>();
     for (const toque of this.data.toques()) {
       const cat = toque.category ?? 'other';
       if (!byCategory.has(cat)) byCategory.set(cat, []);
       byCategory.get(cat)!.push(toque);
     }
-    return SongListComponent.TOQUE_CATEGORY_ORDER
+    return TOQUE_CATEGORY_ORDER
       .filter(c => byCategory.has(c))
-      .map(c => ({ label: SongListComponent.TOQUE_CATEGORY_LABELS[c], toques: byCategory.get(c)! }));
+      .map(c => ({ label: TOQUE_CATEGORY_LABELS[c], toques: byCategory.get(c)! }));
   });
 
   isAccessible(song: Song): boolean {

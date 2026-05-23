@@ -77,14 +77,6 @@ export class DataService {
       .slice(0, 6)
   );
 
-  readonly allThemes = computed(() => {
-    const set = new Set<string>();
-    for (const song of this.songs()) {
-      for (const theme of song.themes ?? []) set.add(theme);
-    }
-    return [...set].sort();
-  });
-
   constructor() {
     this.refreshOverrides();
   }

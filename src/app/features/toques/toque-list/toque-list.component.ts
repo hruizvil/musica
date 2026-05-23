@@ -35,7 +35,7 @@ const TAB_LABELS: Record<string, string> = {
       </div>
 
       <!-- Tabs -->
-      <div class="flex gap-0 border-b border-stone-200 dark:border-stone-700 overflow-x-auto">
+      <div class="flex gap-0 border-b border-stone-200 dark:border-stone-700 overflow-x-auto scrollbar-hide">
         @for (tab of allTabs(); track tab.key) {
           <button (click)="activeTab.set(tab.key)"
             class="px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px shrink-0"

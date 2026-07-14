@@ -76,7 +76,7 @@ type PanelMode = 'none' | 'edit' | 'add';
     <div class="h-screen flex flex-col overflow-hidden bg-stone-50 dark:bg-stone-900">
 
       <!-- ── GLOBAL HEADER ─────────────────────────────────────────── -->
-      <header class="h-14 shrink-0 bg-white dark:bg-stone-800 border-b border-stone-200 dark:border-stone-700 flex items-center px-5 gap-3 z-20 shadow-sm">
+      <header class="h-14 shrink-0 backdrop-blur-md bg-white/90 dark:bg-stone-950/90 border-b border-stone-200/60 dark:border-stone-800/60 flex items-center px-5 gap-3 z-20">
 
         <!-- Breadcrumb -->
         <div class="flex items-center gap-2 min-w-0">
@@ -94,7 +94,7 @@ type PanelMode = 'none' | 'edit' | 'add';
               {{ panelMode() === 'add' ? 'Nova música' : (editTitle || selectedSong()?.title || '') }}
             </span>
             @if (isDirty()) {
-              <span class="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 shrink-0 ml-1">
+              <span class="flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 shrink-0 ml-1 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full">
                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                 Não salvo
               </span>
@@ -119,12 +119,12 @@ type PanelMode = 'none' | 'edit' | 'add';
           }
           @if (panelMode() !== 'none') {
             <button (click)="closePanel()"
-              class="px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-600 text-stone-500 dark:text-stone-400 text-sm hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
+              class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-600 text-stone-500 dark:text-stone-400 text-sm hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
               Cancelar
             </button>
             <button (click)="panelMode() === 'edit' ? save() : addSong()"
               [disabled]="saving() || (panelMode() === 'add' && !editTitle.trim())"
-              class="px-4 py-1.5 rounded-lg bg-capoeira-brown text-white text-sm font-semibold hover:bg-capoeira-brown/90 disabled:opacity-50 transition-colors">
+              class="px-4 py-1.5 rounded-xl bg-capoeira-brown text-white text-sm font-semibold hover:bg-capoeira-brown/90 disabled:opacity-50 transition-colors shadow-sm shadow-capoeira-gold/10">
               {{ saving() ? 'Salvando…' : panelMode() === 'add' ? 'Adicionar' : 'Salvar alterações' }}
             </button>
           }
@@ -141,7 +141,7 @@ type PanelMode = 'none' | 'edit' | 'add';
         <!-- Left sidebar: song list -->
         <aside
           [ngClass]="{ 'hidden': panelMode() !== 'none' }"
-          class="md:flex md:flex-col w-full md:w-64 md:shrink-0 border-r border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800">
+          class="md:flex md:flex-col w-full md:w-64 md:shrink-0 border-r border-stone-200/60 dark:border-stone-800/60 bg-white dark:bg-stone-950">
 
           <!-- Sidebar header -->
           <div class="px-3 py-3 border-b border-stone-100 dark:border-stone-700 space-y-2 shrink-0">
@@ -171,7 +171,7 @@ type PanelMode = 'none' | 'edit' | 'add';
               [ngModel]="filterQuery()"
               (ngModelChange)="filterQuery.set($event)"
               placeholder="Filtrar músicas..."
-              class="w-full px-2.5 py-1.5 rounded-md border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-xs placeholder-stone-300 focus:outline-none focus:ring-1 focus:ring-capoeira-gold"
+              class="w-full px-2.5 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-xs placeholder-stone-300 focus:outline-none focus:ring-1 focus:ring-capoeira-gold shadow-inner"
             />
           </div>
 
@@ -242,7 +242,7 @@ type PanelMode = 'none' | 'edit' | 'add';
               </button>
             } @else {
               <button (click)="startAdd()"
-                class="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-capoeira-brown text-white text-sm font-semibold hover:bg-capoeira-brown/90 transition-colors">
+                class="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-capoeira-brown text-white text-sm font-semibold hover:bg-capoeira-brown/90 transition-colors shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
@@ -296,7 +296,7 @@ type PanelMode = 'none' | 'edit' | 'add';
               <div class="space-y-4">
 
               <!-- ─ Card: Informações + Letra & Tradução (merged) ── -->
-              <section class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden shadow-sm">
+              <section class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 overflow-hidden shadow-sm">
                 <div class="px-5 py-4 space-y-4">
 
                   <!-- Título + Compositor + Toque in one row -->
@@ -466,8 +466,8 @@ type PanelMode = 'none' | 'edit' | 'add';
               <div class="space-y-4">
 
               <!-- ─ Card: Mídia ────────────────────────────────── -->
-              <section class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden shadow-sm">
-                <header class="px-5 py-3 border-b border-stone-100 dark:border-stone-700 bg-stone-50/60 dark:bg-stone-800/60">
+              <section class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 overflow-hidden shadow-sm">
+                <header class="px-5 py-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50/60 dark:bg-stone-900/60">
                   <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">Mídia</h2>
                 </header>
                 <div class="px-5 py-4 space-y-4">
@@ -546,8 +546,8 @@ type PanelMode = 'none' | 'edit' | 'add';
               </section>
 
               <!-- ─ Card: Publicação ───────────────────────────── -->
-              <section class="bg-white dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden shadow-sm">
-                <header class="px-5 py-3 border-b border-stone-100 dark:border-stone-700 bg-stone-50/60 dark:bg-stone-800/60">
+              <section class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 overflow-hidden shadow-sm">
+                <header class="px-5 py-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50/60 dark:bg-stone-900/60">
                   <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">Publicação</h2>
                 </header>
                 <div class="px-5 py-4">
@@ -591,7 +591,7 @@ type PanelMode = 'none' | 'edit' | 'add';
 
         <!-- Right sidebar: song metadata (desktop only) -->
         @if (panelMode() === 'edit' && selectedSong()) {
-          <aside class="hidden lg:flex lg:flex-col w-52 shrink-0 border-l border-stone-200 dark:border-stone-700 overflow-y-auto bg-white dark:bg-stone-800">
+          <aside class="hidden lg:flex lg:flex-col w-52 shrink-0 border-l border-stone-200/60 dark:border-stone-800/60 overflow-y-auto bg-white dark:bg-stone-950">
             <div class="px-4 py-5 space-y-5">
 
               <div>
@@ -666,8 +666,8 @@ type PanelMode = 'none' | 'edit' | 'add';
 
       <!-- Delete confirmation modal -->
       @if (deleteTarget()) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div class="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-6 max-w-sm w-full space-y-4 shadow-xl">
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-capoeira-night/60 backdrop-blur-sm px-4">
+          <div class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 p-6 max-w-sm w-full space-y-4 shadow-2xl">
             <h3 class="font-display text-lg font-bold text-stone-800 dark:text-stone-100">Apagar música?</h3>
             <p class="text-sm text-stone-500">"{{ deleteTarget()!.title }}" será removida permanentemente.</p>
             <div class="flex gap-3">

@@ -9,7 +9,7 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
   standalone: true,
   imports: [RouterLink, RouterLinkActive, SearchBarComponent],
   template: `
-    <header class="sticky top-0 z-50 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 shadow-sm">
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/90 dark:bg-stone-950/90 border-b border-stone-200/60 dark:border-stone-800/60">
       <div class="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
 
         <!-- Logo -->
@@ -56,7 +56,7 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
           @if (firebase.currentUser() && !firebase.isAdmin()) {
             <!-- Avatar button -->
             <button (click)="toggleDropdown()"
-              class="w-8 h-8 rounded-full bg-capoeira-gold/20 text-capoeira-brown dark:text-capoeira-gold text-sm font-bold flex items-center justify-center hover:bg-capoeira-gold/30 transition-colors"
+              class="w-8 h-8 rounded-full bg-capoeira-gold text-capoeira-night text-sm font-bold flex items-center justify-center hover:bg-amber-400 transition-colors shadow-sm"
               [title]="firebase.currentUser()?.displayName || firebase.currentUser()?.email || ''">
               {{ userInitial() }}
             </button>
@@ -121,7 +121,7 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
 
       <!-- Mobile menu -->
       @if (mobileOpen()) {
-        <div class="md:hidden border-t border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-4 py-3 space-y-2">
+        <div class="md:hidden border-t border-stone-200/60 dark:border-stone-800/60 bg-white/95 dark:bg-stone-950/95 backdrop-blur-md px-4 py-3 space-y-2">
           <app-search-bar />
 
           <nav class="flex flex-col gap-1 pt-1">

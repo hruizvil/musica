@@ -1,0 +1,113 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { colors: {
+    'capoeira-gold': '#D4A017', 'capoeira-brown': '#6B3A2A',
+    'capoeira-green': '#2D5016', 'capoeira-cream': '#F5F0E8', 'capoeira-night': '#1A1208',
+  }, fontFamily: { sans: ['Inter','system-ui','sans-serif'], display: ['"Playfair Display"','Georgia','serif'] } } }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-stone-50 p-8 font-sans">
+  <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-6">Cards</h2>
+
+  <div class="space-y-8 max-w-xl">
+
+    <!-- Song Grid Card -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Song Grid Cards</p>
+      <div class="grid grid-cols-3 gap-3">
+        <!-- Default -->
+        <div class="group flex flex-col gap-2 p-3 rounded-xl bg-white border border-stone-200 hover:border-capoeira-gold hover:shadow-sm transition-all cursor-pointer">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-capoeira-gold/10 text-capoeira-brown font-medium">Ladainha</span>
+          </div>
+          <p class="text-sm font-semibold text-stone-800 leading-snug line-clamp-2">Paranauê</p>
+          <p class="text-xs text-stone-400">São Bento Grande</p>
+        </div>
+        <!-- Hovered -->
+        <div class="group flex flex-col gap-2 p-3 rounded-xl bg-white border border-capoeira-gold shadow-sm cursor-pointer">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-capoeira-gold/10 text-capoeira-brown font-medium">Corrido</span>
+          </div>
+          <p class="text-sm font-semibold text-capoeira-brown leading-snug line-clamp-2">É Roda, Vem Jogar</p>
+          <p class="text-xs text-stone-400">Angola</p>
+        </div>
+        <!-- Locked -->
+        <div class="flex flex-col gap-2 p-3 rounded-xl bg-white border border-stone-200 opacity-60 cursor-default">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-sky-400 shrink-0"></span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-capoeira-gold/10 text-capoeira-brown font-medium">Louvação</span>
+          </div>
+          <p class="text-sm font-semibold text-stone-800 leading-snug line-clamp-2">Zum Zum Zum</p>
+          <p class="text-xs text-stone-400">Idalina</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Cards -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Content Cards</p>
+      <div class="space-y-3">
+        <!-- Lyrics card -->
+        <div class="bg-white rounded-xl p-6 border border-stone-200">
+          <h2 class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4">Letra</h2>
+          <p class="font-sans text-sm text-stone-700 whitespace-pre-wrap leading-relaxed">Escuta só quem está chamando
+A roda já se formou
+Agora é berimbau</p>
+        </div>
+        <!-- Refrão card -->
+        <div class="bg-amber-50 rounded-xl p-5 border border-amber-200">
+          <h2 class="text-xs font-semibold text-amber-500 uppercase tracking-wide mb-3">Refrão</h2>
+          <p class="font-sans text-sm text-stone-700 whitespace-pre-wrap leading-relaxed">É roda, vem jogar
+Berimbau ta tocando</p>
+        </div>
+        <!-- Notes card -->
+        <div class="bg-capoeira-gold/5 border border-capoeira-gold/20 rounded-lg p-4 text-sm text-stone-600">
+          Ladainha clássica de Mestre Bimba. Frequentemente usada para abrir a roda no estilo Regional.
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Card with Header -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Admin Panel Card</p>
+      <div class="bg-white rounded-xl border border-stone-200 overflow-hidden shadow-sm">
+        <div class="px-5 py-3 border-b border-stone-100 bg-stone-50/60">
+          <span class="text-xs font-semibold text-stone-500">Informações da Música</span>
+        </div>
+        <div class="px-5 py-4 space-y-3">
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Título</label>
+            <input type="text" value="Paranauê" class="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Empty State (Members only)</p>
+      <div class="bg-white rounded-xl p-8 border border-stone-200 text-center space-y-4">
+        <svg class="w-8 h-8 text-stone-300 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+        </svg>
+        <div class="space-y-1">
+          <p class="text-sm font-semibold text-stone-700">Conteúdo exclusivo para membros</p>
+          <p class="text-sm text-stone-400">Letra e tradução disponíveis com assinatura Abadá Música ($2.99/mês).</p>
+        </div>
+        <a href="#" class="inline-block px-6 py-2.5 rounded-xl bg-capoeira-gold text-capoeira-brown font-bold text-sm">Seja Membro</a>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

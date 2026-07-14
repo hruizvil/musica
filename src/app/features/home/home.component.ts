@@ -9,27 +9,28 @@ import { FirebaseService } from '../../core/services/firebase.service';
   imports: [RouterLink],
   template: `
     <!-- Hero -->
-    <section class="rounded-2xl bg-gradient-to-br from-capoeira-brown via-amber-900 to-stone-900 text-white px-5 py-8 sm:px-8 sm:py-12 mb-10 relative overflow-hidden">
-      <div class="absolute -top-12 -right-12 w-64 h-64 rounded-full border border-white/5 pointer-events-none"></div>
-      <div class="absolute -top-4 -right-4 w-40 h-40 rounded-full border border-white/5 pointer-events-none"></div>
+    <section class="rounded-2xl bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-capoeira-brown via-amber-900/90 to-capoeira-night text-white px-6 py-16 sm:px-10 sm:py-24 mb-10 relative overflow-hidden min-h-[60vh] flex flex-col justify-center">
+      <div class="absolute -top-16 -right-16 w-80 h-80 rounded-full bg-white/3 blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-8 -left-8 w-56 h-56 rounded-full bg-capoeira-gold/10 blur-3xl pointer-events-none"></div>
+      <div class="absolute top-8 right-8 w-32 h-32 rounded-full border border-white/5 pointer-events-none"></div>
 
-      <p class="text-capoeira-gold text-xs font-semibold uppercase tracking-widest mb-3">Abadá Capoeira</p>
-      <h1 class="font-display text-4xl md:text-5xl font-bold mb-4 leading-tight">
+      <p class="text-capoeira-gold text-xs font-semibold uppercase tracking-widest mb-4 border-b border-capoeira-gold/30 pb-1 w-fit">Abadá Capoeira</p>
+      <h1 class="font-display text-5xl md:text-7xl font-bold mb-5 leading-[1.05]">
         A biblioteca musical<br class="hidden sm:block"> da capoeira
       </h1>
-      <p class="text-amber-100/75 text-sm max-w-md leading-relaxed mb-8">
+      <p class="text-amber-100/70 text-base max-w-md leading-relaxed mb-10">
         Letras completas com tradução em inglês, organizadas por toque e estilo.
         Aprenda o repertório da roda — onde quer que você esteja.
       </p>
 
       <div class="flex flex-wrap gap-3">
         <a routerLink="/musicas"
-           class="px-5 py-2.5 rounded-xl bg-capoeira-gold text-capoeira-brown font-bold text-sm hover:bg-amber-400 transition-colors">
+           class="px-6 py-3 rounded-xl bg-capoeira-gold text-capoeira-brown font-bold text-sm hover:bg-amber-400 transition-colors shadow-lg shadow-capoeira-gold/20">
           Explorar músicas
         </a>
         @if (!firebase.currentUser() || (!firebase.membershipActive() && !firebase.isAdmin())) {
           <a routerLink="/membership"
-             class="px-5 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white font-semibold text-sm hover:bg-white/20 transition-colors">
+             class="px-6 py-3 rounded-xl bg-white/10 ring-1 ring-white/25 text-white font-semibold text-sm hover:bg-white/20 transition-colors">
             Seja Membro — $2.99/mês
           </a>
         }
@@ -40,24 +41,24 @@ import { FirebaseService } from '../../core/services/firebase.service';
     <section class="grid grid-cols-3 gap-3 mb-10">
       @for (stat of stats(); track stat.label) {
         <a [routerLink]="stat.path"
-           class="group flex flex-col items-center gap-1.5 py-5 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:border-capoeira-gold hover:shadow-sm transition-all text-center">
+           class="group flex flex-col items-center gap-2 py-6 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-capoeira-gold/30 transition-all duration-200 text-center">
           <span class="text-2xl">{{ stat.icon }}</span>
-          <span class="text-lg font-bold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold">{{ stat.count() }}</span>
-          <span class="text-xs text-stone-400">{{ stat.label }}</span>
+          <span class="text-2xl font-bold font-display text-capoeira-gold">{{ stat.count() }}</span>
+          <span class="text-xs text-stone-400 font-medium">{{ stat.label }}</span>
         </a>
       }
     </section>
 
     <!-- Why us -->
     <section class="mb-10">
-      <h2 class="font-display text-xl font-bold text-stone-800 dark:text-stone-100 mb-5">
+      <h2 class="font-display text-xl font-bold text-stone-800 dark:text-stone-100 mb-5 border-l-4 border-capoeira-gold pl-4">
         Por que somos diferentes
       </h2>
       <div class="grid sm:grid-cols-3 gap-4">
         @for (reason of whyUs; track reason.title) {
-          <div class="p-5 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
-            <div class="text-2xl mb-3">{{ reason.icon }}</div>
-            <h3 class="font-semibold text-stone-800 dark:text-stone-100 mb-1.5">{{ reason.title }}</h3>
+          <div class="p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:ring-1 hover:ring-capoeira-gold/20 transition-all duration-200">
+            <div class="text-2xl mb-4 w-12 h-12 rounded-2xl bg-capoeira-gold/10 flex items-center justify-center">{{ reason.icon }}</div>
+            <h3 class="font-bold text-stone-800 dark:text-stone-100 mb-2">{{ reason.title }}</h3>
             <p class="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">{{ reason.body }}</p>
           </div>
         }
@@ -66,19 +67,19 @@ import { FirebaseService } from '../../core/services/firebase.service';
 
     <!-- Recent songs -->
     <section class="mb-10">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="font-display text-lg font-semibold text-stone-800 dark:text-stone-100">Últimas adicionadas</h2>
-        <a routerLink="/musicas" class="text-xs text-capoeira-gold hover:underline">Ver todas →</a>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-display text-lg font-bold text-stone-800 dark:text-stone-100 border-l-4 border-capoeira-gold pl-4">Últimas adicionadas</h2>
+        <a routerLink="/musicas" class="text-xs text-capoeira-gold hover:underline font-medium">Ver todas →</a>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         @for (song of data.recentSongs(); track song.id) {
           <a [routerLink]="['/musicas', song.id]"
-             class="group flex flex-col gap-2 p-3 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:border-capoeira-gold hover:shadow-sm transition-all">
+             class="group flex flex-col gap-3 p-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-center justify-between">
-              <span class="w-2 h-2 rounded-full shrink-0" [class]="typeDot(song.type)"></span>
-              <span class="text-xs text-stone-400">{{ songTypeLabel(song.type) }}</span>
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" [class]="typeDot(song.type)"></span>
+              <span class="text-xs text-stone-500 font-medium">{{ songTypeLabel(song.type) }}</span>
             </div>
-            <span class="text-sm font-semibold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug line-clamp-2">{{ song.title }}</span>
+            <span class="text-[15px] font-bold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug line-clamp-2">{{ song.title }}</span>
           </a>
         }
       </div>

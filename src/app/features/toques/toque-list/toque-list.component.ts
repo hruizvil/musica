@@ -35,13 +35,13 @@ const TAB_LABELS: Record<string, string> = {
       </div>
 
       <!-- Tabs -->
-      <div class="flex gap-0 border-b border-stone-200 dark:border-stone-700 overflow-x-auto scrollbar-hide">
+      <div class="flex gap-1 p-1 rounded-xl bg-stone-100 dark:bg-stone-800 overflow-x-auto scrollbar-hide">
         @for (tab of allTabs(); track tab.key) {
           <button (click)="activeTab.set(tab.key)"
-            class="px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px shrink-0"
+            class="px-4 py-2 text-sm font-medium whitespace-nowrap transition-all duration-150 rounded-lg shrink-0"
             [class]="activeTab() === tab.key
-              ? 'border-capoeira-gold text-capoeira-brown dark:text-capoeira-gold'
-              : 'border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'">
+              ? 'bg-white dark:bg-stone-700 text-capoeira-brown dark:text-capoeira-gold shadow-sm'
+              : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'">
             {{ tab.label }}
           </button>
         }
@@ -62,9 +62,9 @@ const TAB_LABELS: Record<string, string> = {
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @for (toque of group.toques; track toque.id) {
               <a [routerLink]="['/toques', toque.id]"
-                 class="group p-5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:border-capoeira-gold hover:shadow-md transition-all">
+                 class="group p-5 rounded-2xl border border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm hover:shadow-md hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
                 <div class="flex items-start justify-between mb-3">
-                  <h3 class="font-display text-base font-semibold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug">
+                  <h3 class="font-display text-base font-bold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug">
                     {{ toque.name }}
                   </h3>
                   <span [class]="tempoClass(toque.tempo)" class="px-2 py-0.5 rounded-full text-xs font-medium shrink-0 ml-2">

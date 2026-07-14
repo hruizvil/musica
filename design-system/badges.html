@@ -1,0 +1,103 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { colors: {
+    'capoeira-gold': '#D4A017', 'capoeira-brown': '#6B3A2A',
+    'capoeira-green': '#2D5016', 'capoeira-cream': '#F5F0E8', 'capoeira-night': '#1A1208',
+  }, fontFamily: { sans: ['Inter','system-ui','sans-serif'], display: ['"Playfair Display"','Georgia','serif'] } } }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white p-8 font-sans">
+  <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-6">Badges & Pills</h2>
+
+  <div class="space-y-8">
+
+    <!-- Song Type Badges -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Song Type Badges</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-0.5 rounded-full text-xs bg-capoeira-gold/10 text-capoeira-brown font-medium">Ladainha</span>
+        <span class="px-2 py-0.5 rounded-full text-xs bg-capoeira-gold/10 text-capoeira-brown font-medium">Corrido</span>
+        <span class="px-2 py-0.5 rounded-full text-xs bg-capoeira-gold/10 text-capoeira-brown font-medium">Louvação</span>
+        <span class="px-2 py-0.5 rounded-full text-xs bg-capoeira-gold/10 text-capoeira-brown font-medium">Quadra</span>
+      </div>
+    </div>
+
+    <!-- Toque Link Badges -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Toque Link Badges</p>
+      <div class="flex flex-wrap gap-2">
+        <a href="#" class="px-2 py-0.5 rounded-full text-xs bg-stone-100 text-stone-500 hover:bg-capoeira-gold/10 hover:text-capoeira-gold transition-colors">São Bento Grande</a>
+        <a href="#" class="px-2 py-0.5 rounded-full text-xs bg-stone-100 text-stone-500 hover:bg-capoeira-gold/10 hover:text-capoeira-gold transition-colors">Angola</a>
+        <a href="#" class="px-2 py-0.5 rounded-full text-xs bg-stone-100 text-stone-500 hover:bg-capoeira-gold/10 hover:text-capoeira-gold transition-colors">Idalina</a>
+      </div>
+    </div>
+
+    <!-- Filter Chips -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Filter Chips</p>
+      <div class="flex flex-wrap gap-2">
+        <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-capoeira-gold text-white">Todos</button>
+        <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-stone-100 text-stone-600 hover:bg-stone-200">Ladainha</button>
+        <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-stone-100 text-stone-600 hover:bg-stone-200">Corrido</button>
+        <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-stone-100 text-stone-600 hover:bg-stone-200">Louvação</button>
+        <button class="px-3 py-1.5 rounded-full text-xs font-medium bg-stone-100 text-stone-600 hover:bg-stone-200">Quadra</button>
+      </div>
+    </div>
+
+    <!-- Song Type Dot Indicators -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Type Dot Indicators</p>
+      <div class="flex flex-wrap gap-4">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span class="text-xs text-stone-600">Ladainha</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span class="text-xs text-stone-600">Corrido</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+          <span class="text-xs text-stone-600">Louvação</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+          <span class="text-xs text-stone-600">Quadra</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Indicators -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Status Indicators</p>
+      <div class="flex flex-wrap gap-4">
+        <div class="flex items-center gap-1 text-xs text-amber-600">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+          Não salvo
+        </div>
+        <div class="flex items-center gap-1 text-xs text-emerald-600">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          Salvo
+        </div>
+        <div class="flex items-center gap-1.5 text-xs">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+          <span class="text-stone-500">Active</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs">
+          <span class="w-1.5 h-1.5 rounded-full bg-stone-200"></span>
+          <span class="text-stone-500">Inactive</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

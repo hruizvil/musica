@@ -1,0 +1,93 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { colors: {
+    'capoeira-gold': '#D4A017', 'capoeira-brown': '#6B3A2A',
+    'capoeira-green': '#2D5016', 'capoeira-cream': '#F5F0E8', 'capoeira-night': '#1A1208',
+  }, fontFamily: { sans: ['Inter','system-ui','sans-serif'], display: ['"Playfair Display"','Georgia','serif'] } } }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white p-8 font-sans">
+  <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-6">Buttons</h2>
+
+  <div class="space-y-8">
+    <!-- Primary Actions -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Primary Actions</p>
+      <div class="flex flex-wrap gap-3 items-center">
+        <button class="px-4 py-1.5 rounded-lg bg-capoeira-brown text-white text-sm font-semibold hover:bg-capoeira-brown/90 transition-colors">Save</button>
+        <button class="px-4 py-1.5 rounded-lg bg-capoeira-brown text-white text-sm font-semibold opacity-50 cursor-not-allowed">Save (disabled)</button>
+        <button class="px-6 py-2.5 rounded-xl bg-capoeira-gold text-capoeira-brown font-bold text-sm hover:bg-capoeira-gold/90 transition-colors">Seja Membro</button>
+        <button class="w-40 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-capoeira-brown text-white text-sm font-semibold hover:bg-capoeira-brown/90 transition-colors">+ Adicionar música</button>
+      </div>
+    </div>
+
+    <!-- Danger -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Danger</p>
+      <div class="flex flex-wrap gap-3 items-center">
+        <button class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors">Delete Song</button>
+        <button class="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors">Apagar 3 música(s)</button>
+        <button class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-red-500 text-white text-sm font-semibold opacity-40 cursor-not-allowed">Selecione músicas</button>
+      </div>
+    </div>
+
+    <!-- Secondary -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Secondary / Outline</p>
+      <div class="flex flex-wrap gap-3 items-center">
+        <button class="px-3 py-1.5 rounded-lg border border-stone-200 text-stone-500 text-sm hover:bg-stone-50 transition-colors">Cancel</button>
+        <button class="flex items-center gap-1 px-3 py-2 rounded-lg border border-stone-200 text-stone-400 hover:text-capoeira-brown hover:border-capoeira-gold transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          Print
+        </button>
+        <button class="text-xs text-stone-400 hover:text-capoeira-gold transition-colors">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- Toggle Buttons -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Toggle / State Buttons</p>
+      <div class="flex flex-wrap gap-3 items-center">
+        <!-- Favorite inactive -->
+        <button class="flex items-center gap-1 px-3 py-2 rounded-lg border text-sm transition-colors border-stone-200 text-stone-400 hover:text-red-400 hover:border-red-200">♡</button>
+        <!-- Favorite active -->
+        <button class="flex items-center gap-1 px-3 py-2 rounded-lg border text-sm border-red-200 bg-red-50 text-red-500">♥</button>
+        <!-- Learned inactive -->
+        <button class="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-medium border-stone-200 text-stone-400 hover:text-emerald-500 hover:border-emerald-200 transition-colors">Marcar aprendida</button>
+        <!-- Learned active -->
+        <button class="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-medium border-emerald-200 bg-emerald-50 text-emerald-600">✓ Aprendida</button>
+      </div>
+    </div>
+
+    <!-- Preview Toggle -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Preview Toggle (Admin)</p>
+      <div class="flex gap-2 w-72">
+        <button class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border text-sm transition-colors bg-emerald-50 border-emerald-400 text-emerald-800 font-semibold">Public</button>
+        <button class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border text-sm transition-colors border-stone-200 text-stone-500 hover:border-stone-300">Preview only</button>
+      </div>
+    </div>
+
+    <!-- Icon Buttons -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Icon Buttons</p>
+      <div class="flex flex-wrap gap-3 items-center">
+        <button class="p-1 rounded text-stone-300 hover:text-red-400 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <button class="p-1.5 rounded-lg border border-stone-200 text-stone-400 hover:text-capoeira-gold hover:border-capoeira-gold transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

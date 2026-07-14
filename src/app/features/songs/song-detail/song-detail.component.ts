@@ -20,7 +20,7 @@ const SONG_TYPE_LABELS: Record<string, string> = {
 
         <!-- Back + actions -->
         <div class="flex flex-wrap items-center gap-2">
-          <a routerLink="/musicas" class="text-sm text-stone-400 hover:text-capoeira-gold flex items-center gap-1 flex-1">
+          <a routerLink="/musicas" class="flex items-center gap-1.5 text-sm font-medium text-stone-500 hover:text-capoeira-brown dark:hover:text-capoeira-gold px-3 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors flex-1">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             Músicas
           </a>
@@ -29,7 +29,7 @@ const SONG_TYPE_LABELS: Record<string, string> = {
             <div class="flex items-center gap-2 no-print">
               <!-- Favorite -->
               <button (click)="toggleFavorite()" [title]="isFavorite() ? 'Remover favorita' : 'Adicionar aos favoritos'"
-                class="flex items-center gap-1 px-3 py-2 rounded-lg border text-sm transition-colors"
+                class="flex items-center gap-1 px-3 py-2 rounded-xl border text-sm transition-colors shadow-sm"
                 [class]="isFavorite()
                   ? 'border-red-200 bg-red-50 text-red-500 dark:bg-red-900/20 dark:border-red-800'
                   : 'border-stone-200 dark:border-stone-700 text-stone-400 hover:text-red-400 hover:border-red-200'">
@@ -39,7 +39,7 @@ const SONG_TYPE_LABELS: Record<string, string> = {
               <!-- Learned — only for accessible songs -->
               @if (isAccessible()) {
                 <button (click)="toggleLearned()" [title]="isLearned() ? 'Marcar como não aprendida' : 'Marcar como aprendida'"
-                  class="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-medium whitespace-nowrap transition-colors"
+                  class="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-medium whitespace-nowrap transition-colors shadow-sm"
                   [class]="isLearned()
                     ? 'border-emerald-200 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:border-emerald-800'
                     : 'border-stone-200 dark:border-stone-700 text-stone-400 hover:text-emerald-500 hover:border-emerald-200'">
@@ -72,7 +72,7 @@ const SONG_TYPE_LABELS: Record<string, string> = {
               </a>
             }
           </div>
-          <h1 class="font-display text-3xl font-bold text-capoeira-brown dark:text-capoeira-cream">
+          <h1 class="font-display text-3xl md:text-4xl font-bold text-capoeira-brown dark:text-capoeira-cream">
             {{ song()!.title }}
           </h1>
           @if (song()!.composer || song()!.mestre) {
@@ -83,7 +83,7 @@ const SONG_TYPE_LABELS: Record<string, string> = {
         <!-- Lyrics -->
         @if (isAccessible()) {
           @if (song()!.refrao) {
-            <div class="bg-amber-50 dark:bg-amber-900/10 rounded-xl p-5 border border-amber-200 dark:border-amber-800">
+            <div class="bg-amber-50/80 dark:bg-amber-900/15 rounded-xl p-5 border border-amber-200 dark:border-amber-800 shadow-sm">
               <h2 class="text-xs font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-wide mb-3">Refrão</h2>
               @if (song()!.refraoTranslation) {
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -95,12 +95,12 @@ const SONG_TYPE_LABELS: Record<string, string> = {
               }
             </div>
           }
-          <div class="bg-white dark:bg-stone-800 rounded-xl p-6 border border-stone-200 dark:border-stone-700">
+          <div class="bg-white dark:bg-stone-900 rounded-xl p-6 border border-stone-100 dark:border-stone-800 shadow-sm">
             <h2 class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 no-print">Letra</h2>
             <app-lyrics-display [lyrics]="song()!.lyrics" [translation]="song()!.translation" />
           </div>
         } @else {
-          <div class="bg-white dark:bg-stone-800 rounded-xl p-5 sm:p-8 border border-stone-200 dark:border-stone-700 text-center space-y-4 no-print">
+          <div class="bg-white dark:bg-stone-900 rounded-xl p-5 sm:p-8 border border-stone-100 dark:border-stone-800 shadow-sm text-center space-y-4 no-print">
             <svg class="w-8 h-8 text-stone-300 mx-auto" fill="currentColor" viewBox="0 0 24 24">
               <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
             </svg>
@@ -133,7 +133,7 @@ const SONG_TYPE_LABELS: Record<string, string> = {
 
         <!-- Notes -->
         @if (song()!.notes) {
-          <div class="bg-capoeira-gold/5 border border-capoeira-gold/20 rounded-lg p-4 text-sm text-stone-600 dark:text-stone-300">
+          <div class="border-l-4 border-capoeira-gold bg-capoeira-gold/5 dark:bg-capoeira-gold/10 rounded-r-lg p-4 text-sm text-stone-600 dark:text-stone-300">
             {{ song()!.notes }}
           </div>
         }

@@ -1,0 +1,87 @@
+<!-- @dsCard group="Foundation" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { colors: {
+    'capoeira-gold': '#D4A017', 'capoeira-brown': '#6B3A2A',
+    'capoeira-green': '#2D5016', 'capoeira-cream': '#F5F0E8', 'capoeira-night': '#1A1208',
+  }, fontFamily: { sans: ['Inter','system-ui','sans-serif'], display: ['"Playfair Display"','Georgia','serif'] } } }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white p-8 font-sans">
+  <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-6">Typography</h2>
+
+  <div class="space-y-8 max-w-lg">
+    <!-- Display -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Display — Playfair Display</p>
+      <div class="space-y-2 border-l-2 border-stone-100 pl-4">
+        <div>
+          <p class="font-display text-3xl font-bold text-capoeira-brown">Page Title H1</p>
+          <p class="text-[10px] text-stone-400 mt-0.5">font-display text-3xl font-bold text-capoeira-brown</p>
+        </div>
+        <div>
+          <p class="font-display text-lg font-bold text-stone-800">Modal Title H3</p>
+          <p class="text-[10px] text-stone-400 mt-0.5">font-display text-lg font-bold text-stone-800</p>
+        </div>
+        <div>
+          <p class="font-display text-sm font-bold text-capoeira-brown">Header Brand</p>
+          <p class="text-[10px] text-stone-400 mt-0.5">font-display text-sm font-bold text-capoeira-brown</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Body — Inter</p>
+      <div class="space-y-2.5 border-l-2 border-stone-100 pl-4">
+        <div>
+          <p class="text-sm font-semibold text-stone-800">Song Card Title</p>
+          <p class="text-[10px] text-stone-400 mt-0.5">text-sm font-semibold text-stone-800</p>
+        </div>
+        <div>
+          <p class="text-sm text-stone-500">Body / Subtitle text</p>
+          <p class="text-[10px] text-stone-400 mt-0.5">text-sm text-stone-500</p>
+        </div>
+        <div>
+          <p class="text-sm text-stone-700 whitespace-pre-wrap leading-relaxed">Lyrics & multi-line content</p>
+          <p class="text-[10px] text-stone-400 mt-0.5">text-sm text-stone-700 leading-relaxed</p>
+        </div>
+        <div>
+          <p class="text-sm text-stone-500 italic leading-relaxed">Translation text (italic)</p>
+          <p class="text-[10px] text-stone-400 mt-0.5">text-sm text-stone-500 italic leading-relaxed</p>
+        </div>
+        <div>
+          <p class="text-xs text-stone-400">Small / metadata</p>
+          <p class="text-[10px] text-stone-400 mt-0.5">text-xs text-stone-400</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Labels -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Labels & Overlines</p>
+      <div class="space-y-2.5 border-l-2 border-stone-100 pl-4">
+        <div>
+          <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Form Label</p>
+          <p class="text-[10px] text-stone-400 mt-0.5">text-xs font-semibold text-stone-400 uppercase tracking-wide</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-stone-400">Section Label</p>
+          <p class="text-[10px] text-stone-400 mt-0.5">text-xs font-bold uppercase tracking-widest text-stone-400</p>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Dropdown Group Header</p>
+          <p class="text-[10px] text-stone-400 mt-0.5">text-[10px] font-bold uppercase tracking-widest text-stone-300</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

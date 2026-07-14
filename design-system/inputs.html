@@ -1,0 +1,106 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { colors: {
+    'capoeira-gold': '#D4A017', 'capoeira-brown': '#6B3A2A',
+    'capoeira-green': '#2D5016', 'capoeira-cream': '#F5F0E8', 'capoeira-night': '#1A1208',
+  }, fontFamily: { sans: ['Inter','system-ui','sans-serif'], display: ['"Playfair Display"','Georgia','serif'] } } }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white p-8 font-sans">
+  <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-6">Form Inputs</h2>
+
+  <div class="space-y-8 max-w-md">
+
+    <!-- Text Input -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Text Input</p>
+      <div class="space-y-3">
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Título</label>
+          <input type="text" placeholder="ex: Paranauê" value=""
+            class="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-stone-800 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold transition-shadow" />
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Compositor</label>
+          <input type="text" value="Mestre Bimba"
+            class="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-stone-800 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold transition-shadow" />
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Disabled</label>
+          <input type="text" value="Read only" disabled
+            class="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-stone-400 text-sm opacity-60 cursor-not-allowed" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Search Input</p>
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input type="text" placeholder="Buscar músicas..."
+          class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-stone-200 bg-white text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-capoeira-gold text-sm" />
+      </div>
+    </div>
+
+    <!-- Toque Selection (filled) -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Toque Selection</p>
+      <div class="space-y-1.5">
+        <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Toque</label>
+        <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-amber-300 bg-amber-50 text-amber-800 text-sm">
+          <span class="flex-1 truncate">São Bento Grande</span>
+          <button class="text-amber-400 hover:text-amber-600 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <input type="text" placeholder="Trocar toque..."
+          class="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-stone-800 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
+      </div>
+    </div>
+
+    <!-- Select Dropdown -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Select</p>
+      <select class="text-sm bg-white border border-stone-200 rounded-lg px-3 py-1.5 text-stone-600 focus:outline-none focus:border-capoeira-gold cursor-pointer">
+        <option>Tipo de música</option>
+        <option>Ladainha</option>
+        <option>Corrido</option>
+        <option>Louvação</option>
+        <option>Quadra</option>
+      </select>
+    </div>
+
+    <!-- Textarea -->
+    <div class="space-y-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300">Textarea</p>
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Letra (Português)</label>
+          <a href="#" class="text-xs text-stone-400 hover:text-capoeira-gold transition-colors">PT→EN ↗</a>
+        </div>
+        <textarea rows="4" placeholder="Escuta só quem está chamando..."
+          class="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-stone-800 text-sm leading-relaxed placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold resize-y">Escuta só quem está chamando
+A roda já se formou
+Agora é berimbau</textarea>
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Notas</label>
+        <textarea rows="2" placeholder="Contexto histórico, dicas de pronúncia..."
+          class="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-white text-stone-800 text-sm leading-relaxed placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold resize-y"></textarea>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

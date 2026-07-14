@@ -1,0 +1,129 @@
+<!-- @dsCard group="Foundation" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { colors: {
+    'capoeira-gold': '#D4A017', 'capoeira-brown': '#6B3A2A',
+    'capoeira-green': '#2D5016', 'capoeira-cream': '#F5F0E8', 'capoeira-night': '#1A1208',
+  }, fontFamily: { sans: ['Inter','system-ui','sans-serif'], display: ['"Playfair Display"','Georgia','serif'] } } }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white p-8 font-sans">
+  <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-6">Color Palette</h2>
+
+  <div class="space-y-6">
+    <!-- Brand Colors -->
+    <div>
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300 mb-3">Brand</p>
+      <div class="flex gap-3 flex-wrap">
+        <div class="space-y-1.5">
+          <div class="w-20 h-20 rounded-xl bg-capoeira-gold shadow-sm"></div>
+          <p class="text-xs font-semibold text-stone-700">Gold</p>
+          <p class="text-[10px] text-stone-400">#D4A017</p>
+        </div>
+        <div class="space-y-1.5">
+          <div class="w-20 h-20 rounded-xl bg-capoeira-brown shadow-sm"></div>
+          <p class="text-xs font-semibold text-stone-700">Brown</p>
+          <p class="text-[10px] text-stone-400">#6B3A2A</p>
+        </div>
+        <div class="space-y-1.5">
+          <div class="w-20 h-20 rounded-xl bg-capoeira-green shadow-sm"></div>
+          <p class="text-xs font-semibold text-stone-700">Green</p>
+          <p class="text-[10px] text-stone-400">#2D5016</p>
+        </div>
+        <div class="space-y-1.5">
+          <div class="w-20 h-20 rounded-xl bg-capoeira-cream border border-stone-200 shadow-sm"></div>
+          <p class="text-xs font-semibold text-stone-700">Cream</p>
+          <p class="text-[10px] text-stone-400">#F5F0E8</p>
+        </div>
+        <div class="space-y-1.5">
+          <div class="w-20 h-20 rounded-xl bg-capoeira-night shadow-sm"></div>
+          <p class="text-xs font-semibold text-stone-700">Night</p>
+          <p class="text-[10px] text-stone-400">#1A1208</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- UI Colors -->
+    <div>
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300 mb-3">UI State Colors</p>
+      <div class="flex gap-3 flex-wrap">
+        <div class="space-y-1.5">
+          <div class="w-20 h-12 rounded-lg bg-red-500 shadow-sm"></div>
+          <p class="text-xs font-semibold text-stone-700">Danger</p>
+          <p class="text-[10px] text-stone-400">red-500</p>
+        </div>
+        <div class="space-y-1.5">
+          <div class="w-20 h-12 rounded-lg bg-emerald-500 shadow-sm"></div>
+          <p class="text-xs font-semibold text-stone-700">Success</p>
+          <p class="text-[10px] text-stone-400">emerald-500</p>
+        </div>
+        <div class="space-y-1.5">
+          <div class="w-20 h-12 rounded-lg bg-amber-400 shadow-sm"></div>
+          <p class="text-xs font-semibold text-stone-700">Warning</p>
+          <p class="text-[10px] text-stone-400">amber-400</p>
+        </div>
+        <div class="space-y-1.5">
+          <div class="w-20 h-12 rounded-lg bg-sky-400 shadow-sm"></div>
+          <p class="text-xs font-semibold text-stone-700">Info</p>
+          <p class="text-[10px] text-stone-400">sky-400</p>
+        </div>
+        <div class="space-y-1.5">
+          <div class="w-20 h-12 rounded-lg bg-purple-400 shadow-sm"></div>
+          <p class="text-xs font-semibold text-stone-700">Accent</p>
+          <p class="text-[10px] text-stone-400">purple-400</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stone Scale -->
+    <div>
+      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-300 mb-3">Stone Neutral Scale</p>
+      <div class="flex gap-2 flex-wrap">
+        <div class="space-y-1">
+          <div class="w-14 h-8 rounded-md bg-stone-50 border border-stone-200"></div>
+          <p class="text-[10px] text-stone-400 text-center">50</p>
+        </div>
+        <div class="space-y-1">
+          <div class="w-14 h-8 rounded-md bg-stone-100"></div>
+          <p class="text-[10px] text-stone-400 text-center">100</p>
+        </div>
+        <div class="space-y-1">
+          <div class="w-14 h-8 rounded-md bg-stone-200"></div>
+          <p class="text-[10px] text-stone-400 text-center">200</p>
+        </div>
+        <div class="space-y-1">
+          <div class="w-14 h-8 rounded-md bg-stone-300"></div>
+          <p class="text-[10px] text-stone-400 text-center">300</p>
+        </div>
+        <div class="space-y-1">
+          <div class="w-14 h-8 rounded-md bg-stone-400"></div>
+          <p class="text-[10px] text-stone-400 text-center">400</p>
+        </div>
+        <div class="space-y-1">
+          <div class="w-14 h-8 rounded-md bg-stone-500"></div>
+          <p class="text-[10px] text-stone-400 text-center">500</p>
+        </div>
+        <div class="space-y-1">
+          <div class="w-14 h-8 rounded-md bg-stone-700"></div>
+          <p class="text-[10px] text-stone-400 text-center">700</p>
+        </div>
+        <div class="space-y-1">
+          <div class="w-14 h-8 rounded-md bg-stone-800"></div>
+          <p class="text-[10px] text-stone-400 text-center">800</p>
+        </div>
+        <div class="space-y-1">
+          <div class="w-14 h-8 rounded-md bg-stone-900"></div>
+          <p class="text-[10px] text-stone-400 text-center">900</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

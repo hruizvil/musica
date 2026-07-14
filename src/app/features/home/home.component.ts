@@ -15,7 +15,7 @@ import { FirebaseService } from '../../core/services/firebase.service';
       <div class="absolute top-8 right-8 w-32 h-32 rounded-full border border-white/5 pointer-events-none"></div>
 
       <p class="text-capoeira-gold text-xs font-semibold uppercase tracking-widest mb-4 border-b border-capoeira-gold/30 pb-1 w-fit">Abadá Capoeira</p>
-      <h1 class="font-display text-5xl md:text-7xl font-bold mb-5 leading-[1.05]">
+      <h1 class="font-display text-4xl sm:text-5xl md:text-7xl font-bold mb-5 leading-[1.05]">
         A biblioteca musical<br class="hidden sm:block"> da capoeira
       </h1>
       <p class="text-amber-100/70 text-base max-w-md leading-relaxed mb-10">
@@ -74,7 +74,7 @@ import { FirebaseService } from '../../core/services/firebase.service';
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         @for (song of data.recentSongs(); track song.id) {
           <a [routerLink]="['/musicas', song.id]"
-             class="group flex flex-col gap-3 p-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
+             class="group flex flex-col gap-3 p-3 sm:p-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
             <div class="flex items-center justify-between">
               <span class="w-2.5 h-2.5 rounded-full shrink-0" [class]="typeDot(song.type)"></span>
               <span class="text-xs text-stone-500 font-medium">{{ songTypeLabel(song.type) }}</span>

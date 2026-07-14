@@ -74,7 +74,7 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
         @for (song of search.filteredSongs(); track song.id) {
           @if (isAccessible(song)) {
             <a [routerLink]="['/musicas', song.id]"
-               class="group relative flex flex-col gap-3 p-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
+               class="group relative flex flex-col gap-3 p-3 sm:p-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
               <div class="flex items-center justify-between">
                 <span class="w-2.5 h-2.5 rounded-full shrink-0" [class]="typeDot(song.type)"></span>
                 <div class="flex items-center gap-1.5">
@@ -93,7 +93,7 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
               }
             </a>
           } @else {
-            <div class="flex flex-col gap-3 p-4 rounded-2xl bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 cursor-default opacity-70">
+            <div class="flex flex-col gap-3 p-3 sm:p-4 rounded-2xl bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 cursor-default opacity-70">
               <div class="flex items-center justify-between">
                 <svg class="w-3.5 h-3.5 text-stone-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>

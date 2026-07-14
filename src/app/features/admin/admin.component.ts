@@ -272,15 +272,15 @@ type PanelMode = 'none' | 'edit' | 'add';
 
           @if (panelMode() !== 'none') {
             <!-- Mobile back button -->
-            <div class="md:hidden flex items-center gap-2 px-4 py-2.5 border-b border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 shrink-0">
-              <button (click)="closePanel()" class="flex items-center gap-1.5 text-sm text-capoeira-brown dark:text-capoeira-gold font-medium">
+            <div class="md:hidden flex items-center gap-2 px-4 py-2.5 border-b border-stone-200/60 dark:border-stone-800/60 bg-white/90 dark:bg-stone-950/90 backdrop-blur-md shrink-0">
+              <button (click)="closePanel()" class="flex items-center gap-1.5 text-sm text-capoeira-brown dark:text-capoeira-gold font-medium px-2 py-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
                 Músicas
               </button>
               @if (isDirty()) {
-                <span class="ml-auto flex items-center gap-1 text-xs text-amber-600">
+                <span class="ml-auto flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full">
                   <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                   Não salvo
                 </span>

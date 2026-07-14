@@ -72,7 +72,7 @@ const SONG_TYPE_LABELS: Record<string, string> = {
               </a>
             }
           </div>
-          <h1 class="font-display text-3xl md:text-4xl font-bold text-capoeira-brown dark:text-capoeira-cream">
+          <h1 class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-capoeira-brown dark:text-capoeira-cream">
             {{ song()!.title }}
           </h1>
           @if (song()!.composer || song()!.mestre) {

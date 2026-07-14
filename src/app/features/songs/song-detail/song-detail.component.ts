@@ -120,45 +120,17 @@ const TYPE_LABELS: Record<string, string> = {
               </div>
             }
 
-            <!-- Letra with tabs -->
-            <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-100 dark:border-stone-800 shadow-sm overflow-hidden">
-              <!-- Tab bar -->
+            <!-- Letra -->
+            <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-100 dark:border-stone-800 shadow-sm p-6">
+              <h2 class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 no-print">Letra</h2>
               @if (song()!.translation) {
-                <div class="flex border-b border-stone-100 dark:border-stone-800 no-print">
-                  <button (click)="activeTab.set('pt')"
-                    class="px-5 py-3 text-sm font-semibold transition-colors border-b-2"
-                    [class]="activeTab() === 'pt'
-                      ? 'border-capoeira-gold text-capoeira-brown dark:text-capoeira-gold'
-                      : 'border-transparent text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'">
-                    Português
-                  </button>
-                  <button (click)="activeTab.set('en')"
-                    class="px-5 py-3 text-sm font-semibold transition-colors border-b-2"
-                    [class]="activeTab() === 'en'
-                      ? 'border-capoeira-gold text-capoeira-brown dark:text-capoeira-gold'
-                      : 'border-transparent text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'">
-                    English
-                  </button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-800 dark:text-stone-200">{{ song()!.lyrics }}</pre>
+                  <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-500 dark:text-stone-400 italic sm:border-l sm:border-stone-100 sm:dark:border-stone-800 sm:pl-6">{{ song()!.translation }}</pre>
                 </div>
               } @else {
-                <div class="px-6 pt-4 pb-0">
-                  <h2 class="text-xs font-semibold text-stone-400 uppercase tracking-wide no-print">Letra</h2>
-                </div>
+                <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-800 dark:text-stone-200">{{ song()!.lyrics }}</pre>
               }
-              <div class="p-6">
-                @if (activeTab() === 'pt' || !song()!.translation) {
-                  <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-800 dark:text-stone-200">{{ song()!.lyrics }}</pre>
-                } @else {
-                  <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-600 dark:text-stone-300 italic">{{ song()!.translation }}</pre>
-                }
-                <!-- Print: always show both -->
-                @if (song()!.translation) {
-                  <div class="hidden print:block mt-6 pt-6 border-t border-stone-200">
-                    <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">English</p>
-                    <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-600 italic">{{ song()!.translation }}</pre>
-                  </div>
-                }
-              </div>
             </div>
 
             <!-- Sobre esta música -->
@@ -308,8 +280,6 @@ export class SongDetailComponent {
       .filter(s => s.id !== song.id)
       .slice(0, 5);
   });
-  readonly activeTab = signal<'pt' | 'en'>('pt');
-
   toqueName = (id: string): string => this.data.toqueById().get(id)?.name ?? id;
 
   toggleFavorite() { this.firebase.toggleFavorite(this.id()); }

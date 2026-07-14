@@ -151,9 +151,7 @@ export class SongDetailComponent {
 
   song = computed(() => this.data.songById().get(this.id()));
   typeLabel = computed(() => SONG_TYPE_LABELS[this.song()?.type ?? ''] ?? '');
-  isAccessible = computed(() =>
-    !!this.song()?.preview || this.firebase.membershipActive() || this.firebase.isAdmin()
-  );
+  isAccessible = computed(() => true);
   isFavorite = computed(() => this.firebase.favorites().has(this.id()));
   isLearned = computed(() => this.firebase.learnedSongs().has(this.id()));
 

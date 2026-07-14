@@ -133,8 +133,8 @@ export class SongListComponent {
       .map(c => ({ label: TOQUE_CATEGORY_LABELS[c], toques: byCategory.get(c)! }));
   });
 
-  isAccessible(song: Song): boolean {
-    return !!song.preview || this.firebase.membershipActive() || this.firebase.isAdmin();
+  isAccessible(_song: Song): boolean {
+    return true;
   }
 
   typeLabel(type: string): string {

@@ -53,11 +53,6 @@ const TYPE_LABELS: Record<string, string> = {
                     RITMO: {{ toqueName(t).toUpperCase() }}
                   </a>
                 }
-                @if (typeLabel()) {
-                  <span class="px-3 py-1 rounded-full text-xs font-semibold bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 border border-stone-200 dark:border-stone-700">
-                    {{ typeLabel().toUpperCase() }}
-                  </span>
-                }
               </div>
             </div>
 
@@ -172,16 +167,6 @@ const TYPE_LABELS: Record<string, string> = {
                   <div>
                     <p class="text-xs text-stone-400 font-medium mb-0.5">Ritmo</p>
                     <p class="text-stone-700 dark:text-stone-200 font-medium">{{ song()!.toque.map(toqueName).join(', ') }}</p>
-                  </div>
-                </div>
-              }
-
-              @if (typeLabel()) {
-                <div class="flex items-start gap-3 text-sm">
-                  <span class="text-lg shrink-0 mt-0.5">🎵</span>
-                  <div>
-                    <p class="text-xs text-stone-400 font-medium mb-0.5">Tipo</p>
-                    <p class="text-stone-700 dark:text-stone-200 font-medium">{{ typeLabel() }}</p>
                   </div>
                 </div>
               }

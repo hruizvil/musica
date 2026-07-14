@@ -3,14 +3,9 @@ import { RouterLink } from '@angular/router';
 import { SearchService } from '../../../core/services/search.service';
 import { DataService } from '../../../core/services/data.service';
 import { FirebaseService } from '../../../core/services/firebase.service';
-import { FilterChipComponent } from '../../../shared/components/filter-chip/filter-chip.component';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
-import { Song, SongType } from '../../../core/models/song.model';
+import { Song } from '../../../core/models/song.model';
 import { Toque } from '../../../core/models/toque.model';
-
-const SONG_TYPE_LABELS: Record<SongType, string> = {
-  ladainha: 'Ladainha', corrido: 'Corrido', louvacao: 'Louvação', quadra: 'Quadra'
-};
 
 const TOQUE_CATEGORY_ORDER = ['angola', 'regional', 'abada', 'other'];
 const TOQUE_CATEGORY_LABELS: Record<string, string> = {
@@ -21,7 +16,7 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-song-list',
   standalone: true,
-  imports: [RouterLink, FilterChipComponent, SearchBarComponent],
+  imports: [RouterLink, SearchBarComponent],
   template: `
     <div class="space-y-6">
       <div>
@@ -33,17 +28,6 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
 
       <!-- Filters -->
       <div class="space-y-3">
-        <!-- Type chips -->
-        <div class="flex flex-wrap gap-2 items-center">
-          <span class="text-xs font-semibold text-stone-400 uppercase tracking-wide shrink-0">Tipo</span>
-          @for (type of songTypes; track type.value) {
-            <app-filter-chip
-              [label]="type.label"
-              [active]="search.activeSongType() === type.value"
-              (toggle)="search.activeSongType.set(search.activeSongType() === type.value ? null : type.value)" />
-          }
-        </div>
-
         <!-- Toque dropdown -->
         <div class="flex items-center gap-3">
           <span class="text-xs font-semibold text-stone-400 uppercase tracking-wide shrink-0">Toque</span>
@@ -62,7 +46,7 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
           </select>
         </div>
 
-        @if (search.activeSongType() || search.activeToqueFilter()) {
+        @if (search.activeToqueFilter()) {
           <button (click)="search.clearFilters()" class="text-xs text-stone-400 hover:text-capoeira-gold underline">
             Limpar filtros
           </button>
@@ -109,8 +93,6 @@ export class SongListComponent {
   data = inject(DataService);
   firebase = inject(FirebaseService);
 
-  songTypes = Object.entries(SONG_TYPE_LABELS).map(([value, label]) => ({ value: value as SongType, label }));
-
   groupedToques = computed(() => {
     const byCategory = new Map<string, Toque[]>();
     for (const toque of this.data.toques()) {
@@ -127,21 +109,7 @@ export class SongListComponent {
     return true;
   }
 
-  typeLabel(type: string): string {
-    return SONG_TYPE_LABELS[type as SongType] ?? type;
-  }
-
   toqueName(id: string): string {
     return this.data.toqueById().get(id)?.name ?? id;
-  }
-
-  typeDot(type: string): string {
-    const map: Record<string, string> = {
-      ladainha: 'bg-amber-400',
-      corrido:  'bg-emerald-400',
-      louvacao: 'bg-sky-400',
-      quadra:   'bg-purple-400',
-    };
-    return map[type] ?? 'bg-stone-300';
   }
 }

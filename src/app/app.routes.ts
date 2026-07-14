@@ -47,12 +47,13 @@ export const routes: Routes = [
         path: 'admin/login',
         loadComponent: () => import('./features/admin/admin-login.component').then(m => m.AdminLoginComponent),
       },
-      {
-        path: 'admin',
-        loadComponent: () => import('./features/admin/admin.component').then(m => m.AdminComponent),
-        canActivate: [authGuard],
-      },
     ],
+  },
+  // Admin uses its own full-viewport shell (no site header/footer)
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/admin.component').then(m => m.AdminComponent),
+    canActivate: [authGuard],
   },
   { path: '**', redirectTo: '' },
 ];

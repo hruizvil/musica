@@ -18,6 +18,8 @@ export interface Song {
   themes: string[];
   audioLinks: AudioLinks;
   notes: string | null;
+  refrao?: string | null;
+  refraoTranslation?: string | null;
   dateAdded: string;
   preview?: boolean;
 }

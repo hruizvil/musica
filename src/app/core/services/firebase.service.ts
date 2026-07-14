@@ -23,6 +23,8 @@ export interface SongOverride {
   lyrics?: string;
   translation?: string;
   notes?: string | null;
+  refrao?: string | null;
+  refraoTranslation?: string | null;
   deleted?: boolean;
   preview?: boolean;
 }

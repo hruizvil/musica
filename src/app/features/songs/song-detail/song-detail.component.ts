@@ -82,6 +82,19 @@ const SONG_TYPE_LABELS: Record<string, string> = {
 
         <!-- Lyrics -->
         @if (isAccessible()) {
+          @if (song()!.refrao) {
+            <div class="bg-amber-50 dark:bg-amber-900/10 rounded-xl p-5 border border-amber-200 dark:border-amber-800">
+              <h2 class="text-xs font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-wide mb-3">Refrão</h2>
+              @if (song()!.refraoTranslation) {
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <pre class="font-sans text-sm text-stone-700 dark:text-stone-300 whitespace-pre-wrap leading-relaxed">{{ song()!.refrao }}</pre>
+                  <pre class="font-sans text-sm text-stone-500 dark:text-stone-400 whitespace-pre-wrap leading-relaxed italic">{{ song()!.refraoTranslation }}</pre>
+                </div>
+              } @else {
+                <pre class="font-sans text-sm text-stone-700 dark:text-stone-300 whitespace-pre-wrap leading-relaxed">{{ song()!.refrao }}</pre>
+              }
+            </div>
+          }
           <div class="bg-white dark:bg-stone-800 rounded-xl p-6 border border-stone-200 dark:border-stone-700">
             <h2 class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 no-print">Letra</h2>
             <app-lyrics-display [lyrics]="song()!.lyrics" [translation]="song()!.translation" />

@@ -31,9 +31,6 @@ const SONG_TYPE_LABELS: Record<string, string> = {
             <!-- Header — always visible -->
             <div>
               <div class="flex flex-wrap gap-2 mb-2">
-                <span class="px-2 py-0.5 rounded-full text-xs bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold font-medium">
-                  {{ typeLabel() }}
-                </span>
                 @for (t of song()!.toque; track t) {
                   <a [routerLink]="['/toques', t]" class="no-print px-2 py-0.5 rounded-full text-xs bg-stone-100 dark:bg-stone-700 text-stone-500 dark:text-stone-400 hover:bg-capoeira-gold/10 hover:text-capoeira-gold transition-colors">
                     {{ toqueName(t) }}

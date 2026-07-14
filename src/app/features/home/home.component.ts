@@ -71,14 +71,10 @@ import { FirebaseService } from '../../core/services/firebase.service';
         <h2 class="font-display text-lg font-bold text-stone-800 dark:text-stone-100 border-l-4 border-capoeira-gold pl-4">Últimas adicionadas</h2>
         <a routerLink="/musicas" class="text-xs text-capoeira-gold hover:underline font-medium">Ver todas →</a>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3">
         @for (song of data.recentSongs(); track song.id) {
           <a [routerLink]="['/musicas', song.id]"
-             class="group flex flex-col gap-3 p-3 sm:p-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
-            <div class="flex items-center justify-between">
-              <span class="w-2.5 h-2.5 rounded-full shrink-0" [class]="typeDot(song.type)"></span>
-              <span class="text-xs text-stone-500 font-medium">{{ songTypeLabel(song.type) }}</span>
-            </div>
+             class="group flex flex-col gap-2 p-3 sm:p-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
             <span class="text-[15px] font-bold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug line-clamp-2">{{ song.title }}</span>
           </a>
         }

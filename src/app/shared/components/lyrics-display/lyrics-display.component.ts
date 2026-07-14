@@ -12,7 +12,7 @@ import { Component, input, signal } from '@angular/core';
           <button
             (click)="showTranslation.set(!showTranslation())"
             class="text-sm text-capoeira-gold hover:underline flex items-center gap-1">
-            {{ showTranslation() ? 'Ocultar tradução' : 'Ver tradução (inglês)' }}
+            {{ showTranslation() ? 'Ocultar tradução (inglês)' : 'Ver tradução (inglês)' }}
           </button>
           @if (showTranslation()) {
             <pre class="mt-2 font-display text-sm leading-relaxed whitespace-pre-line text-stone-500 dark:text-stone-400 border-l-2 border-capoeira-gold pl-4">{{ translation() }}</pre>
@@ -26,5 +26,5 @@ export class LyricsDisplayComponent {
   lyrics = input.required<string>();
   translation = input<string | null>(null);
 
-  readonly showTranslation = signal(false);
+  readonly showTranslation = signal(true);
 }

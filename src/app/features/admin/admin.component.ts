@@ -8,6 +8,7 @@ import { FirebaseService, SongOverride } from '../../core/services/firebase.serv
 import { ThemeService } from '../../core/services/theme.service';
 import { Song } from '../../core/models/song.model';
 import { Toque } from '../../core/models/toque.model';
+import { normalizeForSearch } from '../../core/utils/text-normalize';
 
 const YOUTUBE_RE = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/;
 const SPOTIFY_RE = /open\.spotify\.com\/(track|album|playlist)\/([A-Za-z0-9]+)/;
@@ -22,6 +23,17 @@ function normalizeSpotify(input: string): string {
   if (input.startsWith('spotify:')) return input.trim();
   const m = input.match(SPOTIFY_RE);
   return m ? `spotify:${m[1]}:${m[2]}` : input.trim();
+}
+
+// Conservative cleanup only: strip surrounding quote characters (straight or curly).
+// Deliberately does not try to split noisy "Title" - Channel Name strings apart —
+// author_name from oEmbed already gives the channel/composer separately, so guessing
+// at a separator would be clever, not predictable.
+function cleanYoutubeTitle(title: string): string {
+  return title.trim()
+    .replace(/^["'‘’“”]+/, '')
+    .replace(/["'‘’“”]+$/, '')
+    .trim();
 }
 
 function slugify(title: string): string {
@@ -392,7 +404,6 @@ type PanelMode = 'none' | 'edit' | 'add';
 
                   </div>
 
-                  <!-- Refrão -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                       <div class="flex items-center justify-between">
@@ -505,6 +516,60 @@ type PanelMode = 'none' | 'edit' | 'add';
                       class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
                     @if (editYoutube.trim()) {
                       <p class="text-xs text-stone-400">ID: <span class="font-mono text-capoeira-gold">{{ previewYoutubeId() }}</span></p>
+                    }
+
+                    <!-- Metadata from YouTube. Nothing is filled in automatically over
+                         something the admin typed; each value is applied on request. -->
+                    @if (validYoutubeId()) {
+                      <div class="rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50/70 dark:bg-stone-900/60 px-3 py-2.5 space-y-2">
+                        @if (!youtubeMeta() && !youtubeMetaError()) {
+                          <button type="button" (click)="fetchYoutubeMeta()" [disabled]="youtubeMetaLoading()"
+                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-600 text-xs font-semibold text-stone-500 dark:text-stone-300 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:border-capoeira-gold disabled:opacity-50 transition-colors">
+                            {{ youtubeMetaLoading() ? 'Buscando...' : 'Buscar título e autor' }}
+                          </button>
+                        }
+
+                        @if (youtubeMetaError()) {
+                          <div class="flex flex-wrap items-center gap-2">
+                            <p class="text-xs text-amber-600 dark:text-amber-400">{{ youtubeMetaError() }}</p>
+                            <button type="button" (click)="fetchYoutubeMeta()"
+                              class="px-2 py-1.5 rounded text-xs font-semibold text-stone-500 dark:text-stone-400 hover:text-capoeira-gold transition-colors">
+                              Tentar de novo
+                            </button>
+                          </div>
+                        }
+
+                        @if (youtubeMeta(); as meta) {
+                          <div class="space-y-1.5">
+                            @if (meta.title) {
+                              <div class="flex items-start gap-2">
+                                <p class="flex-1 text-xs text-stone-600 dark:text-stone-300 leading-snug">
+                                  <span class="text-stone-400">Título: </span>{{ meta.title }}
+                                </p>
+                                <button type="button" (click)="applyYoutubeTitle()"
+                                  class="shrink-0 px-2 py-1.5 rounded text-[11px] font-bold uppercase tracking-wide text-stone-400 hover:text-capoeira-gold transition-colors">
+                                  Usar
+                                </button>
+                              </div>
+                            }
+                            @if (meta.author) {
+                              <div class="flex items-start gap-2">
+                                <p class="flex-1 text-xs text-stone-600 dark:text-stone-300 leading-snug">
+                                  <span class="text-stone-400">Autor: </span>{{ meta.author }}
+                                </p>
+                                <button type="button" (click)="applyYoutubeAuthor()"
+                                  class="shrink-0 px-2 py-1.5 rounded text-[11px] font-bold uppercase tracking-wide text-stone-400 hover:text-capoeira-gold transition-colors">
+                                  Usar
+                                </button>
+                              </div>
+                            }
+                            <button type="button" (click)="applyYoutubeMeta()"
+                              class="px-2.5 py-2 rounded-lg text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:bg-capoeira-gold/10 transition-colors">
+                              Preencher campos vazios
+                            </button>
+                          </div>
+                        }
+                      </div>
                     }
                     @if (validYoutubeId(); as ytId) {
                       <div class="aspect-video w-full rounded-lg overflow-hidden border border-stone-200 dark:border-stone-700 bg-stone-900">
@@ -727,9 +792,9 @@ export class AdminComponent implements OnInit {
   readonly typeOptions = TYPE_OPTIONS;
 
   readonly filteredSongs = computed(() => {
-    const q = this.filterQuery().toLowerCase().trim();
+    const q = normalizeForSearch(this.filterQuery().trim());
     if (!q) return this.data.songs();
-    return this.data.songs().filter(s => s.title.toLowerCase().includes(q));
+    return this.data.songs().filter(s => normalizeForSearch(s.title).includes(q));
   });
 
   readonly groupedToques = computed(() => {
@@ -745,11 +810,11 @@ export class AdminComponent implements OnInit {
   });
 
   readonly filteredGroupedToques = computed(() => {
-    const q = this.toqueSearchQuery().toLowerCase().trim();
+    const q = normalizeForSearch(this.toqueSearchQuery().trim());
     const groups = this.groupedToques();
     if (!q) return groups;
     return groups
-      .map(g => ({ ...g, toques: g.toques.filter(t => t.name.toLowerCase().includes(q)) }))
+      .map(g => ({ ...g, toques: g.toques.filter(t => normalizeForSearch(t.name).includes(q)) }))
       .filter(g => g.toques.length > 0);
   });
 
@@ -769,6 +834,12 @@ export class AdminComponent implements OnInit {
   saving = signal(false);
   saveError = signal('');
   saveSuccess = signal(false);
+
+  // ── YouTube oEmbed metadata (title/author autofill) ────────────────────────
+  youtubeMetaLoading = signal(false);
+  youtubeMetaError = signal('');
+  youtubeMeta = signal<{ title: string; author: string } | null>(null);
+  private youtubeMetaFetchedId = '';
 
   private snapshot: { title: string; type: string; toque: string[]; mestre: string; youtube: string; spotify: string; lyrics: string; translation: string; notes: string; refrao: string; refraoTranslation: string; preview: boolean } | null = null;
 
@@ -868,6 +939,7 @@ export class AdminComponent implements OnInit {
     this.saveError.set('');
     this.saveSuccess.set(false);
     this.toqueSearchQuery.set('');
+    this.resetYoutubeMeta();
     this.resetMediaPreview();
     this.takeSnapshot();
   }
@@ -891,6 +963,7 @@ export class AdminComponent implements OnInit {
     this.saveError.set('');
     this.saveSuccess.set(false);
     this.toqueSearchQuery.set('');
+    this.resetYoutubeMeta();
     this.resetMediaPreview();
     this.takeSnapshot();
   }
@@ -901,6 +974,7 @@ export class AdminComponent implements OnInit {
     this.panelMode.set('none');
     this.selectedSong.set(null);
     this.toqueSearchQuery.set('');
+    this.resetYoutubeMeta();
     this.resetMediaPreview();
   }
 
@@ -949,6 +1023,60 @@ export class AdminComponent implements OnInit {
     this.loadedSpotifyUri.set('');
     this.spotifyEmbedUrl = null;
   }
+
+  // ── YouTube metadata ───────────────────────────────────────────────────────
+  // youtube.com/oembed allows cross-origin reads, so this works from the static
+  // GitHub Pages host with no key and no proxy.
+  private resetYoutubeMeta() {
+    this.youtubeMetaLoading.set(false);
+    this.youtubeMetaError.set('');
+    this.youtubeMeta.set(null);
+    this.youtubeMetaFetchedId = '';
+  }
+
+  async fetchYoutubeMeta() {
+    const id = this.validYoutubeId();
+    if (!id || this.youtubeMetaLoading()) return;
+    if (id === this.youtubeMetaFetchedId && this.youtubeMeta()) return;
+    this.youtubeMetaLoading.set(true);
+    this.youtubeMetaError.set('');
+    this.youtubeMeta.set(null);
+    try {
+      const url = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`;
+      const res = await fetch(url);
+      // 401/404 here usually means the video is private, deleted or age-gated.
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      const title = cleanYoutubeTitle(String(data?.title ?? ''));
+      const author = String(data?.author_name ?? '').trim();
+      if (!title && !author) throw new Error('empty');
+      this.youtubeMeta.set({ title, author });
+      this.youtubeMetaFetchedId = id;
+    } catch {
+      this.youtubeMetaError.set('Não foi possível ler os dados do YouTube.');
+    } finally {
+      this.youtubeMetaLoading.set(false);
+    }
+  }
+
+  /** Fills only the fields the admin left empty, so typed values are never lost. */
+  applyYoutubeMeta() {
+    const meta = this.youtubeMeta();
+    if (!meta) return;
+    if (meta.title && !this.editTitle.trim()) this.editTitle = meta.title;
+    if (meta.author && !this.editMestre.trim()) this.editMestre = meta.author;
+  }
+
+  applyYoutubeTitle() {
+    const meta = this.youtubeMeta();
+    if (meta?.title) this.editTitle = meta.title;
+  }
+
+  applyYoutubeAuthor() {
+    const meta = this.youtubeMeta();
+    if (meta?.author) this.editMestre = meta.author;
+  }
+
 
   async save() {
     const song = this.selectedSong();
@@ -1048,6 +1176,7 @@ export class AdminComponent implements OnInit {
       this.editRefrao = '';
       this.editRefraoTranslation = '';
       this.editPreview = false;
+      this.resetYoutubeMeta();
     } catch {
       this.saveError.set('Erro ao adicionar. Verifique sua conexão.');
     } finally {

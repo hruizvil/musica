@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, effect, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
 import { FirebaseService } from '../../core/services/firebase.service';
@@ -13,7 +13,7 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
       <div class="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
 
         <!-- Logo -->
-        <a routerLink="/" class="flex items-center shrink-0">
+        <a routerLink="/" class="flex items-center shrink-0 py-2 -my-2">
           <span class="font-display text-lg font-bold text-capoeira-brown dark:text-capoeira-gold leading-tight">
             Abadá <span class="text-capoeira-gold dark:text-capoeira-cream">Música</span>
           </span>
@@ -112,16 +112,44 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
         </div>
 
         <!-- Mobile menu button -->
-        <button (click)="mobileOpen.set(!mobileOpen())" class="md:hidden p-2 rounded-md text-stone-500" aria-label="Menu">
+        <button (click)="mobileOpen.set(!mobileOpen())" class="md:hidden p-2 rounded-md text-stone-500"
+          aria-label="Menu" aria-controls="mobile-drawer" [attr.aria-expanded]="mobileOpen()">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
       </div>
 
-      <!-- Mobile menu -->
-      @if (mobileOpen()) {
-        <div class="md:hidden border-t border-stone-200/60 dark:border-stone-800/60 bg-white/95 dark:bg-stone-950/95 backdrop-blur-md px-4 py-3 space-y-2">
+    </header>
+
+    <!-- Mobile drawer — always rendered so it can animate both ways; the inert attribute
+         keeps its links out of the tab order while closed. -->
+    <div class="md:hidden fixed inset-0 z-[60]"
+      [class.pointer-events-none]="!mobileOpen()"
+      [attr.inert]="mobileOpen() ? null : ''">
+
+      <!-- Dimmed page -->
+      <div (click)="mobileOpen.set(false)"
+        class="absolute inset-0 bg-stone-900/40 backdrop-blur-sm transition-opacity duration-200"
+        [class]="mobileOpen() ? 'opacity-100' : 'opacity-0'"></div>
+
+      <!-- Panel -->
+      <div id="mobile-drawer" role="dialog" aria-modal="true" aria-label="Menu"
+        (touchstart)="onDrawerTouchStart($event)" (touchend)="onDrawerTouchEnd($event)"
+        class="absolute right-0 top-0 h-full w-[82%] max-w-xs flex flex-col bg-white dark:bg-stone-950 shadow-2xl transition-transform duration-200 ease-out"
+        [class]="mobileOpen() ? 'translate-x-0' : 'translate-x-full'">
+
+        <div class="h-14 shrink-0 flex items-center justify-between px-4 border-b border-stone-200/60 dark:border-stone-800/60">
+          <span class="font-display text-sm font-bold text-capoeira-brown dark:text-capoeira-gold">Menu</span>
+          <button (click)="mobileOpen.set(false)" aria-label="Fechar menu"
+            class="p-2 -mr-2 rounded-md text-stone-400 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-4 py-3 space-y-2">
           <app-search-bar />
 
           <nav class="flex flex-col gap-1 pt-1">
@@ -180,8 +208,8 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
             }
           </nav>
         </div>
-      }
-    </header>
+      </div>
+    </div>
   `,
 })
 export class HeaderComponent {
@@ -199,11 +227,40 @@ export class HeaderComponent {
     { path: '/videos', label: 'Vídeos' },
   ];
 
+  /** Horizontal start of a drag on the drawer, for swipe-to-close. */
+  private touchStartX: number | null = null;
+
+  constructor() {
+    // Keep the page behind the drawer from scrolling while it's open.
+    effect(() => {
+      document.body.style.overflow = this.mobileOpen() ? 'hidden' : '';
+    });
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     if (!this.el.nativeElement.contains(event.target)) {
       this.dropdownOpen.set(false);
     }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.mobileOpen.set(false);
+    this.dropdownOpen.set(false);
+  }
+
+  onDrawerTouchStart(event: TouchEvent) {
+    this.touchStartX = event.changedTouches[0]?.clientX ?? null;
+  }
+
+  onDrawerTouchEnd(event: TouchEvent) {
+    const startX = this.touchStartX;
+    this.touchStartX = null;
+    if (startX === null) return;
+    const deltaX = (event.changedTouches[0]?.clientX ?? startX) - startX;
+    // A swipe to the right pushes the panel back off screen.
+    if (deltaX > 60) this.mobileOpen.set(false);
   }
 
   toggleDropdown() {

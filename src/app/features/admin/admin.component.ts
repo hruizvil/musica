@@ -78,29 +78,34 @@ type PanelMode = 'none' | 'edit' | 'add';
       <!-- ── GLOBAL HEADER ─────────────────────────────────────────── -->
       <header class="h-14 shrink-0 backdrop-blur-md bg-white/90 dark:bg-stone-950/90 border-b border-stone-200/60 dark:border-stone-800/60 flex items-center px-5 gap-3 z-20">
 
-        <!-- Breadcrumb -->
-        <div class="flex items-center gap-2 min-w-0">
-          <span class="font-display text-sm font-bold text-capoeira-brown dark:text-capoeira-gold whitespace-nowrap">Abadá Música</span>
-          <svg class="w-4 h-4 text-stone-300 dark:text-stone-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-          </svg>
-          <span class="text-sm text-stone-400 dark:text-stone-500 whitespace-nowrap">Admin</span>
-
-          @if (panelMode() !== 'none') {
+        <!-- Breadcrumb — the site/section crumbs give way to the song title on phones,
+             where the header actions need the room. -->
+        <div class="flex items-center gap-2 min-w-0 overflow-hidden">
+          <div class="items-center gap-2 shrink-0"
+            [ngClass]="panelMode() === 'none' ? 'flex' : 'hidden sm:flex'">
+            <span class="font-display text-sm font-bold text-capoeira-brown dark:text-capoeira-gold whitespace-nowrap">Abadá Música</span>
             <svg class="w-4 h-4 text-stone-300 dark:text-stone-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
-            <span class="text-sm font-medium text-stone-700 dark:text-stone-200 truncate max-w-[16rem]">
+            <span class="text-sm text-stone-400 dark:text-stone-500 whitespace-nowrap">Admin</span>
+          </div>
+
+          @if (panelMode() !== 'none') {
+            <svg class="hidden sm:block w-4 h-4 text-stone-300 dark:text-stone-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+            <span class="text-sm font-medium text-stone-700 dark:text-stone-200 truncate max-w-[9rem] sm:max-w-[16rem]">
               {{ panelMode() === 'add' ? 'Nova música' : (editTitle || selectedSong()?.title || '') }}
             </span>
+            <!-- Both status pills are repeated in the mobile back bar below. -->
             @if (isDirty()) {
-              <span class="flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 shrink-0 ml-1 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full">
+              <span class="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 shrink-0 ml-1 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full">
                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                 Não salvo
               </span>
             }
             @if (saveSuccess()) {
-              <span class="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 shrink-0 ml-1">
+              <span class="hidden sm:flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 shrink-0 ml-1">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -118,18 +123,26 @@ type PanelMode = 'none' | 'edit' | 'add';
             <span class="text-xs text-red-500 hidden sm:inline">{{ saveError() }}</span>
           }
           @if (panelMode() !== 'none') {
+            <!-- The mobile back bar already offers this action. -->
             <button (click)="closePanel()"
-              class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-600 text-stone-500 dark:text-stone-400 text-sm hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
+              class="hidden sm:block px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-600 text-stone-500 dark:text-stone-400 text-sm hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
               Cancelar
             </button>
             <button (click)="panelMode() === 'edit' ? save() : addSong()"
               [disabled]="saving() || (panelMode() === 'add' && !editTitle.trim())"
-              class="px-4 py-1.5 rounded-xl bg-capoeira-brown text-white text-sm font-semibold hover:bg-capoeira-brown/90 disabled:opacity-50 transition-colors shadow-sm shadow-capoeira-gold/10">
-              {{ saving() ? 'Salvando…' : panelMode() === 'add' ? 'Adicionar' : 'Salvar alterações' }}
+              class="px-4 py-2 sm:py-1.5 rounded-xl bg-capoeira-brown text-white text-sm font-semibold hover:bg-capoeira-brown/90 disabled:opacity-50 transition-colors shadow-sm shadow-capoeira-gold/10 whitespace-nowrap">
+              @if (saving()) {
+                Salvando…
+              } @else if (panelMode() === 'add') {
+                Adicionar
+              } @else {
+                <span class="sm:hidden">Salvar</span>
+                <span class="hidden sm:inline">Salvar alterações</span>
+              }
             </button>
           }
           <button (click)="signOut()"
-            class="text-xs text-stone-400 hover:text-red-500 transition-colors px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 ml-1">
+            class="text-xs text-stone-400 hover:text-red-500 transition-colors px-2.5 py-2 sm:py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 ml-1">
             Sair
           </button>
         </div>
@@ -154,14 +167,14 @@ type PanelMode = 'none' | 'edit' | 'add';
               @if (!bulkSelectMode()) {
                 <button type="button" (click)="enterBulkMode()"
                   title="Selecionar para apagar"
-                  class="p-1 rounded text-stone-300 dark:text-stone-600 hover:text-red-400 dark:hover:text-red-400 transition-colors">
+                  class="p-2 -m-1 rounded text-stone-300 dark:text-stone-600 hover:text-red-400 dark:hover:text-red-400 transition-colors">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                   </svg>
                 </button>
               } @else {
                 <button type="button" (click)="exitBulkMode()"
-                  class="text-xs text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors">
+                  class="px-1.5 py-1.5 -my-1 rounded text-xs text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors">
                   Cancelar
                 </button>
               }
@@ -206,7 +219,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                   <div class="flex-1 min-w-0">
                     <p class="text-sm text-stone-700 dark:text-stone-200 truncate"
                        [class.font-semibold]="selectedSong()?.id === song.id">{{ song.title }}</p>
-                    <p class="text-xs text-stone-400 dark:text-stone-500">{{ song.toque.length ? toqueNameById(song.toque[0]) : song.type }}</p>
+                    <p class="text-xs text-stone-400 dark:text-stone-500 truncate">{{ song.toque.length ? toqueNameById(song.toque[0]) : song.type }}</p>
                   </div>
                   @if (!bulkSelectMode()) {
                     <span class="text-[10px] shrink-0 transition-colors"
@@ -214,8 +227,11 @@ type PanelMode = 'none' | 'edit' | 'add';
                   }
                 </button>
                 @if (!bulkSelectMode()) {
+                  <!-- Hover-reveal only where hover exists: a touch device (incl. iPad, which is
+                       wide enough for md:) can never trigger it, so it stays visible there. -->
                   <button (click)="confirmDelete(song)"
-                    class="px-2.5 py-2.5 text-stone-200 dark:text-stone-700 hover:text-red-400 transition-colors shrink-0 opacity-0 group-hover:opacity-100"
+                    class="px-3 py-3 md:px-2.5 md:py-2.5 text-stone-300 dark:text-stone-600 hover:text-red-400 transition-colors shrink-0
+                           opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
                     title="Apagar">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -273,7 +289,7 @@ type PanelMode = 'none' | 'edit' | 'add';
           @if (panelMode() !== 'none') {
             <!-- Mobile back button -->
             <div class="md:hidden flex items-center gap-2 px-4 py-2.5 border-b border-stone-200/60 dark:border-stone-800/60 bg-white/90 dark:bg-stone-950/90 backdrop-blur-md shrink-0">
-              <button (click)="closePanel()" class="flex items-center gap-1.5 text-sm text-capoeira-brown dark:text-capoeira-gold font-medium px-2 py-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+              <button (click)="closePanel()" class="flex items-center gap-1.5 text-sm text-capoeira-brown dark:text-capoeira-gold font-medium px-2 py-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
@@ -289,8 +305,11 @@ type PanelMode = 'none' | 'edit' | 'add';
 
             <div class="w-full px-4 md:px-6 py-5 space-y-4">
 
-              <!-- Top 2-col grid on lg: Informações left, Mídia+Publicação right -->
-              <div class="grid grid-cols-1 lg:grid-cols-[58%_42%] gap-4 items-start">
+              <!-- Top 2-col grid: Informações left, Mídia+Publicação right. Held back to xl
+                   because at 1024–1279 the song list and the details sidebar are both already
+                   on screen, and splitting what's left squeezes the 58% column to ~290px —
+                   enough to overlap the paired PT/EN labels and clip button text. -->
+              <div class="grid grid-cols-1 xl:grid-cols-[58%_42%] gap-4 items-start">
 
               <!-- ─ Left column: Informações + Letra & Tradução ──── -->
               <div class="space-y-4">
@@ -328,7 +347,8 @@ type PanelMode = 'none' | 'edit' | 'add';
                         <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 text-sm">
                           <span class="flex-1 truncate text-sm">{{ toqueNameById(editToque[0]) }}</span>
                           <button type="button" (click)="editToque = []; toqueSearchQuery.set('')"
-                            class="shrink-0 text-amber-400 hover:text-amber-700 dark:hover:text-amber-100 transition-colors">
+                            aria-label="Remover toque"
+                            class="shrink-0 w-8 h-8 -my-1 flex items-center justify-center rounded-full text-amber-400 hover:text-amber-700 dark:hover:text-amber-100 hover:bg-amber-100/60 dark:hover:bg-amber-900/30 transition-colors">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -380,7 +400,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                         @if (editRefraoTranslation.trim()) {
                           <a [href]="googleTranslateUrl(editRefraoTranslation, 'en', 'pt')"
                             target="_blank" rel="noopener"
-                            class="text-xs text-stone-400 hover:text-capoeira-gold transition-colors">
+                            class="px-1.5 py-1.5 -my-1.5 rounded text-xs text-stone-400 hover:text-capoeira-gold transition-colors">
                             ← EN→PT ↗
                           </a>
                         }
@@ -398,7 +418,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                         @if (editRefrao.trim()) {
                           <a [href]="googleTranslateUrl(editRefrao, 'pt', 'en')"
                             target="_blank" rel="noopener"
-                            class="text-xs text-stone-400 hover:text-capoeira-gold transition-colors">
+                            class="px-1.5 py-1.5 -my-1.5 rounded text-xs text-stone-400 hover:text-capoeira-gold transition-colors">
                             PT→EN ↗
                           </a>
                         }
@@ -419,7 +439,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                           @if (editTranslation.trim()) {
                             <a [href]="googleTranslateUrl(editTranslation, 'en', 'pt')"
                               target="_blank" rel="noopener"
-                              class="text-xs text-stone-400 hover:text-capoeira-gold transition-colors">
+                              class="px-1.5 py-1.5 -my-1.5 rounded text-xs text-stone-400 hover:text-capoeira-gold transition-colors">
                               ← EN→PT ↗
                             </a>
                           }
@@ -436,7 +456,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                           @if (editLyrics.trim()) {
                             <a [href]="googleTranslateUrl(editLyrics, 'pt', 'en')"
                               target="_blank" rel="noopener"
-                              class="text-xs text-stone-400 hover:text-capoeira-gold transition-colors">
+                              class="px-1.5 py-1.5 -my-1.5 rounded text-xs text-stone-400 hover:text-capoeira-gold transition-colors">
                               PT→EN ↗
                             </a>
                           }

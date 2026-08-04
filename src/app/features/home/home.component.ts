@@ -69,7 +69,7 @@ import { FirebaseService } from '../../core/services/firebase.service';
     <section class="mb-10">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-display text-lg font-bold text-stone-800 dark:text-stone-100 border-l-4 border-capoeira-gold pl-4">Últimas adicionadas</h2>
-        <a routerLink="/musicas" class="text-xs text-capoeira-gold hover:underline font-medium">Ver todas →</a>
+        <a routerLink="/musicas" class="text-xs text-capoeira-gold hover:underline font-medium py-2 -my-2">Ver todas →</a>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3">
         @for (song of data.recentSongs(); track song.id) {

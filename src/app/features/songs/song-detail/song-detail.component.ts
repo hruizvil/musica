@@ -19,7 +19,7 @@ const TYPE_LABELS: Record<string, string> = {
 
         <!-- Breadcrumb -->
         <nav class="flex items-center gap-1.5 text-sm text-stone-400 mb-6 no-print">
-          <a routerLink="/musicas" class="hover:text-capoeira-gold transition-colors">Músicas</a>
+          <a routerLink="/musicas" class="py-1.5 -my-1.5 hover:text-capoeira-gold transition-colors">Músicas</a>
           <span class="text-stone-300 dark:text-stone-600">›</span>
           <span class="text-stone-600 dark:text-stone-300 truncate max-w-[280px]">{{ song()!.title }}</span>
         </nav>
@@ -49,7 +49,7 @@ const TYPE_LABELS: Record<string, string> = {
               <div class="flex flex-wrap gap-2">
                 @for (t of song()!.toque; track t) {
                   <a [routerLink]="['/toques', t]"
-                     class="no-print px-3 py-1 rounded-full text-xs font-semibold bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold border border-capoeira-gold/20 hover:bg-capoeira-gold/20 transition-colors">
+                     class="no-print px-3 py-1.5 rounded-full text-xs font-semibold bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold border border-capoeira-gold/20 hover:bg-capoeira-gold/20 transition-colors">
                     RITMO: {{ toqueName(t).toUpperCase() }}
                   </a>
                 }

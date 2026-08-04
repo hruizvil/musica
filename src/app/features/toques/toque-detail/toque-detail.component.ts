@@ -16,7 +16,7 @@ const TEMPO_LABELS: Record<string, string> = {
       <div class="max-w-2xl space-y-8">
 
         <!-- Back -->
-        <a routerLink="/toques" class="text-sm text-stone-400 hover:text-capoeira-gold flex items-center gap-1">
+        <a routerLink="/toques" class="text-sm text-stone-400 hover:text-capoeira-gold inline-flex items-center gap-1 py-2 -my-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
           Toques
         </a>

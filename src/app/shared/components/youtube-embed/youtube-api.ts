@@ -17,6 +17,7 @@ export interface YtPlayer {
   getDuration(): number;
   getPlayerState(): number;
   cueVideoById(options: { videoId: string; startSeconds?: number }): void;
+  setPlaybackRate(rate: number): void;
   destroy(): void;
 }
 
@@ -26,7 +27,7 @@ export interface YtNamespace {
     options: {
       videoId: string;
       playerVars?: Record<string, string | number>;
-      events?: { onStateChange?: (event: { data: number }) => void };
+      events?: { onReady?: () => void; onStateChange?: (event: { data: number }) => void };
     },
   ) => YtPlayer;
 }

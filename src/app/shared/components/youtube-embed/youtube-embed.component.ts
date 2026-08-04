@@ -9,6 +9,7 @@ import {
 
 const LOOP_KEY = 'capoeira-video-loop';
 const START_KEY = 'capoeira-video-start';
+const SPEED_KEY = 'capoeira-video-speed';
 
 @Component({
   selector: 'app-youtube-embed',
@@ -76,6 +77,22 @@ const START_KEY = 'capoeira-video-start';
                 </button>
               }
             </div>
+
+            <!-- Playback speed -->
+            <div class="inline-flex items-center gap-1 pl-3 pr-1.5 py-1 sm:py-0.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm">
+              <span class="text-xs font-semibold text-stone-500 dark:text-stone-400 mr-0.5">Velocidade</span>
+              @for (rate of speedOptions; track rate) {
+                <button type="button" (click)="setSpeed(rate)"
+                  [attr.aria-pressed]="speed() === rate"
+                  [title]="'Reproduzir a ' + rate + 'x'"
+                  class="px-2 py-2 sm:py-1.5 rounded-lg text-[11px] font-bold transition-colors"
+                  [class]="speed() === rate
+                    ? 'bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold'
+                    : 'text-stone-400 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800'">
+                  {{ rate }}×
+                </button>
+              }
+            </div>
           }
         </div>
       }
@@ -100,6 +117,10 @@ export class YoutubeEmbedComponent implements OnDestroy {
   readonly apiFailed = signal(false);
   readonly loop = signal<boolean>(this.storedLoop());
   readonly resolvedId = computed(() => this.extractId(this.videoId()));
+
+  /** Playback rate, remembered globally like the loop switch. */
+  readonly speedOptions: readonly number[] = [1, 0.75, 0.5];
+  readonly speed = signal<number>(this.storedSpeed());
 
   /** Start point of every repeat, remembered per video. */
   readonly startSeconds = linkedSignal<string | null, number>({
@@ -134,7 +155,11 @@ export class YoutubeEmbedComponent implements OnDestroy {
           playerVars: {
             rel: 0, modestbranding: 1, playsinline: 1, start, origin: location.origin,
           },
-          events: { onStateChange: (event) => this.onStateChange(event.data) },
+          events: {
+            // cueVideoById below resets the rate to 1x, same as a fresh player does.
+            onReady: () => this.player?.setPlaybackRate(this.speed()),
+            onStateChange: (event) => this.onStateChange(event.data),
+          },
         });
         this.loadedId = id;
       }).catch(() => this.apiFailed.set(true));
@@ -146,6 +171,8 @@ export class YoutubeEmbedComponent implements OnDestroy {
       if (!this.player || !id || id === this.loadedId) return;
       this.loadedId = id;
       this.player.cueVideoById({ videoId: id, startSeconds: untracked(this.startSeconds) });
+      // cueVideoById drops any previously chosen rate back to 1x — reapply it.
+      this.player.setPlaybackRate(untracked(this.speed));
     });
 
     // A new start time applies immediately while nothing is playing yet; mid-playback it
@@ -157,6 +184,7 @@ export class YoutubeEmbedComponent implements OnDestroy {
       const state = this.player.getPlayerState();
       if (state === YT_UNSTARTED || state === YT_CUED) {
         this.player.cueVideoById({ videoId: id, startSeconds: start });
+        this.player.setPlaybackRate(untracked(this.speed));
       }
     });
   }
@@ -192,8 +220,17 @@ export class YoutubeEmbedComponent implements OnDestroy {
     if (this.player) this.setStart(this.player.getCurrentTime());
   }
 
+  setSpeed(rate: number): void {
+    this.speed.set(rate);
+    this.write(SPEED_KEY, String(rate));
+    this.player?.setPlaybackRate(rate);
+  }
+
   private onStateChange(state: number): void {
     if (state !== YT_ENDED || !this.loop() || !this.player) return;
+    // seekTo/playVideo don't touch the rate (only cueing a video does), but reapply it
+    // anyway so a loop restart can never be seen to fall back to 1x.
+    this.player.setPlaybackRate(this.speed());
     this.player.seekTo(this.startSeconds(), true);
     this.player.playVideo();
   }
@@ -203,6 +240,15 @@ export class YoutubeEmbedComponent implements OnDestroy {
       return localStorage.getItem(LOOP_KEY) === '1';
     } catch {
       return false;
+    }
+  }
+
+  private storedSpeed(): number {
+    try {
+      const stored = Number(localStorage.getItem(SPEED_KEY));
+      return stored === 0.75 || stored === 0.5 ? stored : 1;
+    } catch {
+      return 1;
     }
   }
 

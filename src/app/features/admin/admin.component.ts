@@ -10,7 +10,9 @@ import { Song } from '../../core/models/song.model';
 import { Toque } from '../../core/models/toque.model';
 import { normalizeForSearch } from '../../core/utils/text-normalize';
 
-const YOUTUBE_RE = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/;
+// Includes shorts/ and live/: a clip filmed on a phone gets shared as a Shorts link,
+// and without those the pasted URL silently fails to yield an id.
+const YOUTUBE_RE = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/;
 const SPOTIFY_RE = /open\.spotify\.com\/(track|album|playlist)\/([A-Za-z0-9]+)/;
 
 function extractYoutubeId(input: string): string {

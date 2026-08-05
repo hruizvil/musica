@@ -271,7 +271,9 @@ export class YoutubeEmbedComponent implements OnDestroy {
 
   private extractId(input: string): string | null {
     if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
-    const match = input.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+    // shorts/ and live/ matter as much as watch?v= — a phone shares a vertical clip
+    // as a Shorts link, and without them the id never parses.
+    const match = input.match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([a-zA-Z0-9_-]{11})/);
     return match ? match[1] : null;
   }
 }

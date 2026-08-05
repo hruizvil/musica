@@ -7,6 +7,11 @@ import { Toque } from '../models/toque.model';
 import { Video } from '../models/video.model';
 import { FirebaseService, SongOverride } from './firebase.service';
 
+// Last server state, kept in localStorage so a refresh can hide deleted songs on
+// the very first paint instead of showing them until Firestore answers.
+const OVERRIDES_CACHE_KEY = 'capoeira-overrides-cache';
+const EXTRA_CACHE_KEY = 'capoeira-extra-cache';
+
 @Injectable({ providedIn: 'root' })
 export class DataService {
   private http = inject(HttpClient);
@@ -77,6 +82,7 @@ export class DataService {
   );
 
   constructor() {
+    this.seedFromCache();
     this.refreshOverrides();
   }
 
@@ -88,8 +94,35 @@ export class DataService {
       ]);
       this.overrides.set(overridesMap);
       this.extraSongs.set(extra);
+      this.writeCache(overridesMap, extra);
     } catch {
       // Firebase not configured — app works with JSON-only data
+    }
+  }
+
+  /** Prime the signals from the last cached server state so the first render is
+   *  already correct. Firestore then reconciles a moment later. */
+  private seedFromCache(): void {
+    try {
+      const rawOverrides = localStorage.getItem(OVERRIDES_CACHE_KEY);
+      if (rawOverrides) {
+        this.overrides.set(new Map(JSON.parse(rawOverrides) as [string, SongOverride][]));
+      }
+      const rawExtra = localStorage.getItem(EXTRA_CACHE_KEY);
+      if (rawExtra) {
+        this.extraSongs.set(JSON.parse(rawExtra) as Song[]);
+      }
+    } catch {
+      // no cache, corrupt cache, or storage unavailable — the refresh fills it in
+    }
+  }
+
+  private writeCache(overrides: Map<string, SongOverride>, extra: Song[]): void {
+    try {
+      localStorage.setItem(OVERRIDES_CACHE_KEY, JSON.stringify([...overrides.entries()]));
+      localStorage.setItem(EXTRA_CACHE_KEY, JSON.stringify(extra));
+    } catch {
+      // storage full or unavailable — caching is best-effort
     }
   }
 }

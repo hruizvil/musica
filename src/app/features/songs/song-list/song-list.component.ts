@@ -1,6 +1,6 @@
 import { Component, inject, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { SearchService } from '../../../core/services/search.service';
+import { Collection, SearchService } from '../../../core/services/search.service';
 import { DataService } from '../../../core/services/data.service';
 import { FirebaseService } from '../../../core/services/firebase.service';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
@@ -46,7 +46,30 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
           </select>
         </div>
 
-        @if (search.activeToqueFilter()) {
+        <!-- The user's own lists. Only shown when signed in, since the sets are
+             per-account and would always read as empty otherwise. -->
+        @if (firebase.currentUser()) {
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-semibold text-stone-400 uppercase tracking-wide shrink-0">Minhas</span>
+            <div class="inline-flex items-center gap-1.5">
+              @for (option of collections; track option.value) {
+                <button type="button" (click)="search.activeCollection.set(option.value)"
+                  [attr.aria-pressed]="search.activeCollection() === option.value"
+                  class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors"
+                  [class]="search.activeCollection() === option.value
+                    ? 'bg-capoeira-gold/10 border-capoeira-gold text-capoeira-brown dark:text-capoeira-gold'
+                    : 'bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:border-capoeira-gold/50'">
+                  {{ option.label }}
+                  @if (option.value !== 'all') {
+                    <span class="ml-1 font-bold">{{ count(option.value) }}</span>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        @if (search.activeToqueFilter() || search.activeCollection() !== 'all') {
           <button (click)="search.clearFilters()" class="text-xs text-stone-400 hover:text-capoeira-gold underline">
             Limpar filtros
           </button>
@@ -82,7 +105,13 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
             </div>
           }
         } @empty {
-          <p class="col-span-full text-center text-stone-400 py-8">Nenhuma música encontrada.</p>
+          <p class="col-span-full text-center text-stone-400 py-8">
+            @switch (search.activeCollection()) {
+              @case ('favorites') { Você ainda não marcou nenhuma música como favorita. }
+              @case ('learned') { Você ainda não marcou nenhuma música como aprendida. }
+              @default { Nenhuma música encontrada. }
+            }
+          </p>
         }
       </div>
     </div>
@@ -92,6 +121,18 @@ export class SongListComponent {
   search = inject(SearchService);
   data = inject(DataService);
   firebase = inject(FirebaseService);
+
+  readonly collections: { value: Collection; label: string }[] = [
+    { value: 'all', label: 'Todas' },
+    { value: 'favorites', label: 'Favoritas' },
+    { value: 'learned', label: 'Aprendidas' },
+  ];
+
+  count(collection: Collection): number {
+    return collection === 'favorites'
+      ? this.firebase.favorites().size
+      : this.firebase.learnedSongs().size;
+  }
 
   groupedToques = computed(() => {
     const byCategory = new Map<string, Toque[]>();

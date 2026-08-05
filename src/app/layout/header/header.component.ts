@@ -2,6 +2,7 @@ import { Component, ElementRef, HostListener, effect, inject, signal } from '@an
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
 import { FirebaseService } from '../../core/services/firebase.service';
+import { RodaService } from '../../core/services/roda.service';
 import { SearchBarComponent } from '../../shared/components/search-bar/search-bar.component';
 
 @Component({
@@ -27,6 +28,13 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
               {{ link.label }}
             </a>
           }
+          <a routerLink="/roda" routerLinkActive="text-capoeira-gold"
+             class="px-3 py-1.5 rounded-md text-stone-600 dark:text-stone-300 hover:text-capoeira-brown dark:hover:text-capoeira-cream hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+            Roda
+            @if (roda.count()) {
+              <span class="text-capoeira-gold font-semibold">({{ roda.count() }})</span>
+            }
+          </a>
           @if (firebase.isAdmin()) {
             <a routerLink="/admin" routerLinkActive="text-capoeira-gold"
                class="px-3 py-1.5 rounded-md text-capoeira-gold hover:bg-capoeira-gold/10 transition-colors font-semibold">
@@ -160,6 +168,14 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
                 {{ link.label }}
               </a>
             }
+            <a routerLink="/roda" routerLinkActive="text-capoeira-gold"
+               (click)="mobileOpen.set(false)"
+               class="px-3 py-2 rounded-md text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 text-sm font-medium">
+              Roda
+              @if (roda.count()) {
+                <span class="text-capoeira-gold font-semibold">({{ roda.count() }})</span>
+              }
+            </a>
             @if (firebase.isAdmin()) {
               <a routerLink="/admin" (click)="mobileOpen.set(false)"
                  class="px-3 py-2 rounded-md text-capoeira-gold hover:bg-capoeira-gold/10 text-sm font-semibold">
@@ -215,6 +231,7 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
 export class HeaderComponent {
   theme = inject(ThemeService);
   firebase = inject(FirebaseService);
+  roda = inject(RodaService);
   private el = inject(ElementRef);
 
   mobileOpen = signal(false);

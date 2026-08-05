@@ -2,6 +2,7 @@ import { Component, inject, input, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../../core/services/data.service';
 import { FirebaseService } from '../../../core/services/firebase.service';
+import { RodaService } from '../../../core/services/roda.service';
 import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/youtube-embed.component';
 import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/spotify-embed.component';
 
@@ -68,6 +69,14 @@ const TYPE_LABELS: Record<string, string> = {
                   Ouvir no YouTube
                 </a>
               }
+              <button (click)="toggleRoda()"
+                [attr.aria-pressed]="inRoda()"
+                class="no-print flex items-center gap-1.5 px-4 py-2 sm:py-1.5 rounded-xl border text-sm font-medium transition-colors shadow-sm"
+                [class]="inRoda()
+                  ? 'border-capoeira-gold/40 bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold'
+                  : 'border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:border-capoeira-gold bg-white dark:bg-stone-900'">
+                {{ inRoda() ? '✓ Na roda — remover' : '+ Adicionar à roda' }}
+              </button>
               @if (firebase.currentUser() && !firebase.isAdmin()) {
                 <button (click)="toggleFavorite()"
                   class="flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-medium transition-colors shadow-sm"
@@ -239,11 +248,13 @@ export class SongDetailComponent {
   id = input.required<string>();
   private data = inject(DataService);
   readonly firebase = inject(FirebaseService);
+  private roda = inject(RodaService);
 
   song = computed(() => this.data.songById().get(this.id()));
   isAccessible = computed(() => true);
   isFavorite = computed(() => this.firebase.favorites().has(this.id()));
   isLearned = computed(() => this.firebase.learnedSongs().has(this.id()));
+  inRoda = computed(() => this.roda.has(this.id()));
 
   readonly author = computed(() => this.song()?.mestre ?? this.song()?.composer ?? null);
   readonly authorInitials = computed(() => {
@@ -269,5 +280,9 @@ export class SongDetailComponent {
 
   toggleFavorite() { this.firebase.toggleFavorite(this.id()); }
   toggleLearned() { this.firebase.toggleLearned(this.id()); }
+  toggleRoda() {
+    if (this.inRoda()) this.roda.remove(this.id());
+    else this.roda.add(this.id());
+  }
   print() { window.print(); }
 }

@@ -48,6 +48,11 @@ export class DataService {
         preview: ov.preview ?? false,
         lyrics: ov.lyrics ?? song.lyrics,
         translation: ov.translation ?? song.translation,
+        // The admin saves these three, so they have to be merged back or the edit
+        // is silently discarded on render.
+        notes: ov.notes ?? song.notes,
+        refrao: ov.refrao ?? song.refrao,
+        refraoTranslation: ov.refraoTranslation ?? song.refraoTranslation,
         audioLinks: {
           youtube: ov.youtube ?? song.audioLinks.youtube,
           spotify: ov.spotify ?? song.audioLinks.spotify,

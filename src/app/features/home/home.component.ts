@@ -1,50 +1,73 @@
 import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
-import { FirebaseService } from '../../core/services/firebase.service';
+
+const CATEGORY_LABELS: Record<string, string> = {
+  angola: 'Angola', regional: 'Regional', abada: 'Abadá', other: 'Outros',
+};
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [RouterLink],
   template: `
-    <!-- Hero -->
-    <section class="rounded-2xl bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-capoeira-brown via-amber-900/90 to-capoeira-night text-white px-6 py-16 sm:px-10 sm:py-24 mb-10 relative overflow-hidden min-h-[60vh] flex flex-col justify-center">
+    <!-- Hero. The photo layer is optional: drop a file at public/hero.jpg and it
+         appears behind the scrim. Until then the gradient below carries the section,
+         so a missing file degrades quietly instead of showing a broken box. -->
+    <section class="rounded-2xl bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-capoeira-brown via-amber-900/90 to-capoeira-night text-white px-6 py-14 sm:px-10 sm:py-20 mb-10 relative overflow-hidden min-h-[60vh] flex flex-col justify-center">
+      <!-- Anchored right: the berimbaus live on the right of the photo, so bg-center
+           would crop them out of a narrow viewport. The scrim below runs dark-to-clear
+           left-to-right, keeping the headline legible over the open side of the image. -->
+      <div class="absolute inset-0 bg-[url('/hero.jpg')] bg-cover bg-right opacity-70 pointer-events-none"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-capoeira-night/90 via-capoeira-night/50 to-transparent pointer-events-none"></div>
       <div class="absolute -top-16 -right-16 w-80 h-80 rounded-full bg-white/3 blur-3xl pointer-events-none"></div>
       <div class="absolute -bottom-8 -left-8 w-56 h-56 rounded-full bg-capoeira-gold/10 blur-3xl pointer-events-none"></div>
       <div class="absolute top-8 right-8 w-32 h-32 rounded-full border border-white/5 pointer-events-none"></div>
 
-      <p class="text-capoeira-gold text-xs font-semibold uppercase tracking-widest mb-4 border-b border-capoeira-gold/30 pb-1 w-fit">Abadá Capoeira</p>
-      <h1 class="font-display text-4xl sm:text-5xl md:text-7xl font-bold mb-5 leading-[1.05]">
-        A biblioteca musical<br class="hidden sm:block"> da capoeira
-      </h1>
-      <p class="text-amber-100/70 text-base max-w-md leading-relaxed mb-10">
-        Letras completas com tradução em inglês, organizadas por toque e estilo.
-        Aprenda o repertório da roda — onde quer que você esteja.
-      </p>
+      <div class="relative">
+        <p class="text-capoeira-gold text-xs font-semibold uppercase tracking-widest mb-4 border-b border-capoeira-gold/30 pb-1 w-fit">Abadá Capoeira</p>
+        <h1 class="font-display text-4xl sm:text-5xl md:text-7xl font-bold mb-5 leading-[1.05]">
+          A biblioteca musical<br class="hidden sm:block">
+          da <span class="text-capoeira-gold">capoeira</span>
+        </h1>
+        <p class="text-amber-100/70 text-base max-w-md leading-relaxed mb-8">
+          Letras completas com tradução em inglês, organizadas por toque e estilo.
+          Aprenda o repertório da roda — onde quer que você esteja.
+        </p>
 
-      <div class="flex flex-wrap gap-3">
-        <a routerLink="/musicas"
-           class="px-6 py-3 rounded-xl bg-capoeira-gold text-capoeira-brown font-bold text-sm hover:bg-amber-400 transition-colors shadow-lg shadow-capoeira-gold/20">
-          Explorar músicas
-        </a>
-        @if (!firebase.currentUser() || (!firebase.membershipActive() && !firebase.isAdmin())) {
-          <a routerLink="/membership"
-             class="px-6 py-3 rounded-xl bg-white/10 ring-1 ring-white/25 text-white font-semibold text-sm hover:bg-white/20 transition-colors">
-            Seja Membro — $2.99/mês
+        <div class="flex flex-wrap gap-3">
+          <a routerLink="/musicas"
+             class="px-6 py-3 rounded-xl bg-capoeira-gold text-capoeira-brown font-bold text-sm hover:bg-amber-400 transition-colors shadow-lg shadow-capoeira-gold/20">
+            Explorar músicas
           </a>
-        }
+        </div>
+
+        <!-- Benefits, stated up front rather than buried further down the page. -->
+        <div class="mt-8 pt-6 border-t border-white/10 flex flex-wrap gap-x-8 gap-y-4">
+          @for (badge of heroBadges; track badge.title) {
+            <div class="flex items-center gap-2.5">
+              <span class="w-8 h-8 shrink-0 rounded-lg bg-white/10 ring-1 ring-white/15 flex items-center justify-center text-sm">{{ badge.icon }}</span>
+              <span class="leading-tight">
+                <span class="block text-xs font-semibold text-white">{{ badge.title }}</span>
+                <span class="block text-[11px] text-amber-100/60">{{ badge.body }}</span>
+              </span>
+            </div>
+          }
+        </div>
       </div>
     </section>
 
     <!-- Stats row -->
-    <section class="grid grid-cols-3 gap-3 mb-10">
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
       @for (stat of stats(); track stat.label) {
         <a [routerLink]="stat.path"
-           class="group flex flex-col items-center gap-2 py-6 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-capoeira-gold/30 transition-all duration-200 text-center">
-          <span class="text-2xl">{{ stat.icon }}</span>
-          <span class="text-2xl font-bold font-display text-capoeira-gold">{{ stat.count() }}</span>
-          <span class="text-xs text-stone-400 font-medium">{{ stat.label }}</span>
+           class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-capoeira-gold/30 transition-all duration-200">
+          <span class="w-12 h-12 shrink-0 rounded-2xl bg-capoeira-gold/10 flex items-center justify-center text-xl">{{ stat.icon }}</span>
+          <span class="min-w-0">
+            <span class="block text-2xl font-bold font-display text-capoeira-gold leading-none">{{ stat.count }}</span>
+            <span class="block text-xs text-stone-500 dark:text-stone-400 font-medium mt-1">{{ stat.label }}</span>
+            <span class="block text-[11px] text-stone-400 dark:text-stone-500 truncate mt-0.5">{{ stat.detail }}</span>
+          </span>
         </a>
       }
     </section>
@@ -56,10 +79,16 @@ import { FirebaseService } from '../../core/services/firebase.service';
       </h2>
       <div class="grid sm:grid-cols-3 gap-4">
         @for (reason of whyUs; track reason.title) {
-          <div class="p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:ring-1 hover:ring-capoeira-gold/20 transition-all duration-200">
+          <div class="flex flex-col p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:ring-1 hover:ring-capoeira-gold/20 transition-all duration-200">
             <div class="text-2xl mb-4 w-12 h-12 rounded-2xl bg-capoeira-gold/10 flex items-center justify-center">{{ reason.icon }}</div>
             <h3 class="font-bold text-stone-800 dark:text-stone-100 mb-2">{{ reason.title }}</h3>
             <p class="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">{{ reason.body }}</p>
+            @if (reason.link) {
+              <a [routerLink]="reason.link"
+                 class="mt-4 w-fit py-1 text-xs font-semibold text-capoeira-gold hover:underline">
+                {{ reason.linkLabel }} →
+              </a>
+            }
           </div>
         }
       </div>
@@ -76,31 +105,13 @@ import { FirebaseService } from '../../core/services/firebase.service';
           <a [routerLink]="['/musicas', song.id]"
              class="group flex flex-col gap-2 p-3 sm:p-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
             <span class="text-[15px] font-bold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug line-clamp-2">{{ song.title }}</span>
+            @if (song.toque.length) {
+              <span class="text-[11px] text-stone-400 dark:text-stone-500 truncate mt-auto">{{ toqueName(song.toque[0]) }}</span>
+            }
           </a>
         }
       </div>
     </section>
-
-    <!-- Membership CTA — non-members only -->
-    @if (!firebase.membershipActive() && !firebase.isAdmin()) {
-      <section class="rounded-2xl border border-capoeira-gold/30 bg-capoeira-gold/5 dark:bg-capoeira-gold/10 p-8 text-center mb-6">
-        <h2 class="font-display text-2xl font-bold text-capoeira-brown dark:text-capoeira-cream mb-2">
-          Acesso completo ao repertório
-        </h2>
-        <p class="text-sm text-stone-500 dark:text-stone-400 mb-6 max-w-sm mx-auto">
-          Letras, traduções em inglês, e áudio de todas as músicas da biblioteca — por menos que um cafezinho por mês.
-        </p>
-        <a routerLink="/membership"
-           class="inline-block px-8 py-3 rounded-xl bg-capoeira-gold text-capoeira-brown font-bold text-sm hover:bg-amber-400 transition-colors">
-          Seja Membro — $2.99/mês
-        </a>
-        @if (!firebase.currentUser()) {
-          <p class="text-xs text-stone-400 mt-3">
-            Já tem conta? <a routerLink="/login" class="text-capoeira-gold hover:underline">Entrar</a>
-          </p>
-        }
-      </section>
-    }
 
     <!-- Add to Home Screen prompt -->
     @if (showInstall()) {
@@ -154,7 +165,6 @@ import { FirebaseService } from '../../core/services/firebase.service';
 })
 export class HomeComponent implements OnInit {
   data = inject(DataService);
-  firebase = inject(FirebaseService);
 
   showInstall = signal(false);
   isIOS = signal(false);
@@ -188,27 +198,83 @@ export class HomeComponent implements OnInit {
     this.showInstall.set(false);
   }
 
-  stats = computed(() => [
-    { path: '/musicas', icon: '🎵', label: 'músicas', count: computed(() => `${this.data.songs().length}`) },
-    { path: '/toques',  icon: '🪘', label: 'toques',  count: computed(() => `${this.data.toques().length}`) },
-    { path: '/videos',  icon: '📹', label: 'vídeos',  count: computed(() => `${this.data.videos().length}`) },
-  ]);
+  /** Songs added in the last 7 days, for the "what's new" line on the stats card. */
+  private readonly addedThisWeek = computed(() => {
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return this.data.songs().filter(song => {
+      const added = Date.parse(song.dateAdded);
+      return !Number.isNaN(added) && added >= cutoff;
+    }).length;
+  });
 
-  whyUs = [
+  /** The traditions actually represented in the toque list, e.g. "Angola, Regional, Abadá". */
+  private readonly toqueSummary = computed(() => {
+    const seen: string[] = [];
+    for (const toque of this.data.toques()) {
+      const label = CATEGORY_LABELS[toque.category ?? 'other'] ?? CATEGORY_LABELS['other'];
+      if (!seen.includes(label)) seen.push(label);
+    }
+    if (!seen.length) return 'Todos os ritmos';
+    return seen.slice(0, 3).join(', ') + (seen.length > 3 ? '…' : '');
+  });
+
+  readonly stats = computed(() => {
+    const videos = this.data.videos().length;
+    const week = this.addedThisWeek();
+    return [
+      {
+        path: '/musicas', icon: '🎵', label: 'músicas',
+        count: `${this.data.songs().length}`,
+        detail: week > 0 ? `+${week} esta semana` : 'Letras com tradução',
+      },
+      {
+        path: '/toques', icon: '🪘', label: 'toques',
+        count: `${this.data.toques().length}`,
+        detail: this.toqueSummary(),
+      },
+      {
+        path: '/videos', icon: '📹', label: 'vídeos',
+        count: `${videos}`,
+        detail: videos > 0 ? 'Aulas e demonstrações' : 'Em breve',
+      },
+    ];
+  });
+
+  toqueName(id: string): string {
+    return this.data.toqueById().get(id)?.name ?? id;
+  }
+
+  readonly heroBadges = [
+    { icon: '💬', title: 'Traduções em inglês', body: 'Letras lado a lado' },
+    { icon: '🥁', title: 'Organizadas por toque', body: 'Encontre rápido' },
+    { icon: '🎓', title: 'Conteúdo confiável', body: 'Curado por professores' },
+  ];
+
+  /** Only the two cards with a real destination get a link — there is no
+   *  "sobre os professores" page to point the third one at. */
+  readonly whyUs = [
     {
-      icon: '🇧🇷🇺🇸',
+      // Not a flag pair: flag emoji are regional-indicator letters and Windows has no
+      // glyphs for them, so the BR/US pair renders as the literal text "BRUS" in Chrome.
+      icon: '💬',
       title: 'Tradução em inglês',
       body: 'Cada letra tem tradução completa para inglês. Sites gratuitos só têm o português — sem contexto para quem está aprendendo.',
+      link: '/musicas' as string | null,
+      linkLabel: 'Ver as letras',
     },
     {
       icon: '🥁',
       title: 'Organizados por toque',
       body: 'Encontre músicas pelo ritmo que o berimbau está tocando. Angola, Regional, Abadá — cada tradição tem seu repertório.',
+      link: '/toques' as string | null,
+      linkLabel: 'Ver os toques',
     },
     {
       icon: '🎓',
       title: 'Curado por professores',
       body: 'Não é um repositório aberto onde qualquer pessoa posta. O conteúdo é revisado e organizado por praticantes experientes.',
+      link: null as string | null,
+      linkLabel: '',
     },
   ];
 }

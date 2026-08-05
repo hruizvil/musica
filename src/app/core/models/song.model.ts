@@ -1,5 +1,3 @@
-export type SongType = 'ladainha' | 'corrido' | 'louvacao' | 'quadra';
-
 export interface AudioLinks {
   youtube?: string;
   spotify?: string;
@@ -8,7 +6,6 @@ export interface AudioLinks {
 export interface Song {
   id: string;
   title: string;
-  type: SongType;
   toque: string[];
   mestre: string | null;
   composer: string | null;

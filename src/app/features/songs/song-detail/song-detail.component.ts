@@ -6,10 +6,6 @@ import { RodaService } from '../../../core/services/roda.service';
 import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/youtube-embed.component';
 import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/spotify-embed.component';
 
-const TYPE_LABELS: Record<string, string> = {
-  ladainha: 'Ladainha', corrido: 'Corrido', louvacao: 'Louvação', quadra: 'Quadra'
-};
-
 @Component({
   selector: 'app-song-detail',
   standalone: true,
@@ -262,7 +258,6 @@ export class SongDetailComponent {
     if (!a) return '?';
     return a.split(' ').slice(0, 2).map((w: string) => w[0]).join('').toUpperCase();
   });
-  readonly typeLabel = computed(() => TYPE_LABELS[this.song()?.type ?? ''] ?? '');
   readonly instruments = computed(() => {
     const song = this.song();
     if (!song || !song.toque.length) return null;

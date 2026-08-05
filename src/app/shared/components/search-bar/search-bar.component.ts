@@ -33,7 +33,6 @@ import { SearchService } from '../../../core/services/search.service';
             @for (song of results().songs; track song.id) {
               <a [routerLink]="['/musicas', song.id]" (mousedown)="close()"
                  class="flex items-center gap-3 px-3 py-3 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
-                <span class="w-1.5 h-1.5 rounded-full shrink-0" [class]="typeDot(song.type)"></span>
                 <span class="text-sm text-stone-700 dark:text-stone-200 truncate">{{ song.title }}</span>
               </a>
             }
@@ -82,13 +81,5 @@ export class SearchBarComponent {
   onBlur() {
     // small delay so mousedown on a result fires before blur hides the dropdown
     setTimeout(() => this.open.set(false), 150);
-  }
-
-  typeDot(type: string): string {
-    const map: Record<string, string> = {
-      ladainha: 'bg-amber-400', corrido: 'bg-emerald-400',
-      louvacao: 'bg-sky-400',   quadra:  'bg-purple-400',
-    };
-    return map[type] ?? 'bg-stone-300';
   }
 }

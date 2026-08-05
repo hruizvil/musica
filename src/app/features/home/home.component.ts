@@ -211,19 +211,4 @@ export class HomeComponent implements OnInit {
       body: 'Não é um repositório aberto onde qualquer pessoa posta. O conteúdo é revisado e organizado por praticantes experientes.',
     },
   ];
-
-  songTypeLabel(type: string): string {
-    const labels: Record<string, string> = {
-      ladainha: 'Ladainha', corrido: 'Corrido', louvacao: 'Louvação', quadra: 'Quadra'
-    };
-    return labels[type] ?? type;
-  }
-
-  typeDot(type: string): string {
-    const map: Record<string, string> = {
-      ladainha: 'bg-amber-400', corrido: 'bg-emerald-400',
-      louvacao: 'bg-sky-400',   quadra:  'bg-purple-400',
-    };
-    return map[type] ?? 'bg-stone-300';
-  }
 }

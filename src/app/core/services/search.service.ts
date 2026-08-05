@@ -1,6 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { DataService } from './data.service';
-import { SongType } from '../models/song.model';
 import { normalizeForSearch } from '../utils/text-normalize';
 
 @Injectable({ providedIn: 'root' })
@@ -8,12 +7,10 @@ export class SearchService {
   private data = inject(DataService);
 
   readonly query = signal('');
-  readonly activeSongType = signal<SongType | null>(null);
   readonly activeToqueFilter = signal<string | null>(null);
 
   readonly filteredSongs = computed(() => {
     const q = normalizeForSearch(this.query().trim());
-    const type = this.activeSongType();
     const toque = this.activeToqueFilter();
 
     return this.data.songs().filter(song => {
@@ -21,9 +18,8 @@ export class SearchService {
         normalizeForSearch(song.title).includes(q) ||
         normalizeForSearch(song.lyrics).includes(q) ||
         normalizeForSearch(song.composer ?? '').includes(q);
-      const matchesType = !type || song.type === type;
       const matchesToque = !toque || song.toque.includes(toque);
-      return matchesQuery && matchesType && matchesToque;
+      return matchesQuery && matchesToque;
     });
   });
 
@@ -41,7 +37,6 @@ export class SearchService {
   });
 
   clearFilters(): void {
-    this.activeSongType.set(null);
     this.activeToqueFilter.set(null);
   }
 }

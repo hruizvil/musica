@@ -38,7 +38,6 @@ export class DataService {
       return {
         ...song,
         title: ov.title ?? song.title,
-        type: (ov.type as Song['type']) ?? song.type,
         toque: ov.toque ?? song.toque,
         mestre: (ov.mestre ?? song.mestre) as string | null,
         preview: ov.preview ?? false,

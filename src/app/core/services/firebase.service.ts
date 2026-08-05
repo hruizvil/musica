@@ -15,7 +15,6 @@ import { Song } from '../models/song.model';
 
 export interface SongOverride {
   title?: string;
-  type?: string;
   toque?: string[];
   mestre?: string;
   youtube?: string;

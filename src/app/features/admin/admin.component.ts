@@ -43,41 +43,6 @@ function slugify(title: string): string {
     + '-' + Date.now().toString(36);
 }
 
-const TYPE_DOT: Record<string, string> = {
-  ladainha: 'bg-amber-400', corrido: 'bg-emerald-400',
-  louvacao: 'bg-sky-400',   quadra:  'bg-purple-400',
-};
-
-const TYPE_OPTIONS = [
-  { value: 'ladainha', label: 'Ladainha' },
-  { value: 'corrido',  label: 'Corrido'  },
-  { value: 'louvacao', label: 'Louvação' },
-  { value: 'quadra',   label: 'Quadra'   },
-];
-
-const TYPE_COLORS: Record<string, { dot: string; base: string; active: string }> = {
-  ladainha: {
-    dot: 'bg-amber-400',
-    base: 'border-stone-200 dark:border-stone-600 text-stone-500 dark:text-stone-400 hover:border-amber-300 hover:text-amber-700',
-    active: 'bg-amber-50 dark:bg-amber-900/30 border-amber-400 dark:border-amber-500 text-amber-800 dark:text-amber-300 font-semibold',
-  },
-  corrido: {
-    dot: 'bg-emerald-400',
-    base: 'border-stone-200 dark:border-stone-600 text-stone-500 dark:text-stone-400 hover:border-emerald-300 hover:text-emerald-700',
-    active: 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-400 dark:border-emerald-500 text-emerald-800 dark:text-emerald-300 font-semibold',
-  },
-  louvacao: {
-    dot: 'bg-sky-400',
-    base: 'border-stone-200 dark:border-stone-600 text-stone-500 dark:text-stone-400 hover:border-sky-300 hover:text-sky-700',
-    active: 'bg-sky-50 dark:bg-sky-900/30 border-sky-400 dark:border-sky-500 text-sky-800 dark:text-sky-300 font-semibold',
-  },
-  quadra: {
-    dot: 'bg-purple-400',
-    base: 'border-stone-200 dark:border-stone-600 text-stone-500 dark:text-stone-400 hover:border-purple-300 hover:text-purple-700',
-    active: 'bg-purple-50 dark:bg-purple-900/30 border-purple-400 dark:border-purple-500 text-purple-800 dark:text-purple-300 font-semibold',
-  },
-};
-
 type PanelMode = 'none' | 'edit' | 'add';
 
 @Component({
@@ -225,13 +190,13 @@ type PanelMode = 'none' | 'edit' | 'add';
                   @if (bulkSelectMode()) {
                     <input type="checkbox" [checked]="bulkSelected().has(song.id)"
                       class="w-4 h-4 shrink-0 accent-red-500 cursor-pointer pointer-events-none" />
-                  } @else {
-                    <span class="w-2 h-2 rounded-full shrink-0" [class]="dot(song.type)"></span>
                   }
                   <div class="flex-1 min-w-0">
                     <p class="text-sm text-stone-700 dark:text-stone-200 truncate"
                        [class.font-semibold]="selectedSong()?.id === song.id">{{ song.title }}</p>
-                    <p class="text-xs text-stone-400 dark:text-stone-500 truncate">{{ song.toque.length ? toqueNameById(song.toque[0]) : song.type }}</p>
+                    @if (song.toque.length) {
+                      <p class="text-xs text-stone-400 dark:text-stone-500 truncate">{{ toqueNameById(song.toque[0]) }}</p>
+                    }
                   </div>
                   @if (!bulkSelectMode()) {
                     <span class="text-[10px] shrink-0 transition-colors"
@@ -684,14 +649,6 @@ type PanelMode = 'none' | 'edit' | 'add';
                 <div class="space-y-4">
 
                   <div>
-                    <p class="text-[10px] text-stone-400 dark:text-stone-500 uppercase tracking-wide mb-1">Tipo</p>
-                    <div class="flex items-center gap-1.5">
-                      <span class="w-2 h-2 rounded-full" [class]="dot(selectedSong()!.type)"></span>
-                      <p class="text-sm font-medium text-stone-700 dark:text-stone-200 capitalize">{{ selectedSong()!.type }}</p>
-                    </div>
-                  </div>
-
-                  <div>
                     <p class="text-[10px] text-stone-400 dark:text-stone-500 uppercase tracking-wide mb-1">Adicionada em</p>
                     <p class="text-sm text-stone-700 dark:text-stone-200">{{ selectedSong()!.dateAdded }}</p>
                   </div>
@@ -789,8 +746,6 @@ export class AdminComponent implements OnInit {
   bulkSelected = signal<Set<string>>(new Set());
   bulkSelectedCount = computed(() => this.bulkSelected().size);
 
-  readonly typeOptions = TYPE_OPTIONS;
-
   readonly filteredSongs = computed(() => {
     const q = normalizeForSearch(this.filterQuery().trim());
     if (!q) return this.data.songs();
@@ -819,7 +774,6 @@ export class AdminComponent implements OnInit {
   });
 
   editTitle = '';
-  editType = 'corrido';
   editToque: string[] = [];
   editMestre = '';
   editYoutube = '';
@@ -841,7 +795,7 @@ export class AdminComponent implements OnInit {
   youtubeMeta = signal<{ title: string; author: string } | null>(null);
   private youtubeMetaFetchedId = '';
 
-  private snapshot: { title: string; type: string; toque: string[]; mestre: string; youtube: string; spotify: string; lyrics: string; translation: string; notes: string; refrao: string; refraoTranslation: string; preview: boolean } | null = null;
+  private snapshot: { title: string; toque: string[]; mestre: string; youtube: string; spotify: string; lyrics: string; translation: string; notes: string; refrao: string; refraoTranslation: string; preview: boolean } | null = null;
 
   ngOnInit() {
     this.theme.init();
@@ -851,7 +805,6 @@ export class AdminComponent implements OnInit {
     const s = this.snapshot;
     if (!s) return false;
     return s.title !== this.editTitle ||
-      s.type !== this.editType ||
       s.mestre !== this.editMestre ||
       s.youtube !== this.editYoutube ||
       s.spotify !== this.editSpotify ||
@@ -866,7 +819,7 @@ export class AdminComponent implements OnInit {
 
   private takeSnapshot() {
     this.snapshot = {
-      title: this.editTitle, type: this.editType, toque: [...this.editToque],
+      title: this.editTitle, toque: [...this.editToque],
       mestre: this.editMestre, youtube: this.editYoutube, spotify: this.editSpotify,
       lyrics: this.editLyrics, translation: this.editTranslation,
       notes: this.editNotes, refrao: this.editRefrao, refraoTranslation: this.editRefraoTranslation, preview: this.editPreview,
@@ -880,15 +833,6 @@ export class AdminComponent implements OnInit {
       if (this.panelMode() === 'edit') this.save();
       if (this.panelMode() === 'add') this.addSong();
     }
-  }
-
-  typeOptionClass(value: string): string {
-    const c = TYPE_COLORS[value];
-    return this.editType === value ? (c?.active ?? '') : (c?.base ?? '');
-  }
-
-  typeDotClass(value: string): string {
-    return TYPE_COLORS[value]?.dot ?? 'bg-stone-300';
   }
 
   isToqueSelected(id: string): boolean {
@@ -925,7 +869,6 @@ export class AdminComponent implements OnInit {
     this.panelMode.set('edit');
     this.selectedSong.set(song);
     this.editTitle = song.title;
-    this.editType = song.type;
     this.editToque = [...song.toque];
     this.editMestre = song.mestre ?? '';
     this.editYoutube = song.audioLinks.youtube ?? '';
@@ -949,7 +892,6 @@ export class AdminComponent implements OnInit {
     this.panelMode.set('add');
     this.selectedSong.set(null);
     this.editTitle = '';
-    this.editType = 'corrido';
     this.editToque = [];
     this.editMestre = '';
     this.editYoutube = '';
@@ -1092,7 +1034,6 @@ export class AdminComponent implements OnInit {
         const updated: Song = {
           ...song,
           title: this.editTitle.trim() || song.title,
-          type: this.editType as Song['type'],
           toque: this.editToque,
           mestre: this.editMestre.trim() || null,
           lyrics: this.editLyrics.trim(),
@@ -1105,7 +1046,7 @@ export class AdminComponent implements OnInit {
         };
         await this.fb.saveExtraSong(updated);
       } else {
-        const override: SongOverride = { type: this.editType, preview: this.editPreview };
+        const override: SongOverride = { preview: this.editPreview };
         if (this.editTitle.trim() && this.editTitle.trim() !== song.title) {
           override.title = this.editTitle.trim();
         }
@@ -1145,7 +1086,6 @@ export class AdminComponent implements OnInit {
       const newSong: Song = {
         id: slugify(this.editTitle),
         title: this.editTitle.trim(),
-        type: this.editType as Song['type'],
         toque: this.editToque,
         mestre: this.editMestre.trim() || null,
         composer: null,
@@ -1249,6 +1189,4 @@ export class AdminComponent implements OnInit {
     await this.fb.signOut();
     this.router.navigate(['/admin/login']);
   }
-
-  dot(type: string) { return TYPE_DOT[type] ?? 'bg-stone-300'; }
 }

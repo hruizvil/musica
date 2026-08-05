@@ -1,3 +1,37 @@
 {
-  "videos": []
+  "videos": [
+    {
+      "id": "toque-sao-bento-abada",
+      "title": "São Bento da Abadá",
+      "category": "toque-demo",
+      "youtubeId": "LBkLfe9lMhI",
+      "description": "",
+      "mestre": null,
+      "toque": "sao-bento-abada",
+      "relatedSongs": [],
+      "dateAdded": "2026-08-05"
+    },
+    {
+      "id": "toque-benguela",
+      "title": "Benguela",
+      "category": "toque-demo",
+      "youtubeId": "K42vE2vX8uc",
+      "description": "",
+      "mestre": null,
+      "toque": "benguela",
+      "relatedSongs": [],
+      "dateAdded": "2026-08-05"
+    },
+    {
+      "id": "toque-siriuna",
+      "title": "Siriúna",
+      "category": "toque-demo",
+      "youtubeId": "yx1B5MVVsxs",
+      "description": "",
+      "mestre": null,
+      "toque": "siriunha",
+      "relatedSongs": [],
+      "dateAdded": "2026-08-05"
+    }
+  ]
 }

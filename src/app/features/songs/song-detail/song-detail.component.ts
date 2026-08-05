@@ -252,7 +252,7 @@ export class SongDetailComponent {
   isLearned = computed(() => this.firebase.learnedSongs().has(this.id()));
   inRoda = computed(() => this.roda.has(this.id()));
 
-  readonly author = computed(() => this.song()?.mestre ?? this.song()?.composer ?? null);
+  readonly author = computed(() => this.song()?.composer ?? null);
   readonly authorInitials = computed(() => {
     const a = this.author();
     if (!a) return '?';

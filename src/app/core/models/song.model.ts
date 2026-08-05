@@ -7,7 +7,6 @@ export interface Song {
   id: string;
   title: string;
   toque: string[];
-  mestre: string | null;
   composer: string | null;
   album: string | null;
   lyrics: string;

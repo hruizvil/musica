@@ -11,7 +11,6 @@ const EXTRA_CACHE_KEY = 'capoeira-extra-cache';
 function makeSong(partial: Partial<Song> & { id: string; title: string }): Song {
   return {
     toque: [],
-    mestre: null,
     composer: null,
     album: null,
     lyrics: '',

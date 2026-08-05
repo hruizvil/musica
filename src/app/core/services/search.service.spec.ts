@@ -8,7 +8,6 @@ import { Toque } from '../models/toque.model';
 function makeSong(partial: Partial<Song> & { id: string; title: string }): Song {
   return {
     toque: [],
-    mestre: null,
     composer: null,
     album: null,
     lyrics: '',

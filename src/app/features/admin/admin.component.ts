@@ -311,8 +311,8 @@ type PanelMode = 'none' | 'edit' | 'add';
                     <!-- Compositor -->
                     <div class="space-y-1.5">
                       <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Compositor</label>
-                      <input type="text" [(ngModel)]="editMestre" name="mestre"
-                        placeholder="ex: Mestre Bimba, Professor Coala..."
+                      <input type="text" [(ngModel)]="editComposer" name="composer"
+                        placeholder="ex: Mestre Bimba, Mestre Camisa, Mosquito..."
                         class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold transition-shadow" />
                     </div>
 
@@ -775,7 +775,7 @@ export class AdminComponent implements OnInit {
 
   editTitle = '';
   editToque: string[] = [];
-  editMestre = '';
+  editComposer = '';
   editYoutube = '';
   editSpotify = '';
   editLyrics = '';
@@ -795,7 +795,7 @@ export class AdminComponent implements OnInit {
   youtubeMeta = signal<{ title: string; author: string } | null>(null);
   private youtubeMetaFetchedId = '';
 
-  private snapshot: { title: string; toque: string[]; mestre: string; youtube: string; spotify: string; lyrics: string; translation: string; notes: string; refrao: string; refraoTranslation: string; preview: boolean } | null = null;
+  private snapshot: { title: string; toque: string[]; composer: string; youtube: string; spotify: string; lyrics: string; translation: string; notes: string; refrao: string; refraoTranslation: string; preview: boolean } | null = null;
 
   ngOnInit() {
     this.theme.init();
@@ -805,7 +805,7 @@ export class AdminComponent implements OnInit {
     const s = this.snapshot;
     if (!s) return false;
     return s.title !== this.editTitle ||
-      s.mestre !== this.editMestre ||
+      s.composer !== this.editComposer ||
       s.youtube !== this.editYoutube ||
       s.spotify !== this.editSpotify ||
       s.lyrics !== this.editLyrics ||
@@ -820,7 +820,7 @@ export class AdminComponent implements OnInit {
   private takeSnapshot() {
     this.snapshot = {
       title: this.editTitle, toque: [...this.editToque],
-      mestre: this.editMestre, youtube: this.editYoutube, spotify: this.editSpotify,
+      composer: this.editComposer, youtube: this.editYoutube, spotify: this.editSpotify,
       lyrics: this.editLyrics, translation: this.editTranslation,
       notes: this.editNotes, refrao: this.editRefrao, refraoTranslation: this.editRefraoTranslation, preview: this.editPreview,
     };
@@ -870,7 +870,7 @@ export class AdminComponent implements OnInit {
     this.selectedSong.set(song);
     this.editTitle = song.title;
     this.editToque = [...song.toque];
-    this.editMestre = song.mestre ?? '';
+    this.editComposer = song.composer ?? '';
     this.editYoutube = song.audioLinks.youtube ?? '';
     this.editSpotify = song.audioLinks.spotify ?? '';
     this.editLyrics = song.lyrics ?? '';
@@ -893,7 +893,7 @@ export class AdminComponent implements OnInit {
     this.selectedSong.set(null);
     this.editTitle = '';
     this.editToque = [];
-    this.editMestre = '';
+    this.editComposer = '';
     this.editYoutube = '';
     this.editSpotify = '';
     this.editLyrics = '';
@@ -1006,7 +1006,7 @@ export class AdminComponent implements OnInit {
     const meta = this.youtubeMeta();
     if (!meta) return;
     if (meta.title && !this.editTitle.trim()) this.editTitle = meta.title;
-    if (meta.author && !this.editMestre.trim()) this.editMestre = meta.author;
+    if (meta.author && !this.editComposer.trim()) this.editComposer = meta.author;
   }
 
   applyYoutubeTitle() {
@@ -1016,7 +1016,7 @@ export class AdminComponent implements OnInit {
 
   applyYoutubeAuthor() {
     const meta = this.youtubeMeta();
-    if (meta?.author) this.editMestre = meta.author;
+    if (meta?.author) this.editComposer = meta.author;
   }
 
 
@@ -1035,7 +1035,7 @@ export class AdminComponent implements OnInit {
           ...song,
           title: this.editTitle.trim() || song.title,
           toque: this.editToque,
-          mestre: this.editMestre.trim() || null,
+          composer: this.editComposer.trim() || null,
           lyrics: this.editLyrics.trim(),
           translation: this.editTranslation.trim() || null,
           notes: this.editNotes.trim() || null,
@@ -1051,7 +1051,7 @@ export class AdminComponent implements OnInit {
           override.title = this.editTitle.trim();
         }
         if (this.editToque.length) override.toque = this.editToque;
-        if (this.editMestre.trim()) override.mestre = this.editMestre.trim();
+        if (this.editComposer.trim()) override.composer = this.editComposer.trim();
         if (this.editYoutube.trim()) override.youtube = extractYoutubeId(this.editYoutube);
         if (this.editSpotify.trim()) override.spotify = normalizeSpotify(this.editSpotify);
         if (this.editLyrics.trim()) override.lyrics = this.editLyrics.trim();
@@ -1087,8 +1087,7 @@ export class AdminComponent implements OnInit {
         id: slugify(this.editTitle),
         title: this.editTitle.trim(),
         toque: this.editToque,
-        mestre: this.editMestre.trim() || null,
-        composer: null,
+        composer: this.editComposer.trim() || null,
         album: null,
         lyrics: this.editLyrics.trim(),
         translation: this.editTranslation.trim() || null,
@@ -1107,7 +1106,7 @@ export class AdminComponent implements OnInit {
       setTimeout(() => this.saveSuccess.set(false), 3000);
       this.editTitle = '';
       this.editToque = [];
-      this.editMestre = '';
+      this.editComposer = '';
       this.editLyrics = '';
       this.editYoutube = '';
       this.editSpotify = '';

@@ -44,7 +44,9 @@ export class DataService {
         ...song,
         title: ov.title ?? song.title,
         toque: ov.toque ?? song.toque,
-        mestre: (ov.mestre ?? song.mestre) as string | null,
+        // `mestre` was the old name for this field. Read it so songs saved before the
+        // rename keep their attribution; nothing writes it any more.
+        composer: (ov.composer ?? (ov as { mestre?: string }).mestre ?? song.composer) as string | null,
         preview: ov.preview ?? false,
         lyrics: ov.lyrics ?? song.lyrics,
         translation: ov.translation ?? song.translation,
@@ -60,9 +62,16 @@ export class DataService {
       };
     }).filter((s): s is Song => s !== null);
 
-    const extraFiltered = this.extraSongs().filter(s => !overrides.get(s.id)?.deleted);
+    const extraFiltered = this.extraSongs().filter(s => !overrides.get(s.id)?.deleted).map(s => this.withLegacyComposer(s));
     return [...merged, ...extraFiltered];
   });
+
+  /** Songs saved before "mestre" was folded into "composer" still carry the old key. */
+  private withLegacyComposer(song: Song): Song {
+    if (song.composer) return song;
+    const legacy = (song as { mestre?: string | null }).mestre;
+    return legacy ? { ...song, composer: legacy } : song;
+  }
 
   readonly songsLoaded = computed(() => this.baseSongs().length > 0);
   readonly extraSongIds = computed(() => new Set(this.extraSongs().map(s => s.id)));

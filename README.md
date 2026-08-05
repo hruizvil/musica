@@ -54,6 +54,28 @@ ng e2e
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
+## Deploying
+
+Production is **Vercel**, at https://abada-musica.vercel.app, built from `main`.
+
+**Pushing to `main` deploys to production.** There is no separate release step and no
+`--base-href` to remember — Vercel builds from source and serves at the domain root, so
+the `<base href="/">` in `src/index.html` is already correct.
+
+Vercel is also the only host that can serve `api/` (the Stripe checkout, billing portal
+and webhook functions). Any host without serverless functions breaks membership.
+
+### Retired: GitHub Pages
+
+The `gh-pages` branch previously served a copy at `hruizvil.github.io/musica/`. It is no
+longer deployed to: it cannot run `api/`, so membership was dead there, and it needed a
+`--base-href=/musica/` build that silently shipped a blank page whenever it was
+forgotten. `vercel.json` tells Vercel to ignore that branch — pushing compiled output to
+it used to trigger a build that always failed, since the branch has no `package.json`.
+
+`angular-cli-ghpages` is invoked via `npx` (not a project dependency) and publishes the
+build output to the `gh-pages` branch, which GitHub Pages serves as-is.
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

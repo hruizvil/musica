@@ -1,6 +1,11 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist/capoeira-musica-library/browser",
+  "git": {
+    "deploymentEnabled": {
+      "gh-pages": false
+    }
+  },
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]

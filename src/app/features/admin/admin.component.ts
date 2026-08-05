@@ -372,7 +372,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                       <div class="flex items-center justify-between">
-                        <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Refrão (Português)</label>
+                        <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Coro (Português)</label>
                         @if (editRefraoTranslation.trim()) {
                           <a [href]="googleTranslateUrl(editRefraoTranslation, 'en', 'pt')"
                             target="_blank" rel="noopener"
@@ -389,7 +389,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                     <div class="space-y-1.5">
                       <div class="flex items-center justify-between">
                         <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">
-                          Refrão (Inglês) <span class="normal-case font-normal text-stone-300 dark:text-stone-600">opcional</span>
+                          Coro (Inglês) <span class="normal-case font-normal text-stone-300 dark:text-stone-600">opcional</span>
                         </label>
                         @if (editRefrao.trim()) {
                           <a [href]="googleTranslateUrl(editRefrao, 'pt', 'en')"

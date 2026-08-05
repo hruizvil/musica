@@ -78,7 +78,7 @@ import { YoutubeEmbedComponent } from '../../shared/components/youtube-embed/you
                 @if (activeSong()!.refrao) {
                   <button (click)="bigView.set(!bigView())"
                     class="shrink-0 px-3 py-2 sm:py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:border-capoeira-gold text-xs font-semibold transition-colors bg-white dark:bg-stone-900 shadow-sm">
-                    Modo Refrão
+                    Modo Coro
                   </button>
                 }
               </div>
@@ -112,7 +112,7 @@ import { YoutubeEmbedComponent } from '../../shared/components/youtube-embed/you
       }
     </div>
 
-    <!-- Big-type refrão view for call-and-response — minimal chrome, legible at arm's length. -->
+    <!-- Big-type coro view for call-and-response — minimal chrome, legible at arm's length. -->
     @if (bigView() && activeSong()?.refrao) {
       <div class="fixed inset-0 z-[70] bg-white dark:bg-stone-950 flex flex-col items-center justify-center px-6 py-12 overflow-y-auto text-center">
         <button (click)="bigView.set(false)"

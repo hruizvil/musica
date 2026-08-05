@@ -98,7 +98,7 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
               </button>
             </div>
 
-            <!-- Refrão -->
+            <!-- Coro (stored as refrao on the model) -->
             @if (song()!.refrao) {
               <div class="bg-amber-50/80 dark:bg-amber-900/15 rounded-xl p-5 border border-amber-200 dark:border-amber-800 shadow-sm">
                 <div class="flex items-center gap-2 mb-3">
@@ -107,7 +107,7 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
                       <path d="M12 3v10.55A4 4 0 1014 17V7h4V3h-6z"/>
                     </svg>
                   </div>
-                  <h2 class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Refrão</h2>
+                  <h2 class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Coro</h2>
                 </div>
                 @if (song()!.refraoTranslation) {
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

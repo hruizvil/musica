@@ -85,7 +85,7 @@ const SPEED_KEY = 'capoeira-video-speed';
                 <button type="button" (click)="setSpeed(rate)"
                   [attr.aria-pressed]="speed() === rate"
                   [title]="'Reproduzir a ' + rate + 'x'"
-                  class="px-2 py-2 sm:py-1.5 rounded-lg text-[11px] font-bold transition-colors"
+                  class="min-w-[34px] px-2 py-2 sm:py-1.5 rounded-lg text-[11px] font-bold transition-colors"
                   [class]="speed() === rate
                     ? 'bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold'
                     : 'text-stone-400 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800'">

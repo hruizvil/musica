@@ -1,7 +1,6 @@
 import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
-import { RevealOnScrollDirective } from '../../shared/directives/reveal-on-scroll.directive';
 
 const CATEGORY_LABELS: Record<string, string> = {
   angola: 'Angola', regional: 'Regional', abada: 'Abadá', other: 'Outros',
@@ -10,7 +9,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, RevealOnScrollDirective],
+  imports: [RouterLink],
   template: `
     <!-- Hero. The photo layer is optional: drop a file at public/hero.jpg and it
          appears behind the scrim. Until then the gradient below carries the section,
@@ -62,7 +61,7 @@ const CATEGORY_LABELS: Record<string, string> = {
     </section>
 
     <!-- Stats row -->
-    <section appReveal class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
       @for (stat of stats(); track stat.label) {
         <a [routerLink]="stat.path"
            class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-capoeira-gold/30 transition-all duration-200">
@@ -77,7 +76,7 @@ const CATEGORY_LABELS: Record<string, string> = {
     </section>
 
     <!-- Why us -->
-    <section appReveal class="mb-10">
+    <section class="mb-10">
       <h2 class="font-display text-xl font-bold text-stone-800 dark:text-stone-100 mb-5 border-l-4 border-capoeira-gold pl-4">
         Por que somos diferentes
       </h2>
@@ -99,7 +98,7 @@ const CATEGORY_LABELS: Record<string, string> = {
     </section>
 
     <!-- Recent songs -->
-    <section appReveal class="mb-10">
+    <section class="mb-10">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-display text-lg font-bold text-stone-800 dark:text-stone-100 border-l-4 border-capoeira-gold pl-4">Últimas adicionadas</h2>
         <a routerLink="/musicas" class="text-xs text-capoeira-gold hover:underline font-medium py-2 -my-2">Ver todas →</a>

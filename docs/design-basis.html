@@ -1,0 +1,925 @@
+<title>Abadá Música — Base de Design</title>
+
+<style>
+  :root {
+    --gold:   #D4A017;
+    --brown:  #6B3A2A;
+    --green:  #2D5016;
+    --cream:  #F5F0E8;
+    --night:  #1A1208;
+
+    --ground:      #F5F0E8;
+    --surface:     #FFFDF9;
+    --surface-alt: #EFE7DA;
+    --line:        #E0D5C4;
+    --line-soft:   #EBE2D4;
+    --ink:         #2E2419;
+    --ink-soft:    #6F6354;
+    --ink-faint:   #9A8F7E;
+    --accent:      #B8860B;
+    --accent-bg:   rgba(212,160,23,.12);
+    --heading:     #6B3A2A;
+
+    --ok:      #3F6B2B;
+    --ok-bg:   rgba(63,107,43,.12);
+    --part:    #A66A12;
+    --part-bg: rgba(166,106,18,.14);
+    --todo:    #7A7061;
+    --todo-bg: rgba(122,112,97,.12);
+
+    --display: "Playfair Display", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --body: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+
+    --r: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground:      #14100A;
+      --surface:     #1F1811;
+      --surface-alt: #292018;
+      --line:        #3A2E23;
+      --line-soft:   #2E241B;
+      --ink:         #EDE4D6;
+      --ink-soft:    #B3A694;
+      --ink-faint:   #7E7364;
+      --accent:      #E5B53C;
+      --accent-bg:   rgba(229,181,60,.14);
+      --heading:     #E8C9A0;
+
+      --ok:      #8FBF6A;
+      --ok-bg:   rgba(143,191,106,.14);
+      --part:    #E0A94A;
+      --part-bg: rgba(224,169,74,.14);
+      --todo:    #948876;
+      --todo-bg: rgba(148,136,118,.14);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #14100A;
+    --surface:     #1F1811;
+    --surface-alt: #292018;
+    --line:        #3A2E23;
+    --line-soft:   #2E241B;
+    --ink:         #EDE4D6;
+    --ink-soft:    #B3A694;
+    --ink-faint:   #7E7364;
+    --accent:      #E5B53C;
+    --accent-bg:   rgba(229,181,60,.14);
+    --heading:     #E8C9A0;
+    --ok:      #8FBF6A;
+    --ok-bg:   rgba(143,191,106,.14);
+    --part:    #E0A94A;
+    --part-bg: rgba(224,169,74,.14);
+    --todo:    #948876;
+    --todo-bg: rgba(148,136,118,.14);
+  }
+
+  :root[data-theme="light"] {
+    --ground:      #F5F0E8;
+    --surface:     #FFFDF9;
+    --surface-alt: #EFE7DA;
+    --line:        #E0D5C4;
+    --line-soft:   #EBE2D4;
+    --ink:         #2E2419;
+    --ink-soft:    #6F6354;
+    --ink-faint:   #9A8F7E;
+    --accent:      #B8860B;
+    --accent-bg:   rgba(212,160,23,.12);
+    --heading:     #6B3A2A;
+    --ok:      #3F6B2B;
+    --ok-bg:   rgba(63,107,43,.12);
+    --part:    #A66A12;
+    --part-bg: rgba(166,106,18,.14);
+    --todo:    #7A7061;
+    --todo-bg: rgba(122,112,97,.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 40px 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  /* ── Masthead ───────────────────────────── */
+  .mast { display: flex; flex-direction: column; gap: 14px; }
+  .mast h1 {
+    font-family: var(--display);
+    font-size: clamp(34px, 6vw, 54px);
+    line-height: 1.04;
+    margin: 0;
+    color: var(--heading);
+    text-wrap: balance;
+    font-weight: 700;
+  }
+  .mast h1 em { font-style: normal; color: var(--accent); }
+  .mast .sub { color: var(--ink-soft); max-width: 60ch; margin: 0; }
+  .mast .meta {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;
+  }
+
+  .tag {
+    font-size: 11px; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; padding: 5px 11px; border-radius: 999px;
+    background: var(--accent-bg); color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  }
+
+  /* ── Section scaffolding ────────────────── */
+  section { display: flex; flex-direction: column; gap: 20px; }
+
+  .sec-head { display: flex; flex-direction: column; gap: 5px; border-top: 2px solid var(--heading); padding-top: 14px; }
+  .sec-head h2 {
+    font-family: var(--display);
+    font-size: 25px; margin: 0; color: var(--heading); font-weight: 700;
+  }
+  .sec-head p { margin: 0; color: var(--ink-soft); font-size: 14px; max-width: 68ch; }
+
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: 18px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .card h3 {
+    margin: 0; font-size: 14px; font-weight: 700;
+    color: var(--ink);
+  }
+  .card p { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+
+  .eyebrow {
+    font-size: 10.5px; font-weight: 800; letter-spacing: .11em;
+    text-transform: uppercase; color: var(--ink-faint);
+  }
+
+  /* ── Sitemap ────────────────────────────── */
+  .map { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .branch {
+    border: 1px solid var(--line); border-radius: var(--r);
+    background: var(--surface); overflow: hidden;
+  }
+  .branch > .top {
+    background: var(--accent-bg);
+    border-bottom: 1px solid var(--line);
+    padding: 11px 14px;
+    font-weight: 700; font-size: 14px; color: var(--heading);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .branch ul { margin: 0; padding: 10px 14px; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .branch li {
+    font-size: 13px; color: var(--ink-soft);
+    padding-left: 14px; position: relative;
+  }
+  .branch li::before {
+    content: ""; position: absolute; left: 0; top: .62em;
+    width: 6px; height: 1px; background: var(--ink-faint);
+  }
+
+  .home-node {
+    justify-self: center;
+    background: var(--heading); color: var(--cream);
+    border-radius: var(--r); padding: 12px 26px; text-align: center;
+    font-weight: 700; font-size: 14px;
+  }
+  .home-node span { display: block; font-weight: 500; font-size: 12px; opacity: .8; }
+
+  /* ── Flow ───────────────────────────────── */
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+  .step {
+    flex: 1 1 120px; min-width: 110px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px; font-size: 12.5px; color: var(--ink-soft);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .step b { color: var(--ink); font-size: 13px; font-weight: 650; }
+  .step .n {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent-bg); color: var(--accent);
+    font-size: 11px; font-weight: 800;
+    display: grid; place-items: center;
+  }
+
+  /* ── Data reality ───────────────────────── */
+  .facts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); }
+  .fact {
+    display: flex; align-items: baseline; gap: 10px;
+    background: var(--surface-alt); border-radius: 9px; padding: 11px 13px;
+    font-size: 13px; color: var(--ink-soft);
+  }
+  .fact b {
+    font-family: var(--display); font-size: 22px; color: var(--heading);
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+
+  /* ── Component specimens ────────────────── */
+  .spec {
+    border: 1px solid var(--line); border-radius: var(--r);
+    background: var(--surface); overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .spec > .label {
+    padding: 9px 14px; border-bottom: 1px solid var(--line-soft);
+    background: var(--surface-alt);
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .spec > .label .name { font-size: 12px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; color: var(--ink); }
+  .spec > .label .only { font-size: 10.5px; color: var(--ink-faint); font-weight: 600; }
+  .spec > .demo { padding: 16px; display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+  .spec > .note { padding: 0 16px 14px; font-size: 12.5px; color: var(--ink-soft); margin: 0; }
+
+  /* live components */
+  .c-card {
+    display: flex; align-items: center; gap: 11px; width: 100%;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px 12px;
+  }
+  .c-card .thumb {
+    width: 42px; height: 42px; border-radius: 8px; flex: none;
+    background: linear-gradient(135deg, var(--brown), var(--night));
+  }
+  .c-card .t { flex: 1; min-width: 0; }
+  .c-card .t b { display: block; font-size: 13.5px; color: var(--ink); font-weight: 650; }
+  .c-card .t span { font-size: 12px; color: var(--ink-faint); }
+  .c-card .star { color: var(--accent); font-size: 16px; }
+
+  .c-chip {
+    font-size: 12.5px; font-weight: 600; padding: 6px 13px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
+  }
+  .c-chip[data-on] { background: var(--accent-bg); border-color: color-mix(in srgb, var(--accent) 35%, transparent); color: var(--accent); }
+
+  .c-pill {
+    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    padding: 5px 11px; border-radius: 999px;
+    background: var(--accent-bg); color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+  .c-pill.plain { background: var(--surface-alt); color: var(--ink-soft); border-color: var(--line); }
+
+  .c-seg {
+    display: inline-flex; padding: 3px; gap: 2px;
+    background: var(--surface-alt); border: 1px solid var(--line); border-radius: 9px;
+  }
+  .c-seg button {
+    font: inherit; font-size: 12.5px; font-weight: 650;
+    padding: 5px 14px; border: 0; border-radius: 7px; cursor: pointer;
+    background: transparent; color: var(--ink-soft);
+  }
+  .c-seg button[aria-pressed="true"] { background: var(--surface); color: var(--heading); box-shadow: 0 1px 2px rgba(0,0,0,.07); }
+  .c-seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .c-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .c-act {
+    width: 38px; height: 38px; border-radius: 10px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface);
+    color: var(--ink-soft); display: grid; place-items: center; font-size: 15px;
+  }
+  .c-act:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .c-media { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 8px; }
+  .c-media .frame {
+    aspect-ratio: 16/9; border-radius: 10px; display: grid; place-items: center;
+    background: linear-gradient(135deg, #3B2A1C, var(--night));
+  }
+  .c-media .play {
+    width: 44px; height: 30px; border-radius: 7px; background: #E33; display: grid; place-items: center;
+    color: #fff; font-size: 12px;
+  }
+  .c-media .bar { display: flex; gap: 7px; flex-wrap: wrap; }
+  .c-media .bar span {
+    font-size: 11px; padding: 5px 10px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
+  }
+
+  /* ── Tokens ─────────────────────────────── */
+  .swatches { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+  .sw { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+  .sw .chip { height: 54px; }
+  .sw .meta { padding: 9px 11px; display: flex; flex-direction: column; gap: 1px; }
+  .sw .meta b { font-size: 12.5px; }
+  .sw .meta code { font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint); }
+
+  /* ── Wireframes ─────────────────────────── */
+  .frames {
+    display: grid; gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  }
+  .phone {
+    border: 1px solid var(--line); border-radius: 16px; background: var(--surface);
+    overflow: hidden; display: flex; flex-direction: column;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .phone > figcaption {
+    padding: 9px 12px; border-bottom: 1px solid var(--line-soft);
+    background: var(--surface-alt);
+    font-size: 11px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .screen {
+    padding: 11px; display: flex; flex-direction: column; gap: 8px;
+    min-height: 330px; font-size: 11px; flex: 1;
+  }
+  .screen .bar-top {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 8px; border-bottom: 1px solid var(--line-soft);
+  }
+  .screen .logo { font-family: var(--display); font-size: 12px; font-weight: 700; color: var(--heading); }
+  .screen h4 { font-family: var(--display); margin: 0; font-size: 16px; color: var(--heading); font-weight: 700; line-height: 1.15; }
+  .screen .muted { color: var(--ink-faint); font-size: 10.5px; }
+  .screen .box {
+    border: 1px solid var(--line-soft); border-radius: 7px; padding: 7px 9px;
+    color: var(--ink-soft); background: var(--surface);
+  }
+  .screen .row { display: flex; gap: 5px; flex-wrap: wrap; }
+  .screen .ph {
+    background: var(--surface-alt); border-radius: 5px; height: 8px;
+  }
+  .screen .vid {
+    aspect-ratio: 16/9; border-radius: 7px; display: grid; place-items: center;
+    background: linear-gradient(135deg, #3B2A1C, var(--night)); color: #fff; font-size: 15px;
+  }
+  .screen .hero {
+    border-radius: 8px; padding: 12px; color: var(--cream);
+    background: linear-gradient(150deg, #4A3120, var(--night));
+    display: flex; flex-direction: column; gap: 7px;
+  }
+  .screen .hero b { font-family: var(--display); font-size: 15px; line-height: 1.15; }
+  .screen .hero b i { font-style: normal; color: var(--gold); }
+  .screen .cta {
+    align-self: flex-start; background: var(--gold); color: #3A2408;
+    font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 6px;
+  }
+  .screen .stats { display: flex; gap: 6px; }
+  .screen .stat {
+    flex: 1; text-align: center; border: 1px solid var(--line-soft);
+    border-radius: 7px; padding: 6px 3px;
+  }
+  .screen .stat b { display: block; font-family: var(--display); font-size: 15px; color: var(--heading); }
+  .screen .stat span { font-size: 8.5px; color: var(--ink-faint); line-height: 1.2; display: block; }
+  .screen .listrow {
+    display: flex; align-items: center; gap: 7px;
+    border-bottom: 1px solid var(--line-soft); padding: 6px 0;
+  }
+  .screen .listrow .sq { width: 22px; height: 22px; border-radius: 5px; background: var(--surface-alt); flex: none; }
+  .screen .listrow .tx { flex: 1; min-width: 0; }
+  .screen .listrow .tx b { display: block; font-size: 10.5px; color: var(--ink); font-weight: 650; }
+  .screen .listrow .tx span { font-size: 9px; color: var(--ink-faint); }
+  .tabbar {
+    margin-top: auto; display: flex; border-top: 1px solid var(--line);
+    padding-top: 7px; gap: 3px;
+  }
+  .tabbar div {
+    flex: 1; text-align: center; font-size: 8.5px; color: var(--ink-faint);
+    display: flex; flex-direction: column; gap: 2px; align-items: center;
+  }
+  .tabbar div i { font-style: normal; font-size: 12px; }
+  .tabbar div[data-on] { color: var(--accent); font-weight: 750; }
+
+  .perf {
+    border-radius: 10px; padding: 22px 18px; text-align: center;
+    background: var(--night); color: var(--cream);
+    display: flex; flex-direction: column; gap: 9px; justify-content: center;
+    min-height: 150px;
+  }
+  .perf .k { font-size: 9.5px; color: var(--gold); letter-spacing: .1em; font-weight: 700; }
+  .perf .l { font-family: var(--display); font-size: 19px; line-height: 1.28; }
+  .perf .l.en { font-style: italic; opacity: .62; font-size: 16px; }
+  .perf .nav { display: flex; justify-content: space-between; font-size: 9.5px; opacity: .5; margin-top: 6px; }
+
+  /* ── Status table ───────────────────────── */
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 620px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line-soft); font-size: 13.5px; vertical-align: top; }
+  th {
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--ink-faint); font-weight: 800; background: var(--surface-alt);
+    position: sticky; top: 0;
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  td .what { font-weight: 650; color: var(--ink); }
+  td .where { display: block; font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+
+  .st {
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    font-size: 11.5px; font-weight: 750; padding: 4px 10px; border-radius: 999px;
+  }
+  .st::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .st.ok   { color: var(--ok);   background: var(--ok-bg); }
+  .st.part { color: var(--part); background: var(--part-bg); }
+  .st.todo { color: var(--todo); background: var(--todo-bg); }
+
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ── Growth ─────────────────────────────── */
+  .growth { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .growth .card b { font-family: var(--display); font-size: 17px; color: var(--heading); }
+  .growth .card code { font-family: var(--mono); font-size: 11.5px; color: var(--accent); }
+
+  .rule {
+    border-left: 3px solid var(--accent); background: var(--accent-bg);
+    padding: 12px 16px; border-radius: 0 10px 10px 0; font-size: 13.5px; color: var(--ink);
+  }
+  .rule b { color: var(--heading); }
+
+  footer.foot {
+    border-top: 1px solid var(--line); padding-top: 18px;
+    font-size: 12.5px; color: var(--ink-faint);
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div class="eyebrow">Base de design · Abadá Capoeira</div>
+    <h1>Abadá <em>Música</em><br>Informação, arquitetura e fluxo</h1>
+    <p class="sub">
+      A referência única para construir o site. Mobile primeiro, crescendo para tablet e desktop.
+      Toda página nova segue estas telas, estes componentes e estas cores — sem inventar variantes.
+    </p>
+    <div class="meta">
+      <span class="tag">Mobile-first</span>
+      <span class="tag">4 destinos</span>
+      <span class="tag">6 componentes</span>
+      <span class="tag">Português na tela</span>
+    </div>
+  </header>
+
+  <!-- PRINCÍPIOS -->
+  <section>
+    <div class="sec-head">
+      <h2>Princípios</h2>
+      <p>Quando duas soluções parecem boas, decide quem estiver mais alinhado com estes quatro.</p>
+    </div>
+    <div class="grid g4">
+      <div class="card"><span class="eyebrow">01</span><h3>Conteúdo primeiro</h3><p>Vídeo, letra e coro em destaque. Controles e enfeites vêm depois.</p></div>
+      <div class="card"><span class="eyebrow">02</span><h3>Simples e direto</h3><p>Só mostramos seções que têm conteúdo. Nada de espaço vazio esperando dados.</p></div>
+      <div class="card"><span class="eyebrow">03</span><h3>Roda pronta</h3><p>Pensado para o jogo, na palma da mão, lido de longe e com uma mão só.</p></div>
+      <div class="card"><span class="eyebrow">04</span><h3>Consistente</h3><p>Um componente por função. A mesma coisa se parece igual em toda parte.</p></div>
+    </div>
+    <div class="rule">
+      <b>Regra que resolve discussões:</b> não construa um lugar que você não consegue preencher.
+      Se o dado existe em poucas músicas, a seção aparece só nelas.
+    </div>
+  </section>
+
+  <!-- SITEMAP -->
+  <section>
+    <div class="sec-head">
+      <h2>Mapa do site</h2>
+      <p>Quatro destinos na navegação. Tudo o mais é uma página filha ou um acesso de apoio.</p>
+    </div>
+    <div class="home-node">HOME<span>hero para visitantes</span></div>
+    <div class="map">
+      <div class="branch">
+        <div class="top">Músicas</div>
+        <ul><li>Lista de músicas</li><li>Busca e filtros</li><li>Detalhe da música</li></ul>
+      </div>
+      <div class="branch">
+        <div class="top">Toques</div>
+        <ul><li>Lista de toques</li><li>Detalhe do toque</li><li>Vídeos do toque</li></ul>
+      </div>
+      <div class="branch">
+        <div class="top">Roda</div>
+        <ul><li>Fila da roda</li><li>Modo Coro (performance)</li></ul>
+      </div>
+      <div class="branch">
+        <div class="top">Minhas</div>
+        <ul><li>Favoritas</li><li>Aprendidas</li><li>Fila da roda</li></ul>
+      </div>
+    </div>
+    <div class="grid g2">
+      <div class="card"><span class="eyebrow">Fora da navegação</span><h3>Login</h3><p>Acesso para sincronizar favoritas e fila da roda entre aparelhos.</p></div>
+      <div class="card"><span class="eyebrow">Fora da navegação</span><h3>Admin (CMS)</h3><p>Gerenciamento de músicas, toques e vídeos.</p></div>
+    </div>
+    <div class="rule">
+      <b>Vídeos não é um destino.</b> Um vídeo pertence ao seu toque e toca na página dele.
+      A rota <code>/videos</code> continua existindo como índice de tudo, sem link na navegação.
+    </div>
+  </section>
+
+  <!-- FLUXOS -->
+  <section>
+    <div class="sec-head">
+      <h2>Fluxos do usuário</h2>
+      <p>Os dois caminhos que o site precisa acertar. Todo o resto é secundário.</p>
+    </div>
+
+    <div class="card">
+      <span class="eyebrow">Fluxo 1 · Estudante aprendendo em casa</span>
+      <div class="flow">
+        <div class="step"><span class="n">1</span><b>Entra em Músicas</b></div>
+        <div class="step"><span class="n">2</span><b>Busca ou explora</b>título, letra ou compositor</div>
+        <div class="step"><span class="n">3</span><b>Abre uma música</b></div>
+        <div class="step"><span class="n">4</span><b>Vê o vídeo</b>e lê letra, coro e tradução</div>
+        <div class="step"><span class="n">5</span><b>Favorita</b>ou marca aprendida</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="eyebrow">Fluxo 2 · Alguém na roda, ao vivo</span>
+      <div class="flow">
+        <div class="step"><span class="n">1</span><b>Abre Roda</b></div>
+        <div class="step"><span class="n">2</span><b>Adiciona músicas</b>à fila</div>
+        <div class="step"><span class="n">3</span><b>Inicia Modo Coro</b></div>
+        <div class="step"><span class="n">4</span><b>Segue os versos</b>na tela grande</div>
+        <div class="step"><span class="n">5</span><b>Próxima música</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REALIDADE DOS DADOS -->
+  <section>
+    <div class="sec-head">
+      <h2>Tudo que exibimos existe hoje</h2>
+      <p>O desenho é calibrado por estes números. Se um número crescer, a seção correspondente ganha espaço — não antes.</p>
+    </div>
+    <div class="facts">
+      <div class="fact"><b>9</b> músicas com letra, tradução e vídeo</div>
+      <div class="fact"><b>9</b> músicas com toque</div>
+      <div class="fact"><b>8</b> músicas com coro e tradução do coro</div>
+      <div class="fact"><b>3</b> vídeos de demonstração de toques</div>
+      <div class="fact"><b>19</b> toques representados</div>
+      <div class="fact"><b>6</b> compositores, 2 com notas</div>
+    </div>
+  </section>
+
+  <!-- COMPONENTES -->
+  <section>
+    <div class="sec-head">
+      <h2>Sistema de componentes</h2>
+      <p>Seis peças, uma versão de cada. Precisa de algo novo? Primeiro tente compor com estas.</p>
+    </div>
+    <div class="grid g2">
+
+      <div class="spec">
+        <div class="label"><span class="name">1 · Card</span><span class="only">música, toque, vídeo</span></div>
+        <div class="demo">
+          <div class="c-card">
+            <div class="thumb"></div>
+            <div class="t"><b>Zum Zum Zum</b><span>São Bento Grande da Regional</span></div>
+            <div class="star">☆</div>
+          </div>
+        </div>
+        <p class="note">Miniatura, título, uma linha de contexto, favoritar. Nunca mais que isso.</p>
+      </div>
+
+      <div class="spec">
+        <div class="label"><span class="name">2 · Chip de filtro</span><span class="only">listas</span></div>
+        <div class="demo">
+          <span class="c-chip" data-on>Todos</span>
+          <span class="c-chip">Angola</span>
+          <span class="c-chip">Regional</span>
+          <span class="c-chip">Abadá</span>
+          <span class="c-chip">Outros</span>
+        </div>
+        <p class="note">Só aparece o chip de uma categoria que tem conteúdo. Filtro vazio é beco sem saída.</p>
+      </div>
+
+      <div class="spec">
+        <div class="label"><span class="name">3 · Pill</span><span class="only">metadado</span></div>
+        <div class="demo">
+          <span class="c-pill">Ritmo: São Bento Grande</span>
+          <span class="c-pill plain">Tradicional</span>
+          <span class="c-pill">Rápido</span>
+        </div>
+        <p class="note">Informação, não ação. Dourada quando leva a algum lugar, neutra quando é só rótulo.</p>
+      </div>
+
+      <div class="spec">
+        <div class="label"><span class="name">4 · Segmented control</span><span class="only">idioma</span></div>
+        <div class="demo">
+          <div class="c-seg" role="group" aria-label="Idioma da letra">
+            <button type="button" aria-pressed="true">Ambos</button>
+            <button type="button" aria-pressed="false">Português</button>
+            <button type="button" aria-pressed="false">Inglês</button>
+          </div>
+        </div>
+        <p class="note">Escolha exclusiva entre poucas opções. Não use para filtrar listas — isso é chip.</p>
+      </div>
+
+      <div class="spec">
+        <div class="label"><span class="name">5 · Icon action row</span><span class="only">detalhe</span></div>
+        <div class="demo">
+          <div class="c-actions">
+            <button class="c-act" type="button" title="Favoritar" aria-label="Favoritar">♡</button>
+            <button class="c-act" type="button" title="Marcar aprendida" aria-label="Marcar aprendida">✓</button>
+            <button class="c-act" type="button" title="Adicionar à roda" aria-label="Adicionar à roda">◯</button>
+            <button class="c-act" type="button" title="Imprimir ou PDF" aria-label="Imprimir ou PDF">⎙</button>
+            <button class="c-act" type="button" title="Compartilhar" aria-label="Compartilhar">↗</button>
+          </div>
+        </div>
+        <p class="note">Ícone sozinho no celular, ícone com rótulo a partir de <code>lg</code>. Todo ícone tem tooltip e aria-label.</p>
+      </div>
+
+      <div class="spec">
+        <div class="label"><span class="name">6 · Media block</span><span class="only">vídeo</span></div>
+        <div class="demo">
+          <div class="c-media">
+            <div class="frame"><span class="play">▶</span></div>
+            <div class="bar"><span>Repetir sem parar</span><span>Início 0:00</span><span>Velocidade 1×</span></div>
+          </div>
+        </div>
+        <p class="note">Player mais os três controles de estudo. Sempre juntos, sempre nessa ordem.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TOKENS -->
+  <section>
+    <div class="sec-head">
+      <h2>Paleta e tipografia</h2>
+      <p>Valores exatos de <code>tailwind.config.js</code>. Não introduza cores fora desta lista.</p>
+    </div>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#D4A017"></div><div class="meta"><b>Gold</b><code>#D4A017</code></div></div>
+      <div class="sw"><div class="chip" style="background:#6B3A2A"></div><div class="meta"><b>Brown</b><code>#6B3A2A</code></div></div>
+      <div class="sw"><div class="chip" style="background:#2D5016"></div><div class="meta"><b>Green</b><code>#2D5016</code></div></div>
+      <div class="sw"><div class="chip" style="background:#F5F0E8"></div><div class="meta"><b>Cream</b><code>#F5F0E8</code></div></div>
+      <div class="sw"><div class="chip" style="background:#1A1208"></div><div class="meta"><b>Night</b><code>#1A1208</code></div></div>
+    </div>
+    <div class="grid g2">
+      <div class="card">
+        <span class="eyebrow">Títulos</span>
+        <h3 style="font-family:var(--display); font-size:26px; color:var(--heading); font-weight:700;">Playfair Display</h3>
+        <p>Nome da música, título de página, versos no Modo Coro. Nunca em texto corrido.</p>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Corpo e interface</span>
+        <h3 style="font-size:22px; font-weight:600;">Inter</h3>
+        <p>Letra, descrições, botões, rótulos. Rótulos em caixa alta ganham espaçamento entre letras.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WIREFRAMES -->
+  <section>
+    <div class="sec-head">
+      <h2>Wireframes · mobile primeiro</h2>
+      <p>A ordem dos blocos em cada tela é a parte importante. Construa de cima para baixo, nesta sequência.</p>
+    </div>
+
+    <div class="frames">
+
+      <figure class="phone" style="margin:0">
+        <figcaption>1 · Home (visitante)</figcaption>
+        <div class="screen">
+          <div class="bar-top"><span class="logo">Abadá Música</span><span class="muted">☰</span></div>
+          <div class="hero">
+            <b>A biblioteca musical da <i>capoeira</i></b>
+            <span style="font-size:9.5px;opacity:.75">Letras completas com tradução em inglês, organizadas por toque.</span>
+            <span class="cta">Explorar músicas</span>
+          </div>
+          <div class="box">Traduções em inglês <span class="muted">· lado a lado</span></div>
+          <div class="box">Organizadas por toque <span class="muted">· encontre rápido</span></div>
+          <div class="stats">
+            <div class="stat"><b>9</b><span>músicas com tradução</span></div>
+            <div class="stat"><b>19</b><span>toques</span></div>
+            <div class="stat"><b>3</b><span>vídeos</span></div>
+          </div>
+          <div class="eyebrow" style="margin-top:2px">Últimas adicionadas</div>
+          <div class="listrow"><div class="sq"></div><div class="tx"><b>Zum Zum Zum</b><span>São Bento Grande</span></div></div>
+          <div class="listrow"><div class="sq"></div><div class="tx"><b>Hoje Tem Capoeira</b><span>São Bento Grande</span></div></div>
+          <div class="tabbar">
+            <div data-on><i>♪</i>Músicas</div><div><i>◑</i>Toques</div><div><i>◯</i>Roda</div><div><i>☆</i>Minhas</div>
+          </div>
+        </div>
+      </figure>
+
+      <figure class="phone" style="margin:0">
+        <figcaption>2 · Músicas (lista)</figcaption>
+        <div class="screen">
+          <div class="bar-top"><span class="logo">Abadá Música</span><span class="muted">☰</span></div>
+          <h4>Músicas</h4>
+          <span class="muted">9 resultados</span>
+          <div class="box">🔍 Buscar músicas...</div>
+          <div class="box">Toque: todos os toques ⌄</div>
+          <div class="row">
+            <span class="c-chip" data-on style="font-size:10px;padding:4px 10px">Todas</span>
+            <span class="c-chip" style="font-size:10px;padding:4px 10px">Favoritas</span>
+            <span class="c-chip" style="font-size:10px;padding:4px 10px">Aprendidas</span>
+          </div>
+          <div class="listrow"><div class="sq"></div><div class="tx"><b>Paranauê, Paranauá</b><span>São Bento Grande</span></div><span class="muted">☆</span></div>
+          <div class="listrow"><div class="sq"></div><div class="tx"><b>Zum Zum Zum</b><span>São Bento Grande</span></div><span class="muted">☆</span></div>
+          <div class="listrow"><div class="sq"></div><div class="tx"><b>Hoje Tem Capoeira</b><span>São Bento Grande</span></div><span class="muted">☆</span></div>
+          <div class="tabbar">
+            <div data-on><i>♪</i>Músicas</div><div><i>◑</i>Toques</div><div><i>◯</i>Roda</div><div><i>☆</i>Minhas</div>
+          </div>
+        </div>
+      </figure>
+
+      <figure class="phone" style="margin:0">
+        <figcaption>3 · Detalhe da música</figcaption>
+        <div class="screen">
+          <span class="muted">Músicas › Zum Zum Zum</span>
+          <h4>Zum Zum Zum</h4>
+          <div class="row">
+            <span class="c-pill plain" style="font-size:9px;padding:3px 8px">Tradicional</span>
+            <span class="c-pill" style="font-size:9px;padding:3px 8px">Ritmo: São Bento Grande</span>
+          </div>
+          <div class="vid">▶</div>
+          <div class="row" style="font-size:9px">
+            <span class="box" style="padding:4px 7px">Repetir</span>
+            <span class="box" style="padding:4px 7px">0:00</span>
+            <span class="box" style="padding:4px 7px">1×</span>
+          </div>
+          <div class="c-actions" style="gap:5px">
+            <span class="c-act" style="width:26px;height:26px;font-size:11px">♡</span>
+            <span class="c-act" style="width:26px;height:26px;font-size:11px">✓</span>
+            <span class="c-act" style="width:26px;height:26px;font-size:11px">◯</span>
+            <span class="c-act" style="width:26px;height:26px;font-size:11px">⎙</span>
+          </div>
+          <div class="row" style="gap:4px">
+            <span class="c-chip" data-on style="font-size:9.5px;padding:3px 9px">Coro</span>
+            <span class="c-chip" style="font-size:9.5px;padding:3px 9px">Letra</span>
+            <span class="c-chip" style="font-size:9.5px;padding:3px 9px">Sobre</span>
+          </div>
+          <div class="c-seg" style="align-self:flex-start">
+            <button type="button" aria-pressed="true" style="font-size:9.5px;padding:3px 9px">Ambos</button>
+            <button type="button" aria-pressed="false" style="font-size:9.5px;padding:3px 9px">Português</button>
+          </div>
+          <div class="box" style="font-size:10px">Zum zum zum<br>Capoeira mata um<br><span class="muted"><i>Capoeira kills one</i></span></div>
+          <div class="tabbar">
+            <div data-on><i>♪</i>Músicas</div><div><i>◑</i>Toques</div><div><i>◯</i>Roda</div><div><i>☆</i>Minhas</div>
+          </div>
+        </div>
+      </figure>
+
+      <figure class="phone" style="margin:0">
+        <figcaption>4 · Toques (lista)</figcaption>
+        <div class="screen">
+          <div class="bar-top"><span class="logo">Abadá Música</span><span class="muted">☰</span></div>
+          <h4>Toques de Capoeira</h4>
+          <div class="row">
+            <span class="c-chip" data-on style="font-size:9.5px;padding:3px 9px">Todos</span>
+            <span class="c-chip" style="font-size:9.5px;padding:3px 9px">Angola</span>
+            <span class="c-chip" style="font-size:9.5px;padding:3px 9px">Regional</span>
+            <span class="c-chip" style="font-size:9.5px;padding:3px 9px">Abadá</span>
+          </div>
+          <div class="box"><b style="font-size:10.5px">São Bento Grande da Regional</b> <span class="c-pill" style="font-size:8px;padding:2px 6px">Rápido</span><br><span class="muted">Toque alegre e enérgico.</span></div>
+          <div class="box"><b style="font-size:10.5px">Angola</b> <span class="c-pill plain" style="font-size:8px;padding:2px 6px">Médio</span><br><span class="muted">Base da capoeira Angola.</span></div>
+          <div class="box"><b style="font-size:10.5px">Benguela</b> <span class="c-pill plain" style="font-size:8px;padding:2px 6px">Lento</span><br><span class="muted">Jogo de floreios.</span></div>
+          <div class="tabbar">
+            <div><i>♪</i>Músicas</div><div data-on><i>◑</i>Toques</div><div><i>◯</i>Roda</div><div><i>☆</i>Minhas</div>
+          </div>
+        </div>
+      </figure>
+
+      <figure class="phone" style="margin:0">
+        <figcaption>5 · Toque (detalhe)</figcaption>
+        <div class="screen">
+          <span class="muted">‹ Toques</span>
+          <h4>São Bento da Abadá</h4>
+          <div class="row"><span class="c-pill" style="font-size:9px;padding:3px 8px">Rápido</span><span class="c-pill plain" style="font-size:9px;padding:3px 8px">120–155 BPM</span></div>
+          <div class="row" style="gap:4px">
+            <span class="c-chip" data-on style="font-size:9.5px;padding:3px 9px">Sobre</span>
+            <span class="c-chip" style="font-size:9.5px;padding:3px 9px">Vídeos</span>
+          </div>
+          <div class="box" style="font-size:10px">Toque principal da Capoeira Abadá. Define o ritmo base do jogo.</div>
+          <div class="eyebrow">Vídeos de demonstração</div>
+          <div class="vid" style="font-size:13px">▶</div>
+          <div class="listrow"><div class="sq" style="background:linear-gradient(135deg,#3B2A1C,#1A1208)"></div><div class="tx"><b>Benguela</b><span>demonstração</span></div></div>
+          <div class="listrow"><div class="sq" style="background:linear-gradient(135deg,#3B2A1C,#1A1208)"></div><div class="tx"><b>Siriúna</b><span>demonstração</span></div></div>
+          <div class="tabbar">
+            <div><i>♪</i>Músicas</div><div data-on><i>◑</i>Toques</div><div><i>◯</i>Roda</div><div><i>☆</i>Minhas</div>
+          </div>
+        </div>
+      </figure>
+
+      <figure class="phone" style="margin:0">
+        <figcaption>6 · Roda (fila)</figcaption>
+        <div class="screen">
+          <div class="bar-top"><span class="logo">Roda</span><span class="muted">Editar</span></div>
+          <span class="muted">3 na fila</span>
+          <div class="box" style="border-color:var(--accent); background:var(--accent-bg)">
+            <b style="font-size:10.5px">1 · Zum Zum Zum</b><br><span class="muted">São Bento Grande</span>
+          </div>
+          <div class="box"><b style="font-size:10.5px">2 · Hoje Tem Capoeira</b><br><span class="muted">São Bento Grande</span></div>
+          <div class="box"><b style="font-size:10.5px">3 · Ê aê aê aê, dendê maré</b><br><span class="muted">São Bento Grande</span></div>
+          <div class="cta" style="align-self:stretch;text-align:center">Iniciar Modo Coro</div>
+          <div class="tabbar">
+            <div><i>♪</i>Músicas</div><div><i>◑</i>Toques</div><div data-on><i>◯</i>Roda</div><div><i>☆</i>Minhas</div>
+          </div>
+        </div>
+      </figure>
+
+    </div>
+  </section>
+
+  <!-- MODO CORO -->
+  <section>
+    <div class="sec-head">
+      <h2>Roda · Modo Coro (performance)</h2>
+      <p>Uma estrofe por tela, tipo grande, lida de longe com o celular na mão. Sem navegação, sem distração.</p>
+    </div>
+    <div class="grid g3">
+      <div class="perf">
+        <span class="k">1 / 3</span>
+        <span class="l">Zum zum zum<br>Capoeira mata um<br>É zum zum zum!</span>
+        <span class="nav"><span>‹ Anterior</span><span>Próxima ›</span></span>
+      </div>
+      <div class="perf">
+        <span class="k">2 / 3</span>
+        <span class="l">Quero ver bater<br>Quero ver cair</span>
+        <span class="nav"><span>‹ Anterior</span><span>Próxima ›</span></span>
+      </div>
+      <div class="perf">
+        <span class="k">3 / 3 · tradução</span>
+        <span class="l en">I want to see you hit<br>I want to see you fall</span>
+        <span class="nav"><span>‹ Anterior</span><span>Próxima ›</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CRESCIMENTO -->
+  <section>
+    <div class="sec-head">
+      <h2>Como cada página cresce</h2>
+      <p>A estrutura não muda entre tamanhos. O que muda é quantas colunas cabem e onde fica a navegação.</p>
+    </div>
+    <div class="growth">
+      <div class="card">
+        <b>Mobile</b><code>&lt; 768px</code>
+        <p>Uma coluna. Conteúdo essencial primeiro. Navegação inferior sempre visível.</p>
+      </div>
+      <div class="card">
+        <b>Tablet</b><code>≥ 768px</code>
+        <p>Duas colunas: lista e detalhe. Mais respiro, mesma estrutura e mesma ordem.</p>
+      </div>
+      <div class="card">
+        <b>Desktop</b><code>≥ 1024px</code>
+        <p>Navegação superior. Três colunas: lista, detalhe da música, informações à direita.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ESTADO -->
+  <section>
+    <div class="sec-head">
+      <h2>Estado da construção</h2>
+      <p>O que já existe no site contra o que esta base pede. Atualize esta tabela a cada entrega.</p>
+    </div>
+    <div class="legend">
+      <span class="st ok">Pronto</span>
+      <span class="st part">Parcial</span>
+      <span class="st todo">A construir</span>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Estado</th><th>Observação</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="what">Paleta e tipografia</span><span class="where">tailwind.config.js</span></td><td><span class="st ok">Pronto</span></td><td>Tokens batem com esta folha.</td></tr>
+          <tr><td><span class="what">Home do visitante</span><span class="where">features/home</span></td><td><span class="st ok">Pronto</span></td><td>Hero, benefícios, números e últimas adicionadas.</td></tr>
+          <tr><td><span class="what">Lista de músicas, busca e filtros</span><span class="where">features/songs/song-list</span></td><td><span class="st ok">Pronto</span></td><td>Busca por título, letra e compositor, sem acento.</td></tr>
+          <tr><td><span class="what">Detalhe da música</span><span class="where">features/songs/song-detail</span></td><td><span class="st part">Parcial</span></td><td>Vídeo no topo, coro e letra lado a lado. Faltam as abas e o controle de idioma.</td></tr>
+          <tr><td><span class="what">Vídeo na página do toque</span><span class="where">features/toques/toque-detail</span></td><td><span class="st ok">Pronto</span></td><td>Indexado por <code>videosByToque</code>. Vídeos saiu da navegação.</td></tr>
+          <tr><td><span class="what">Roda: fila e Modo Coro</span><span class="where">features/roda</span></td><td><span class="st ok">Pronto</span></td><td>Existe como <code>bigView</code>.</td></tr>
+          <tr><td><span class="what">Media block</span><span class="where">shared/youtube-embed</span></td><td><span class="st ok">Pronto</span></td><td>Repetir, início e velocidade.</td></tr>
+          <tr><td><span class="what">Icon action row</span><span class="where">song-detail</span></td><td><span class="st part">Parcial</span></td><td>Falta Compartilhar.</td></tr>
+          <tr><td><span class="what">Minhas como destino</span><span class="where">— sem rota</span></td><td><span class="st todo">A construir</span></td><td>Hoje são chips dentro de Músicas, não uma página.</td></tr>
+          <tr><td><span class="what">Navegação inferior (mobile)</span><span class="where">layout/header</span></td><td><span class="st todo">A construir</span></td><td>Hoje é menu hambúrguer com gaveta lateral.</td></tr>
+          <tr><td><span class="what">Abas Coro · Letra · Sobre</span><span class="where">song-detail</span></td><td><span class="st todo">A construir</span></td><td>Hoje tudo empilhado numa coluna só.</td></tr>
+          <tr><td><span class="what">Controle Ambos · Português · Inglês</span><span class="where">song-detail</span></td><td><span class="st todo">A construir</span></td><td>Hoje sempre lado a lado, sem escolha.</td></tr>
+          <tr><td><span class="what">Abas Sobre · Vídeos no toque</span><span class="where">toque-detail</span></td><td><span class="st todo">A construir</span></td><td>Hoje tudo empilhado.</td></tr>
+          <tr><td><span class="what">Tablet duas colunas</span><span class="where">geral</span></td><td><span class="st todo">A construir</span></td><td>Hoje salta de uma coluna direto para o layout de desktop.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>Abadá Música · base de design · mobile-first</span>
+    <span>Cores e fontes conforme <code>tailwind.config.js</code></span>
+  </footer>
+
+</div>

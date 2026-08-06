@@ -28,7 +28,9 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
           <span class="text-stone-600 dark:text-stone-300 truncate max-w-[280px]">{{ song()!.title }}</span>
         </nav>
 
-        <div class="lg:grid lg:grid-cols-[3fr_2fr] lg:gap-10 lg:items-start">
+        <!-- Two columns from md, as the tablet step calls for; the sidebar only sticks
+             once it has a column of its own. -->
+        <div class="md:grid md:grid-cols-[3fr_2fr] md:gap-8 lg:gap-10 md:items-start">
 
           <!-- ═══ LEFT COLUMN ═══ -->
           <div class="space-y-6">
@@ -64,10 +66,10 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
                  actually is, and the words are read against it. Everything else
                  follows underneath. -->
             @if (song()!.audioLinks.youtube) {
-              <!-- Capped between sm and lg: in that range the page is still one column,
+              <!-- Capped between sm and md: in that range the page is still one column,
                    and a full-bleed 16:9 player would push every line of the song off
-                   screen. At lg the grid column already sets the width. -->
-              <div class="no-print sm:max-w-2xl lg:max-w-none">
+                   screen. From md the grid column already sets the width. -->
+              <div class="no-print sm:max-w-2xl md:max-w-none">
                 <app-youtube-embed [videoId]="song()!.audioLinks.youtube!" [title]="song()!.title" />
               </div>
             }
@@ -176,7 +178,10 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
                   <h2 class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Coro</h2>
                 </div>
                 @if (song()!.refraoTranslation && language() === 'both') {
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <!-- Side by side only from lg. At md the reading column is about
+                       400px wide, and splitting that in two leaves each verse too
+                       narrow to read. -->
+                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <pre class="font-sans text-sm text-stone-700 dark:text-stone-300 whitespace-pre-wrap leading-relaxed">{{ song()!.refrao }}</pre>
                     <pre class="font-sans text-sm text-stone-500 dark:text-stone-400 whitespace-pre-wrap leading-relaxed italic border-l border-amber-200 dark:border-amber-700 pl-4">{{ song()!.refraoTranslation }}</pre>
                   </div>
@@ -193,9 +198,9 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
               [class.hidden]="activeTab() !== 'letra'">
               <h2 class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 no-print">Letra</h2>
               @if (song()!.translation && language() === 'both') {
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-800 dark:text-stone-200">{{ song()!.lyrics }}</pre>
-                  <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-500 dark:text-stone-400 italic sm:border-l sm:border-stone-100 sm:dark:border-stone-800 sm:pl-6">{{ song()!.translation }}</pre>
+                  <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-500 dark:text-stone-400 italic lg:border-l lg:border-stone-100 lg:dark:border-stone-800 lg:pl-6">{{ song()!.translation }}</pre>
                 </div>
               } @else if (song()!.translation && language() === 'en') {
                 <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-500 dark:text-stone-400 italic">{{ song()!.translation }}</pre>
@@ -256,7 +261,7 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
           </div>
 
           <!-- ═══ RIGHT COLUMN ═══ -->
-          <div class="mt-8 lg:mt-0 space-y-5 lg:sticky lg:top-6 no-print">
+          <div class="mt-8 md:mt-0 space-y-5 md:sticky md:top-6 no-print">
 
             <!-- Spotify -->
             @if (song()!.audioLinks.spotify) {

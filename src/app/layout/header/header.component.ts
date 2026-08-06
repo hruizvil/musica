@@ -238,10 +238,12 @@ export class HeaderComponent {
   dropdownOpen = signal(false);
   portalLoading = signal(false);
 
+  // Vídeos is deliberately absent: a video belongs to its toque and plays on that
+  // toque's page, which is where people look for it. The /videos index still exists
+  // as a way to see them all at once, linked from the footer rather than from here.
   navLinks = [
     { path: '/musicas', label: 'Músicas' },
     { path: '/toques', label: 'Toques' },
-    { path: '/videos', label: 'Vídeos' },
   ];
 
   /** Horizontal start of a drag on the drawer, for swipe-to-close. */

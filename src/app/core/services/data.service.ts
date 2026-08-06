@@ -89,6 +89,19 @@ export class DataService {
     return map;
   });
 
+  /** A video belongs to one toque; this is the index that lets the toque page show it.
+   *  The videos list stays the single source — nothing is duplicated, it is just read
+   *  from the other side of the same link. */
+  readonly videosByToque = computed(() => {
+    const map = new Map<string, Video[]>();
+    for (const video of this.videos()) {
+      if (!video.toque) continue;
+      if (!map.has(video.toque)) map.set(video.toque, []);
+      map.get(video.toque)!.push(video);
+    }
+    return map;
+  });
+
   readonly recentSongs = computed(() =>
     [...this.songs()]
       .sort((a, b) => b.dateAdded.localeCompare(a.dateAdded))

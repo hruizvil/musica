@@ -67,10 +67,21 @@ const TEMPO_LABELS: Record<string, string> = {
           </div>
         </div>
 
-        <!-- Videos -->
-        @if (toque()!.videoLinks.length) {
+        <!-- Videos. Two sources feed this one block: videos.json entries pointing at
+             this toque, and any links written on the toque itself. People come to a
+             toque expecting to hear it, so the demonstration belongs here rather than
+             only on the videos index. -->
+        @if (demoVideos().length || toque()!.videoLinks.length) {
           <div class="space-y-4">
             <h2 class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Demonstração em Vídeo</h2>
+            @for (video of demoVideos(); track video.id) {
+              <div>
+                <app-youtube-embed [videoId]="video.youtubeId" [title]="video.title" />
+                @if (video.description) {
+                  <p class="text-sm text-stone-400 mt-2">{{ video.description }}</p>
+                }
+              </div>
+            }
             @for (v of toque()!.videoLinks; track v.url) {
               <div>
                 <app-youtube-embed [videoId]="v.url" [title]="v.label" />
@@ -92,6 +103,7 @@ export class ToqueDetailComponent {
   private data = inject(DataService);
 
   toque = computed(() => this.data.toqueById().get(this.id()));
+  demoVideos = computed(() => this.data.videosByToque().get(this.id()) ?? []);
 
   categoryLabel = computed(() => {
     const c = this.toque()?.category;

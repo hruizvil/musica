@@ -8,7 +8,8 @@ import { SongCardComponent } from '../../../shared/components/song-card/song-car
 import { Song } from '../../../core/models/song.model';
 import { Toque } from '../../../core/models/toque.model';
 
-const TOQUE_CATEGORY_ORDER = ['angola', 'regional', 'abada', 'other'];
+// Same order as the Toques page: Abadá first, Outros last.
+const TOQUE_CATEGORY_ORDER = ['abada', 'regional', 'angola', 'other'];
 const TOQUE_CATEGORY_LABELS: Record<string, string> = {
   angola: 'Capoeira Angola', regional: 'Capoeira Regional',
   abada: 'Capoeira Abadá', other: 'Outros Ritmos',

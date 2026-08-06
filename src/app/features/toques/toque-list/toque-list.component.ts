@@ -14,7 +14,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: 'Outros Ritmos',
 };
 
-const CATEGORY_ORDER = ['angola', 'regional', 'abada', 'other'];
+// Abadá first: it is this school's own repertoire, so it is what people came for.
+// Outros stays last, being the catch-all.
+const CATEGORY_ORDER = ['abada', 'regional', 'angola', 'other'];
 
 const TAB_LABELS: Record<string, string> = {
   angola: 'Angola',
@@ -95,7 +97,9 @@ const TAB_LABELS: Record<string, string> = {
 })
 export class ToqueListComponent {
   data = inject(DataService);
-  activeTab = signal<string>('angola');
+  // Opens on the first tab. It used to open on Angola, which after the reorder would
+  // mean landing on the third one for no reason.
+  activeTab = signal<string>('all');
 
   grouped = computed(() => {
     const byCategory = new Map<string, Toque[]>();
@@ -110,7 +114,7 @@ export class ToqueListComponent {
   });
 
   allTabs = computed(() => [
-    { key: 'all', label: 'Todos' },
+    { key: 'all', label: 'Toques' },
     ...CATEGORY_ORDER
       .filter(c => this.grouped().some(g => g.category === c))
       .map(c => ({ key: c, label: TAB_LABELS[c] ?? c })),

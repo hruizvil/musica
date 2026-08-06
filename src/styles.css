@@ -16,16 +16,6 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-
-  /* Dissolves the hero art into the page. Masking to transparent lets whatever is
-     behind show through, so it works in both themes — fading to a colour instead
-     would mean hard-coding one background and getting the other wrong. The masked
-     band is empty: the hero's bottom padding keeps text out of it, so nothing is
-     ever half-faded or sitting on top of the section below. */
-  .hero-dissolve {
-    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 7rem), transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 7rem), transparent 100%);
-  }
 }
 
 /* iOS Safari zooms the whole page when a focused field's text is smaller than 16px,

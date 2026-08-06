@@ -1,4 +1,4 @@
-import { Component, inject, input, computed, signal } from '@angular/core';
+import { Component, inject, input, computed, signal, OnDestroy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../../core/services/data.service';
 import { FirebaseService } from '../../../core/services/firebase.service';
@@ -53,50 +53,68 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
               </div>
             </div>
 
-            <!-- Action buttons bar -->
+            <!-- Action buttons bar. No "Ouvir no YouTube" button: the embedded player
+                 already surfaces a "Watch on YouTube" link at every screen size, so a
+                 separate button just duplicates it. -->
             <div class="flex flex-wrap gap-2 no-print">
-              @if (song()!.audioLinks.youtube) {
-                <a [href]="'https://www.youtube.com/watch?v=' + song()!.audioLinks.youtube"
-                   target="_blank" rel="noopener"
-                   class="flex items-center gap-2 px-4 py-2 rounded-xl bg-capoeira-gold text-capoeira-brown font-bold text-sm hover:bg-amber-400 transition-colors shadow-sm shadow-capoeira-gold/20">
-                  <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6a3 3 0 00-2.1 2.1C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/>
-                  </svg>
-                  Ouvir no YouTube
-                </a>
-              }
               <button (click)="toggleRoda()"
                 [attr.aria-pressed]="inRoda()"
+                [attr.aria-label]="inRoda() ? 'Na roda — remover' : 'Adicionar à roda'"
+                [attr.title]="inRoda() ? 'Na roda — remover' : 'Adicionar à roda'"
                 class="no-print flex items-center gap-1.5 px-4 py-2 sm:py-1.5 rounded-xl border text-sm font-medium transition-colors shadow-sm"
                 [class]="inRoda()
                   ? 'border-capoeira-gold/40 bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold'
                   : 'border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:border-capoeira-gold bg-white dark:bg-stone-900'">
-                {{ inRoda() ? '✓ Na roda — remover' : '+ Adicionar à roda' }}
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="8" stroke-width="2" />
+                  @if (inRoda()) { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" /> }
+                </svg>
+                <span class="hidden lg:inline">{{ inRoda() ? 'Na roda — remover' : 'Adicionar à roda' }}</span>
               </button>
               @if (firebase.currentUser() && !firebase.isAdmin()) {
                 <button (click)="toggleFavorite()"
+                  [attr.aria-pressed]="isFavorite()"
+                  [attr.aria-label]="isFavorite() ? 'Remover dos favoritos' : 'Favoritar'"
+                  [attr.title]="isFavorite() ? 'Remover dos favoritos' : 'Favoritar'"
                   class="flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-medium transition-colors shadow-sm"
                   [class]="isFavorite()
                     ? 'border-red-200 bg-red-50 text-red-500 dark:bg-red-900/20 dark:border-red-800'
                     : 'border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:text-red-400 hover:border-red-200 bg-white dark:bg-stone-900'">
-                  {{ isFavorite() ? '♥ Favoritada' : '♡ Favoritar' }}
+                  <span class="text-base leading-none shrink-0">{{ isFavorite() ? '♥' : '♡' }}</span>
+                  <span class="hidden lg:inline">{{ isFavorite() ? 'Favoritada' : 'Favoritar' }}</span>
                 </button>
                 <button (click)="toggleLearned()"
+                  [attr.aria-pressed]="isLearned()"
+                  [attr.aria-label]="isLearned() ? 'Marcar como não aprendida' : 'Marcar como aprendida'"
+                  [attr.title]="isLearned() ? 'Marcar como não aprendida' : 'Marcar como aprendida'"
                   class="flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-medium transition-colors shadow-sm"
                   [class]="isLearned()
                     ? 'border-emerald-200 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:border-emerald-800'
                     : 'border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:text-emerald-500 hover:border-emerald-200 bg-white dark:bg-stone-900'">
-                  {{ isLearned() ? '✓ Aprendida' : 'Marcar aprendida' }}
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span class="hidden lg:inline">{{ isLearned() ? 'Aprendida' : 'Marcar aprendida' }}</span>
                 </button>
               }
-              <button (click)="print()"
+              <button (click)="print()" aria-label="Imprimir ou salvar em PDF" title="Imprimir ou salvar em PDF"
                 class="no-print flex items-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:border-capoeira-gold text-sm font-medium transition-colors bg-white dark:bg-stone-900 shadow-sm">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                 </svg>
-                PDF / Imprimir
+                <span class="hidden lg:inline">PDF / Imprimir</span>
               </button>
             </div>
+
+            <!-- On small screens the video is pulled up here, right below the buttons
+                 and above the Coro. On lg+ it stays in the right column instead; the
+                 two are mutually exclusive so only one player is ever created. -->
+            @if (!isWide() && song()!.audioLinks.youtube) {
+              <div>
+                <h2 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-3">Vídeo</h2>
+                <app-youtube-embed [videoId]="song()!.audioLinks.youtube!" [title]="song()!.title" />
+              </div>
+            }
 
             <!-- Coro (stored as refrao on the model) -->
             @if (song()!.refrao) {
@@ -146,8 +164,9 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
           <!-- ═══ RIGHT COLUMN ═══ -->
           <div class="mt-8 lg:mt-0 space-y-5 lg:sticky lg:top-6 no-print">
 
-            <!-- Video -->
-            @if (song()!.audioLinks.youtube) {
+            <!-- Video — right column on lg+ only; on small screens it is rendered up
+                 in the left column above the Coro instead (see above). -->
+            @if (isWide() && song()!.audioLinks.youtube) {
               <div>
                 <h2 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-3">Vídeo</h2>
                 <app-youtube-embed [videoId]="song()!.audioLinks.youtube!" [title]="song()!.title" />
@@ -240,11 +259,29 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
     }
   `,
 })
-export class SongDetailComponent {
+export class SongDetailComponent implements OnDestroy {
   id = input.required<string>();
   private data = inject(DataService);
   readonly firebase = inject(FirebaseService);
   private roda = inject(RodaService);
+
+  // The lg breakpoint (1024px) is where the layout splits into two columns. Track it
+  // so the video can render in the reading column below lg and in the sidebar at/above
+  // it. Defaults to wide when there is no window, keeping the desktop layout as the
+  // no-JS fallback.
+  private readonly wideQuery = typeof window !== 'undefined'
+    ? window.matchMedia('(min-width: 1024px)')
+    : null;
+  readonly isWide = signal(this.wideQuery?.matches ?? true);
+  private readonly onViewportChange = (e: MediaQueryListEvent) => this.isWide.set(e.matches);
+
+  constructor() {
+    this.wideQuery?.addEventListener('change', this.onViewportChange);
+  }
+
+  ngOnDestroy(): void {
+    this.wideQuery?.removeEventListener('change', this.onViewportChange);
+  }
 
   song = computed(() => this.data.songById().get(this.id()));
   isAccessible = computed(() => true);

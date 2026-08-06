@@ -1,10 +1,7 @@
-import { Component, inject, input, computed, linkedSignal } from '@angular/core';
+import { Component, inject, input, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../../core/services/data.service';
 import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/youtube-embed.component';
-import { TabBarComponent, TabOption } from '../../../shared/components/tab-bar/tab-bar.component';
-
-type ToqueTab = 'sobre' | 'videos';
 
 const TEMPO_LABELS: Record<string, string> = {
   slow: 'Lento', medium: 'Médio', fast: 'Rápido', variable: 'Variável'
@@ -13,7 +10,7 @@ const TEMPO_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-toque-detail',
   standalone: true,
-  imports: [RouterLink, YoutubeEmbedComponent, TabBarComponent],
+  imports: [RouterLink, YoutubeEmbedComponent],
   template: `
     @if (toque()) {
       <div class="max-w-2xl space-y-8">
@@ -42,18 +39,35 @@ const TEMPO_LABELS: Record<string, string> = {
           <h1 class="font-display text-3xl font-bold text-capoeira-brown dark:text-capoeira-cream">{{ toque()!.name }}</h1>
         </div>
 
-        <!-- Sobre / Vídeos. The tab bar only appears once there is a video to switch
-             to; with nothing to demonstrate, a lone "Sobre" tab is just noise. -->
-        @if (tabs().length > 1) {
-          <app-tab-bar
-            [tabs]="tabs()" [active]="activeTab()" idPrefix="toque"
-            ariaLabel="Seções do toque"
-            (select)="activeTab.set($any($event))" />
+        <!-- Videos, right under the title. Someone opening a toque wants to hear it,
+             so the demonstration is the first thing on the page rather than something
+             to be found. Two sources feed it: videos.json entries pointing at this
+             toque, and any links written on the toque itself. -->
+        @if (hasVideos()) {
+          <div class="space-y-4">
+            @for (video of demoVideos(); track video.id) {
+              <div>
+                <app-youtube-embed [videoId]="video.youtubeId" [title]="video.title" />
+                <!-- The title is only worth repeating when it says something the toque
+                     name above has not already said. -->
+                @if (video.title !== toque()!.name) {
+                  <p class="text-sm text-stone-500 dark:text-stone-400 mt-2 font-medium">{{ video.title }}</p>
+                }
+                @if (video.description) {
+                  <p class="text-sm text-stone-400 mt-1">{{ video.description }}</p>
+                }
+              </div>
+            }
+            @for (v of toque()!.videoLinks; track v.url) {
+              <div>
+                <app-youtube-embed [videoId]="v.url" [title]="v.label" />
+                <p class="text-sm text-stone-400 mt-2">{{ v.label }}</p>
+              </div>
+            }
+          </div>
         }
 
         <!-- Description -->
-        <div id="toque-panel-sobre" role="tabpanel" aria-labelledby="toque-tab-sobre"
-          class="print-show space-y-8" [class.hidden]="activeTab() !== 'sobre'">
         <div class="bg-white dark:bg-stone-800 rounded-xl p-6 border border-stone-200 dark:border-stone-700 space-y-4">
           <div>
             <h2 class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">Descrição</h2>
@@ -80,36 +94,6 @@ const TEMPO_LABELS: Record<string, string> = {
             }
           </div>
         </div>
-        </div>
-
-        <!-- Videos. Two sources feed this one panel: videos.json entries pointing at
-             this toque, and any links written on the toque itself. People come to a
-             toque expecting to hear it, so the demonstration belongs here rather than
-             only on the videos index. -->
-        @if (hasVideos()) {
-          <div id="toque-panel-videos" role="tabpanel" aria-labelledby="toque-tab-videos"
-            class="print-show space-y-4" [class.hidden]="activeTab() !== 'videos'">
-            @for (video of demoVideos(); track video.id) {
-              <div>
-                <app-youtube-embed [videoId]="video.youtubeId" [title]="video.title" />
-                <!-- The title is only worth repeating when it says something the toque
-                     name above has not already said. -->
-                @if (video.title !== toque()!.name) {
-                  <p class="text-sm text-stone-500 dark:text-stone-400 mt-2 font-medium">{{ video.title }}</p>
-                }
-                @if (video.description) {
-                  <p class="text-sm text-stone-400 mt-1">{{ video.description }}</p>
-                }
-              </div>
-            }
-            @for (v of toque()!.videoLinks; track v.url) {
-              <div>
-                <app-youtube-embed [videoId]="v.url" [title]="v.label" />
-                <p class="text-sm text-stone-400 mt-2">{{ v.label }}</p>
-              </div>
-            }
-          </div>
-        }
 
       </div>
     } @else {
@@ -127,21 +111,6 @@ export class ToqueDetailComponent {
 
   readonly hasVideos = computed(() =>
     this.demoVideos().length > 0 || (this.toque()?.videoLinks.length ?? 0) > 0);
-
-  readonly tabs = computed<TabOption<ToqueTab>[]>(() => {
-    const tabs: TabOption<ToqueTab>[] = [{ value: 'sobre', label: 'Sobre' }];
-    if (this.hasVideos()) tabs.push({ value: 'videos', label: 'Vídeos' });
-    return tabs;
-  });
-
-  /** Falls back to Sobre on a toque with nothing to show. */
-  readonly activeTab = linkedSignal<TabOption<ToqueTab>[], ToqueTab>({
-    source: () => this.tabs(),
-    computation: (tabs, previous) => {
-      const kept = previous?.value;
-      return kept && tabs.some(t => t.value === kept) ? kept : 'sobre';
-    },
-  });
 
   categoryLabel = computed(() => {
     const c = this.toque()?.category;

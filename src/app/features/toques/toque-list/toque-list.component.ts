@@ -63,13 +63,23 @@ const TAB_LABELS: Record<string, string> = {
             @for (toque of group.toques; track toque.id) {
               <a [routerLink]="['/toques', toque.id]"
                  class="group p-5 rounded-2xl border border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm hover:shadow-md hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
-                <div class="flex items-start justify-between mb-3">
+                <div class="flex items-start justify-between gap-2 mb-3">
                   <h3 class="font-display text-base font-bold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug">
                     {{ toque.name }}
                   </h3>
-                  <span [class]="tempoClass(toque.tempo)" class="px-2 py-0.5 rounded-full text-xs font-medium shrink-0 ml-2">
-                    {{ tempoLabel(toque.tempo) }}
-                  </span>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <!-- Says there is something to watch before anyone opens the toque. -->
+                    @if (hasVideo(toque.id)) {
+                      <span title="Tem vídeo de demonstração"
+                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-capoeira-gold/15 text-capoeira-brown dark:text-capoeira-gold border border-capoeira-gold/30">
+                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        Vídeo
+                      </span>
+                    }
+                    <span [class]="tempoClass(toque.tempo)" class="px-2 py-0.5 rounded-full text-xs font-medium">
+                      {{ tempoLabel(toque.tempo) }}
+                    </span>
+                  </div>
                 </div>
                 <p class="text-sm text-stone-500 dark:text-stone-400 line-clamp-2">{{ toque.context }}</p>
                 @if (songCount(toque.id)) {
@@ -123,5 +133,12 @@ export class ToqueListComponent {
 
   songCount(id: string): number {
     return this.data.songsByToque().get(id)?.length ?? 0;
+  }
+
+  /** Counts both sources the toque page plays from, so the mark never promises a
+   *  video that is not there. */
+  hasVideo(id: string): boolean {
+    if (this.data.videosByToque().get(id)?.length) return true;
+    return !!this.data.toqueById().get(id)?.videoLinks.length;
   }
 }

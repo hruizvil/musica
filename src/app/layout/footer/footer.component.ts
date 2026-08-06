@@ -83,10 +83,11 @@ export class FooterComponent {
   readonly offline = inject(OfflineService);
   readonly year = new Date().getFullYear();
 
+  // No Vídeos link: a demonstration lives on its toque's page, which is where people
+  // go looking for it. /videos still resolves as an index of everything.
   readonly nav = [
     { path: '/musicas', label: 'Músicas' },
     { path: '/toques', label: 'Toques' },
-    { path: '/videos', label: 'Vídeos' },
     { path: '/roda', label: 'Roda' },
   ];
 }

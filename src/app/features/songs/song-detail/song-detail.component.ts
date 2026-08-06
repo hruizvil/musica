@@ -1,4 +1,4 @@
-import { Component, inject, input, computed, signal, OnDestroy } from '@angular/core';
+import { Component, inject, input, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../../core/services/data.service';
 import { FirebaseService } from '../../../core/services/firebase.service';
@@ -53,6 +53,18 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
               </div>
             </div>
 
+            <!-- Video leads the page at every width: the recording is what the song
+                 actually is, and the words are read against it. Everything else
+                 follows underneath. -->
+            @if (song()!.audioLinks.youtube) {
+              <!-- Capped between sm and lg: in that range the page is still one column,
+                   and a full-bleed 16:9 player would push every line of the song off
+                   screen. At lg the grid column already sets the width. -->
+              <div class="no-print sm:max-w-2xl lg:max-w-none">
+                <app-youtube-embed [videoId]="song()!.audioLinks.youtube!" [title]="song()!.title" />
+              </div>
+            }
+
             <!-- Action buttons bar. No "Ouvir no YouTube" button: the embedded player
                  already surfaces a "Watch on YouTube" link at every screen size, so a
                  separate button just duplicates it. -->
@@ -106,16 +118,6 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
               </button>
             </div>
 
-            <!-- On small screens the video is pulled up here, right below the buttons
-                 and above the Coro. On lg+ it stays in the right column instead; the
-                 two are mutually exclusive so only one player is ever created. -->
-            @if (!isWide() && song()!.audioLinks.youtube) {
-              <div>
-                <h2 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-3">Vídeo</h2>
-                <app-youtube-embed [videoId]="song()!.audioLinks.youtube!" [title]="song()!.title" />
-              </div>
-            }
-
             <!-- Coro (stored as refrao on the model) -->
             @if (song()!.refrao) {
               <div class="bg-amber-50/80 dark:bg-amber-900/15 rounded-xl p-5 border border-amber-200 dark:border-amber-800 shadow-sm">
@@ -163,15 +165,6 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
 
           <!-- ═══ RIGHT COLUMN ═══ -->
           <div class="mt-8 lg:mt-0 space-y-5 lg:sticky lg:top-6 no-print">
-
-            <!-- Video — right column on lg+ only; on small screens it is rendered up
-                 in the left column above the Coro instead (see above). -->
-            @if (isWide() && song()!.audioLinks.youtube) {
-              <div>
-                <h2 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-3">Vídeo</h2>
-                <app-youtube-embed [videoId]="song()!.audioLinks.youtube!" [title]="song()!.title" />
-              </div>
-            }
 
             <!-- Spotify -->
             @if (song()!.audioLinks.spotify) {
@@ -259,29 +252,11 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
     }
   `,
 })
-export class SongDetailComponent implements OnDestroy {
+export class SongDetailComponent {
   id = input.required<string>();
   private data = inject(DataService);
   readonly firebase = inject(FirebaseService);
   private roda = inject(RodaService);
-
-  // The lg breakpoint (1024px) is where the layout splits into two columns. Track it
-  // so the video can render in the reading column below lg and in the sidebar at/above
-  // it. Defaults to wide when there is no window, keeping the desktop layout as the
-  // no-JS fallback.
-  private readonly wideQuery = typeof window !== 'undefined'
-    ? window.matchMedia('(min-width: 1024px)')
-    : null;
-  readonly isWide = signal(this.wideQuery?.matches ?? true);
-  private readonly onViewportChange = (e: MediaQueryListEvent) => this.isWide.set(e.matches);
-
-  constructor() {
-    this.wideQuery?.addEventListener('change', this.onViewportChange);
-  }
-
-  ngOnDestroy(): void {
-    this.wideQuery?.removeEventListener('change', this.onViewportChange);
-  }
 
   song = computed(() => this.data.songById().get(this.id()));
   isAccessible = computed(() => true);

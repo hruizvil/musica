@@ -123,6 +123,25 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
                 </svg>
                 <span class="hidden lg:inline">PDF / Imprimir</span>
               </button>
+              <button (click)="share()"
+                [attr.aria-label]="shareLabel()" [attr.title]="shareLabel()"
+                class="no-print flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-medium transition-colors shadow-sm"
+                [class]="shared()
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:border-emerald-800'
+                  : shareFailed()
+                    ? 'border-amber-300 bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:border-amber-800'
+                    : 'border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:border-capoeira-gold bg-white dark:bg-stone-900'">
+                @if (shared()) {
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                } @else {
+                  <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.7 10.7a3 3 0 100 2.6m0-2.6l6.6-3.4m-6.6 6l6.6 3.4M18 7a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm0 10a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                  </svg>
+                }
+                <span class="hidden lg:inline">{{ shareLabel() }}</span>
+              </button>
             </div>
 
             <!-- Section tabs, then the language choice for whichever section is
@@ -379,4 +398,73 @@ export class SongDetailComponent {
     else this.roda.add(this.id());
   }
   print() { window.print(); }
+
+  /** Confirms the copy in the button itself, so sharing needs no toast. */
+  readonly shared = signal(false);
+  readonly shareFailed = signal(false);
+  private sharedTimer?: ReturnType<typeof setTimeout>;
+
+  readonly shareLabel = computed(() => {
+    if (this.shared()) return 'Link copiado';
+    if (this.shareFailed()) return 'Copie o link da barra de endereço';
+    return 'Compartilhar';
+  });
+
+  async share(): Promise<void> {
+    const song = this.song();
+    if (!song) return;
+    const url = location.href;
+
+    // The share sheet is the right thing on a phone; everywhere else, copy the link.
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: song.title, url });
+        return;
+      } catch {
+        // dismissed, or not permitted here — fall through to copying
+      }
+    }
+
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(url);
+      copied = true;
+    } catch {
+      // The async clipboard needs a focused document and a permission the browser
+      // may withhold; the old selection-based copy usually still goes through.
+      copied = this.copyBySelection(url);
+    }
+    this.flashShareResult(copied);
+  }
+
+  private copyBySelection(text: string): boolean {
+    const field = document.createElement('textarea');
+    field.value = text;
+    field.setAttribute('readonly', '');
+    field.style.position = 'fixed';
+    field.style.top = '0';
+    field.style.opacity = '0';
+    document.body.appendChild(field);
+    field.select();
+    let ok = false;
+    try {
+      ok = document.execCommand('copy');
+    } catch {
+      ok = false;
+    }
+    document.body.removeChild(field);
+    return ok;
+  }
+
+  /** Say which way it went. A share button that silently does nothing when the
+   *  clipboard is blocked reads as broken. */
+  private flashShareResult(copied: boolean): void {
+    clearTimeout(this.sharedTimer);
+    this.shared.set(copied);
+    this.shareFailed.set(!copied);
+    this.sharedTimer = setTimeout(() => {
+      this.shared.set(false);
+      this.shareFailed.set(false);
+    }, 2400);
+  }
 }

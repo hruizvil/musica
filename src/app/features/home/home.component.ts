@@ -14,15 +14,22 @@ const CATEGORY_LABELS: Record<string, string> = {
     <!-- Hero. The photo layer is optional: drop a file at public/hero.jpg and it
          appears behind the scrim. Until then the gradient below carries the section,
          so a missing file degrades quietly instead of showing a broken box. -->
-    <section class="rounded-2xl bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-capoeira-brown via-amber-900/90 to-capoeira-night text-white px-6 py-14 sm:px-10 sm:py-20 mb-10 relative overflow-hidden min-h-[60vh] flex flex-col justify-center">
-      <!-- Anchored right: the berimbaus live on the right of the photo, so bg-center
-           would crop them out of a narrow viewport. The scrim below runs dark-to-clear
+    <!-- Negative margins cancel the padding on <main> so the art reaches the edges of
+         the screen instead of sitting in the page as a rounded tile. The bottom padding
+         is deliberately large: it holds the band the mask fades out over, so the image
+         finishes dissolving before any content below it starts. -->
+    <section class="relative -mx-4 sm:-mx-8 lg:-mx-12 -mt-8 mb-10 px-6 sm:px-10 lg:px-12 pt-14 sm:pt-20 pb-32 sm:pb-40 text-white overflow-hidden flex flex-col justify-center">
+      <!-- Every layer of art sits in here so one mask dissolves all of it together.
+           Anchored right: the berimbaus live on the right of the photo, so bg-center
+           would crop them out of a narrow viewport. The scrim runs dark-to-clear
            left-to-right, keeping the headline legible over the open side of the image. -->
-      <div class="absolute inset-0 bg-[url('/hero.jpg')] bg-cover bg-right opacity-70 pointer-events-none"></div>
-      <div class="absolute inset-0 bg-gradient-to-r from-capoeira-night/90 via-capoeira-night/50 to-transparent pointer-events-none"></div>
-      <div class="absolute -top-16 -right-16 w-80 h-80 rounded-full bg-white/3 blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-8 -left-8 w-56 h-56 rounded-full bg-capoeira-gold/10 blur-3xl pointer-events-none"></div>
-      <div class="absolute top-8 right-8 w-32 h-32 rounded-full border border-white/5 pointer-events-none"></div>
+      <div class="hero-dissolve absolute inset-0 pointer-events-none">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-capoeira-brown via-amber-900/90 to-capoeira-night"></div>
+        <div class="absolute inset-0 bg-[url('/hero.jpg')] bg-cover bg-right opacity-70"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-capoeira-night/90 via-capoeira-night/50 to-transparent"></div>
+        <div class="absolute -top-16 -right-16 w-80 h-80 rounded-full bg-white/3 blur-3xl"></div>
+        <div class="absolute top-8 right-8 w-32 h-32 rounded-full border border-white/5"></div>
+      </div>
 
       <div class="relative">
         <p class="text-capoeira-gold text-xs font-semibold uppercase tracking-widest mb-4 border-b border-capoeira-gold/30 pb-1 w-fit">Abadá Capoeira</p>

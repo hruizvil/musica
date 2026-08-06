@@ -1,0 +1,350 @@
+<title>Home — como as seções se conectam</title>
+
+<style>
+  :root{
+    --gold:#D4A017;--brown:#6B3A2A;--night:#1A1208;
+    --shell:#EFE9DF;
+    --page:#FDFAF3;          /* fundo da home hoje */
+    --band:#F6EFE2;          /* faixa alternada, opção B1 */
+    --surface:#FFFFFF;--line:#E7DFD2;--line-soft:#F1EADE;
+    --ink:#2E2419;--ink-soft:#6F6354;--ink-faint:#A09684;
+    --heading:#6B3A2A;--accent:#B8860B;--accent-bg:#FAF2DE;
+    --good:#3F6B2B;--good-bg:#EAF2E4;--warn:#A6432B;--warn-bg:#FBEAE5;
+    --display:"Playfair Display","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --body:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--shell:#100D09;--page:#1A1510;--band:#221B13;--surface:#241C14;--line:#3A2E23;--line-soft:#2C2219;
+      --ink:#EDE4D6;--ink-soft:#B3A694;--ink-faint:#7E7364;--heading:#E8C9A0;--accent:#E5B53C;
+      --accent-bg:#3A2C10;--good:#8FBF6A;--good-bg:#25311C;--warn:#E08768;--warn-bg:#3A211A;}
+  }
+  :root[data-theme="dark"]{--shell:#100D09;--page:#1A1510;--band:#221B13;--surface:#241C14;--line:#3A2E23;
+    --line-soft:#2C2219;--ink:#EDE4D6;--ink-soft:#B3A694;--ink-faint:#7E7364;--heading:#E8C9A0;
+    --accent:#E5B53C;--accent-bg:#3A2C10;--good:#8FBF6A;--good-bg:#25311C;--warn:#E08768;--warn-bg:#3A211A;}
+  :root[data-theme="light"]{--shell:#EFE9DF;--page:#FDFAF3;--band:#F6EFE2;--surface:#FFFFFF;--line:#E7DFD2;
+    --line-soft:#F1EADE;--ink:#2E2419;--ink-soft:#6F6354;--ink-faint:#A09684;--heading:#6B3A2A;
+    --accent:#B8860B;--accent-bg:#FAF2DE;--good:#3F6B2B;--good-bg:#EAF2E4;--warn:#A6432B;--warn-bg:#FBEAE5;}
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--shell);color:var(--ink);font-family:var(--body);font-size:15px;
+    line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1150px;margin:0 auto;padding:34px 18px 80px;display:flex;flex-direction:column;gap:34px}
+  .eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+  h1.mast{font-family:var(--display);font-weight:700;font-size:clamp(26px,5vw,38px);line-height:1.07;
+    margin:8px 0 0;color:var(--heading);text-wrap:balance}
+  .lede{margin:11px 0 0;color:var(--ink-soft);max-width:64ch}
+
+  section.blk{display:flex;flex-direction:column;gap:13px}
+  .sec-head{border-top:2px solid var(--heading);padding-top:11px}
+  .sec-head h2{font-family:var(--display);font-size:21px;margin:0;color:var(--heading)}
+  .sec-head p{margin:4px 0 0;color:var(--ink-soft);font-size:13.5px;max-width:76ch}
+  .tagrow{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px}
+  .tg{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+  .tg.good{color:var(--good);background:var(--good-bg)}
+  .tg.warn{color:var(--warn);background:var(--warn-bg)}
+  .tg.neutral{color:var(--ink-soft);background:var(--accent-bg)}
+
+  .duo{display:grid;gap:18px;grid-template-columns:minmax(0,290px) minmax(0,1fr);align-items:start}
+  @media (max-width:800px){.duo{grid-template-columns:1fr}}
+  .devlabel{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+
+  .phone,.desk{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:var(--page);
+    box-shadow:0 3px 14px rgba(0,0,0,.09)}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface);
+    border-bottom:1px solid var(--line-soft)}
+  .bar .lg{font-family:var(--display);font-size:12px;font-weight:700;color:var(--heading)}
+  .bar .lg em{font-style:normal;color:var(--gold)}
+  .bar .ic{color:var(--ink-faint);font-size:11px;display:flex;gap:9px}
+  .bar .nav{display:flex;gap:11px;font-size:10px;color:var(--ink-soft);font-weight:600}
+  .bar .nav b{color:var(--gold)}
+
+  /* hero stand-in — the photo is not what this page is about */
+  .hero{background:linear-gradient(115deg,#4A3120,#241708 62%,#1A1208);color:#fff;padding:18px 14px 20px}
+  .hero .k{font-size:7.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+  .hero .h{font-family:var(--display);font-size:17px;font-weight:700;line-height:1.08}
+  .hero .h i{font-style:normal;color:var(--gold)}
+  .hero .b{display:inline-block;margin-top:9px;background:var(--gold);color:#3A2408;font-size:8.5px;
+    font-weight:800;padding:5px 10px;border-radius:7px}
+
+  .lbl{font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+  .h2s{font-family:var(--display);font-size:13px;font-weight:700;color:var(--ink);margin:0}
+
+  /* ── HOJE: tudo é cartão branco sobre creme ── */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 1px 2px rgba(0,0,0,.05)}
+  .statsA{display:flex;gap:7px}
+  .statsA .s{flex:1;text-align:center;padding:9px 4px}
+  .s b{display:block;font-family:var(--display);font-size:15px;color:var(--gold);line-height:1}
+  .s span{display:block;font-size:7.5px;color:var(--ink-faint);margin-top:3px;line-height:1.2}
+  .whyA{display:flex;flex-direction:column;gap:7px}
+  .whyA .w{padding:10px 11px}
+  .w .ic{width:22px;height:22px;border-radius:7px;background:var(--accent-bg);display:grid;place-items:center;
+    font-size:11px;margin-bottom:6px}
+  .w b{display:block;font-size:10px;color:var(--ink)}
+  .w p{margin:2px 0 0;font-size:8.5px;color:var(--ink-soft);line-height:1.45}
+  .songsA{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .songsA .sg{padding:9px 10px}
+  .sg b{display:block;font-size:9.5px;color:var(--ink);line-height:1.25}
+  .sg span{font-size:7.5px;color:var(--ink-faint)}
+
+  .stack{display:flex;flex-direction:column;gap:13px;padding:13px}
+
+  /* ── B1: faixas de largura total ── */
+  .band{padding:15px 14px}
+  .band.tint{background:var(--band)}
+  .band.plain{background:var(--page)}
+  .statsB1{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .statsB1 .s{flex:1;text-align:center;padding:11px 4px;border-right:1px solid var(--line-soft)}
+  .statsB1 .s:last-child{border-right:0}
+  .rule{height:1px;background:var(--line);margin:11px 0 0}
+
+  /* ── B2: sem moldura nenhuma ── */
+  .bare{padding:15px 14px;background:var(--page)}
+  .statsB2{display:flex;gap:0}
+  .statsB2 .s{flex:1;text-align:center;padding:4px 4px;border-right:1px solid var(--line)}
+  .statsB2 .s:last-child{border-right:0}
+  .whyB2{display:flex;flex-direction:column;gap:12px}
+  .whyB2 .w{padding:0}
+  .songsB2{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .songsB2 .sg{padding:9px 2px;border-bottom:1px solid var(--line-soft)}
+  .headrule{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .headrule .line{flex:1;height:1px;background:var(--line)}
+
+  .notes{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(235px,1fr))}
+  .note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px;
+    display:flex;flex-direction:column;gap:6px}
+  .note h4{margin:0;font-size:13px;font-weight:750}
+  .note p{margin:0;font-size:12.5px;color:var(--ink-soft)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Home · como as seções se conectam</div>
+    <h1 class="mast">Opção B — tirar as bordas duras entre as seções</h1>
+    <p class="lede">
+      Sem movimento nenhum aqui: é só layout. Hoje a home é uma pilha de cartões brancos
+      flutuando sobre creme. Abaixo, o que existe agora e duas formas de fazer a página
+      correr como uma coisa só.
+    </p>
+  </header>
+
+  <!-- HOJE -->
+  <section class="blk">
+    <div class="sec-head">
+      <h2>Hoje</h2>
+      <p>Cada bloco é um cartão branco com borda e sombra, com creme aparecendo entre eles. São nove
+         retângulos empilhados numa coluna estreita.</p>
+      <div class="tagrow"><span class="tg warn">tudo é cartão</span><span class="tg warn">bordas por toda parte</span></div>
+    </div>
+    <div class="duo">
+      <div>
+        <div class="devlabel">Celular</div>
+        <div class="phone">
+          <div class="bar"><span class="lg">Abadá <em>Música</em></span><span class="ic">☀ ☰</span></div>
+          <div class="hero"><div class="k">Abadá Capoeira</div><div class="h">A biblioteca musical da <i>capoeira</i></div><span class="b">Explorar músicas</span></div>
+          <div class="stack">
+            <div class="card statsA">
+              <div class="s"><b>9</b><span>com tradução</span></div>
+              <div class="s"><b>19</b><span>toques</span></div>
+              <div class="s"><b>3</b><span>vídeos</span></div>
+            </div>
+            <div>
+              <h3 class="h2s" style="margin-bottom:8px">Por que somos diferentes</h3>
+              <div class="whyA">
+                <div class="card w"><div class="ic">🌍</div><b>Tradução lado a lado</b><p>Entenda o que está cantando.</p></div>
+                <div class="card w"><div class="ic">🥁</div><b>Organizado por toque</b><p>Ache pelo ritmo da roda.</p></div>
+              </div>
+            </div>
+            <div>
+              <h3 class="h2s" style="margin-bottom:8px">Últimas adicionadas</h3>
+              <div class="songsA">
+                <div class="card sg"><b>Zum Zum Zum</b><span>São Bento Grande</span></div>
+                <div class="card sg"><b>Paranauê</b><span>São Bento Grande</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="devlabel">Desktop</div>
+        <div class="desk">
+          <div class="bar"><span class="lg">Abadá <em>Música</em></span><span class="nav"><b>Músicas</b><span>Toques</span><span>Roda</span><span>Minhas</span></span><span class="ic">☀</span></div>
+          <div class="hero" style="padding:24px 22px"><div class="k">Abadá Capoeira</div><div class="h" style="font-size:23px">A biblioteca musical da <i>capoeira</i></div><span class="b">Explorar músicas</span></div>
+          <div class="stack">
+            <div class="card statsA">
+              <div class="s"><b>9</b><span>músicas com tradução</span></div>
+              <div class="s"><b>19</b><span>toques representados</span></div>
+              <div class="s"><b>3</b><span>vídeos</span></div>
+            </div>
+            <div>
+              <h3 class="h2s" style="margin-bottom:8px">Por que somos diferentes</h3>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+                <div class="card w"><div class="ic">🌍</div><b>Tradução</b><p>Lado a lado.</p></div>
+                <div class="card w"><div class="ic">🥁</div><b>Por toque</b><p>Ache pelo ritmo.</p></div>
+                <div class="card w"><div class="ic">💬</div><b>Curado</b><p>Por professores.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B1 -->
+  <section class="blk">
+    <div class="sec-head">
+      <h2>B1 · Faixas de largura total</h2>
+      <p>Cada seção vira uma faixa que atravessa a tela inteira, como o hero já faz. Faixas alternam
+         de tom, então a página lê como camadas horizontais que se sucedem — não como cartões soltos.
+         Os cartões continuam existindo, mas dentro de uma faixa, não flutuando no creme.</p>
+      <div class="tagrow"><span class="tg good">sem creme entre blocos</span><span class="tg good">combina com o hero</span><span class="tg neutral">estrutura clara</span></div>
+    </div>
+    <div class="duo">
+      <div>
+        <div class="devlabel">Celular</div>
+        <div class="phone">
+          <div class="bar"><span class="lg">Abadá <em>Música</em></span><span class="ic">☀ ☰</span></div>
+          <div class="hero"><div class="k">Abadá Capoeira</div><div class="h">A biblioteca musical da <i>capoeira</i></div><span class="b">Explorar músicas</span></div>
+          <div class="band plain">
+            <div class="statsB1">
+              <div class="s"><b>9</b><span>com tradução</span></div>
+              <div class="s"><b>19</b><span>toques</span></div>
+              <div class="s"><b>3</b><span>vídeos</span></div>
+            </div>
+          </div>
+          <div class="band tint">
+            <h3 class="h2s" style="margin-bottom:9px">Por que somos diferentes</h3>
+            <div class="whyA">
+              <div class="card w"><div class="ic">🌍</div><b>Tradução lado a lado</b><p>Entenda o que está cantando.</p></div>
+              <div class="card w"><div class="ic">🥁</div><b>Organizado por toque</b><p>Ache pelo ritmo da roda.</p></div>
+            </div>
+          </div>
+          <div class="band plain">
+            <h3 class="h2s" style="margin-bottom:9px">Últimas adicionadas</h3>
+            <div class="songsA">
+              <div class="card sg"><b>Zum Zum Zum</b><span>São Bento Grande</span></div>
+              <div class="card sg"><b>Paranauê</b><span>São Bento Grande</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="devlabel">Desktop</div>
+        <div class="desk">
+          <div class="bar"><span class="lg">Abadá <em>Música</em></span><span class="nav"><b>Músicas</b><span>Toques</span><span>Roda</span><span>Minhas</span></span><span class="ic">☀</span></div>
+          <div class="hero" style="padding:24px 22px"><div class="k">Abadá Capoeira</div><div class="h" style="font-size:23px">A biblioteca musical da <i>capoeira</i></div><span class="b">Explorar músicas</span></div>
+          <div class="band plain" style="padding:16px 22px">
+            <div class="statsB1">
+              <div class="s"><b>9</b><span>músicas com tradução</span></div>
+              <div class="s"><b>19</b><span>toques representados</span></div>
+              <div class="s"><b>3</b><span>vídeos</span></div>
+            </div>
+          </div>
+          <div class="band tint" style="padding:18px 22px">
+            <h3 class="h2s" style="margin-bottom:9px">Por que somos diferentes</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+              <div class="card w"><div class="ic">🌍</div><b>Tradução</b><p>Lado a lado.</p></div>
+              <div class="card w"><div class="ic">🥁</div><b>Por toque</b><p>Ache pelo ritmo.</p></div>
+              <div class="card w"><div class="ic">💬</div><b>Curado</b><p>Por professores.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B2 -->
+  <section class="blk">
+    <div class="sec-head">
+      <h2>B2 · Sem moldura nenhuma</h2>
+      <p>Um fundo só, do topo ao rodapé. Os cartões perdem borda e sombra: sobram ícone, título e
+         texto respirando sobre a página, separados por espaço e por um fio fino. Nada “flutua”
+         porque não existe mais caixa.</p>
+      <div class="tagrow"><span class="tg good">o mais contínuo</span><span class="tg warn">menos óbvio o que é clicável</span></div>
+    </div>
+    <div class="duo">
+      <div>
+        <div class="devlabel">Celular</div>
+        <div class="phone">
+          <div class="bar"><span class="lg">Abadá <em>Música</em></span><span class="ic">☀ ☰</span></div>
+          <div class="hero"><div class="k">Abadá Capoeira</div><div class="h">A biblioteca musical da <i>capoeira</i></div><span class="b">Explorar músicas</span></div>
+          <div class="bare">
+            <div class="statsB2">
+              <div class="s"><b>9</b><span>com tradução</span></div>
+              <div class="s"><b>19</b><span>toques</span></div>
+              <div class="s"><b>3</b><span>vídeos</span></div>
+            </div>
+            <div class="rule"></div>
+          </div>
+          <div class="bare" style="padding-top:2px">
+            <div class="headrule"><h3 class="h2s">Por que somos diferentes</h3><span class="line"></span></div>
+            <div class="whyB2">
+              <div class="w"><div class="ic">🌍</div><b>Tradução lado a lado</b><p>Entenda o que está cantando.</p></div>
+              <div class="w"><div class="ic">🥁</div><b>Organizado por toque</b><p>Ache pelo ritmo da roda.</p></div>
+            </div>
+            <div class="rule"></div>
+          </div>
+          <div class="bare" style="padding-top:2px">
+            <div class="headrule"><h3 class="h2s">Últimas adicionadas</h3><span class="line"></span></div>
+            <div class="songsB2">
+              <div class="sg"><b>Zum Zum Zum</b><span>São Bento Grande</span></div>
+              <div class="sg"><b>Paranauê</b><span>São Bento Grande</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="devlabel">Desktop</div>
+        <div class="desk">
+          <div class="bar"><span class="lg">Abadá <em>Música</em></span><span class="nav"><b>Músicas</b><span>Toques</span><span>Roda</span><span>Minhas</span></span><span class="ic">☀</span></div>
+          <div class="hero" style="padding:24px 22px"><div class="k">Abadá Capoeira</div><div class="h" style="font-size:23px">A biblioteca musical da <i>capoeira</i></div><span class="b">Explorar músicas</span></div>
+          <div class="bare" style="padding:18px 22px">
+            <div class="statsB2">
+              <div class="s"><b>9</b><span>músicas com tradução</span></div>
+              <div class="s"><b>19</b><span>toques representados</span></div>
+              <div class="s"><b>3</b><span>vídeos</span></div>
+            </div>
+            <div class="rule"></div>
+          </div>
+          <div class="bare" style="padding:4px 22px 18px">
+            <div class="headrule"><h3 class="h2s">Por que somos diferentes</h3><span class="line"></span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+              <div class="w"><div class="ic">🌍</div><b>Tradução</b><p>Lado a lado.</p></div>
+              <div class="w"><div class="ic">🥁</div><b>Por toque</b><p>Ache pelo ritmo.</p></div>
+              <div class="w"><div class="ic">💬</div><b>Curado</b><p>Por professores.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk">
+    <div class="sec-head"><h2>O que pesar</h2></div>
+    <div class="notes">
+      <div class="note">
+        <h4>B1 é o que eu escolheria</h4>
+        <p>Resolve a queixa e conversa com o hero, que já atravessa a tela. E mantém o cartão como
+           componente único — o mesmo cartão continua valendo em Músicas e Toques.</p>
+      </div>
+      <div class="note">
+        <h4>B2 é mais bonito e mais arriscado</h4>
+        <p>Sem borda nem sombra, some a pista de que aquilo é clicável. Numa página cheia de atalhos
+           para músicas, isso custa.</p>
+      </div>
+      <div class="note">
+        <h4>Não mexe em Músicas nem Toques</h4>
+        <p>As duas opções alteram só a home. O cartão de música compartilhado fica como está, então
+           nada muda nas listas.</p>
+      </div>
+      <div class="note">
+        <h4>Some bem com o que já existe</h4>
+        <p>O leve levantar do cartão ao passar o mouse continua, e a revelação ao rolar também —
+           são coisas independentes desta escolha.</p>
+      </div>
+    </div>
+  </section>
+
+</div>

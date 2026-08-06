@@ -32,8 +32,16 @@
 @media print {
   app-header,
   app-search-bar,
+  app-bottom-nav,
   .no-print {
     display: none !important;
+  }
+
+  /* Tabbed panels are hidden on screen but all belong in the printout — a PDF of a
+     song should hold its coro, its letra and its details, not just whichever tab
+     happened to be open. Overrides Tailwind's .hidden. */
+  .print-show {
+    display: block !important;
   }
 
   body {

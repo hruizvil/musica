@@ -1,15 +1,22 @@
-import { Component, inject, input, computed } from '@angular/core';
+import { Component, inject, input, computed, signal, linkedSignal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../../core/services/data.service';
 import { FirebaseService } from '../../../core/services/firebase.service';
 import { RodaService } from '../../../core/services/roda.service';
 import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/youtube-embed.component';
 import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/spotify-embed.component';
+import { TabBarComponent, TabOption } from '../../../shared/components/tab-bar/tab-bar.component';
+import { SegmentedControlComponent, SegmentOption } from '../../../shared/components/segmented-control/segmented-control.component';
+
+type SongTab = 'coro' | 'letra' | 'sobre';
+type Language = 'both' | 'pt' | 'en';
+
+const LANGUAGE_KEY = 'capoeira-lyrics-language';
 
 @Component({
   selector: 'app-song-detail',
   standalone: true,
-  imports: [RouterLink, YoutubeEmbedComponent, SpotifyEmbedComponent],
+  imports: [RouterLink, YoutubeEmbedComponent, SpotifyEmbedComponent, TabBarComponent, SegmentedControlComponent],
   template: `
     @if (song()) {
       <div class="w-full">
@@ -118,9 +125,29 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
               </button>
             </div>
 
-            <!-- Coro (stored as refrao on the model) -->
+            <!-- Section tabs, then the language choice for whichever section is
+                 showing. Only tabs with something behind them are offered. -->
+            <div class="flex flex-wrap items-center gap-3 no-print">
+              <app-tab-bar
+                [tabs]="tabs()" [active]="activeTab()" idPrefix="song"
+                ariaLabel="Seções da música"
+                (select)="activeTab.set($any($event))" />
+
+              @if (showLanguage()) {
+                <app-segmented-control
+                  [options]="languages" [value]="language()"
+                  ariaLabel="Idioma da letra"
+                  (select)="setLanguage($any($event))" />
+              }
+            </div>
+
+            <!-- Panels are hidden rather than removed so that printing can bring the
+                 whole song back — a PDF of just the tab that happened to be open
+                 would be missing verses. See .print-show in styles.css. -->
             @if (song()!.refrao) {
-              <div class="bg-amber-50/80 dark:bg-amber-900/15 rounded-xl p-5 border border-amber-200 dark:border-amber-800 shadow-sm">
+              <div id="song-panel-coro" role="tabpanel" aria-labelledby="song-tab-coro"
+                class="print-show bg-amber-50/80 dark:bg-amber-900/15 rounded-xl p-5 border border-amber-200 dark:border-amber-800 shadow-sm"
+                [class.hidden]="activeTab() !== 'coro'">
                 <div class="flex items-center gap-2 mb-3">
                   <div class="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
@@ -129,37 +156,83 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
                   </div>
                   <h2 class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Coro</h2>
                 </div>
-                @if (song()!.refraoTranslation) {
+                @if (song()!.refraoTranslation && language() === 'both') {
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <pre class="font-sans text-sm text-stone-700 dark:text-stone-300 whitespace-pre-wrap leading-relaxed">{{ song()!.refrao }}</pre>
                     <pre class="font-sans text-sm text-stone-500 dark:text-stone-400 whitespace-pre-wrap leading-relaxed italic border-l border-amber-200 dark:border-amber-700 pl-4">{{ song()!.refraoTranslation }}</pre>
                   </div>
+                } @else if (song()!.refraoTranslation && language() === 'en') {
+                  <pre class="font-sans text-sm text-stone-500 dark:text-stone-400 whitespace-pre-wrap leading-relaxed italic">{{ song()!.refraoTranslation }}</pre>
                 } @else {
                   <pre class="font-sans text-sm text-stone-700 dark:text-stone-300 whitespace-pre-wrap leading-relaxed">{{ song()!.refrao }}</pre>
                 }
               </div>
             }
 
-            <!-- Letra -->
-            <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-100 dark:border-stone-800 shadow-sm p-6">
+            <div id="song-panel-letra" role="tabpanel" aria-labelledby="song-tab-letra"
+              class="print-show bg-white dark:bg-stone-900 rounded-xl border border-stone-100 dark:border-stone-800 shadow-sm p-6"
+              [class.hidden]="activeTab() !== 'letra'">
               <h2 class="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 no-print">Letra</h2>
-              @if (song()!.translation) {
+              @if (song()!.translation && language() === 'both') {
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-800 dark:text-stone-200">{{ song()!.lyrics }}</pre>
                   <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-500 dark:text-stone-400 italic sm:border-l sm:border-stone-100 sm:dark:border-stone-800 sm:pl-6">{{ song()!.translation }}</pre>
                 </div>
+              } @else if (song()!.translation && language() === 'en') {
+                <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-500 dark:text-stone-400 italic">{{ song()!.translation }}</pre>
               } @else {
                 <pre class="font-display text-base leading-relaxed whitespace-pre-line text-stone-800 dark:text-stone-200">{{ song()!.lyrics }}</pre>
               }
             </div>
 
-            <!-- Sobre esta música -->
-            @if (song()!.notes) {
-              <div class="border-l-4 border-capoeira-gold bg-capoeira-gold/5 dark:bg-capoeira-gold/10 rounded-r-xl p-5">
-                <h3 class="text-xs font-bold text-capoeira-gold uppercase tracking-widest mb-2">Sobre esta música</h3>
-                <p class="text-sm text-stone-600 dark:text-stone-300 leading-relaxed">{{ song()!.notes }}</p>
+            <div id="song-panel-sobre" role="tabpanel" aria-labelledby="song-tab-sobre"
+              class="print-show space-y-4" [class.hidden]="activeTab() !== 'sobre'">
+              @if (song()!.notes) {
+                <div class="border-l-4 border-capoeira-gold bg-capoeira-gold/5 dark:bg-capoeira-gold/10 rounded-r-xl p-5">
+                  <h3 class="text-xs font-bold text-capoeira-gold uppercase tracking-widest mb-2">Sobre esta música</h3>
+                  <p class="text-sm text-stone-600 dark:text-stone-300 leading-relaxed">{{ song()!.notes }}</p>
+                </div>
+              }
+
+              <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-100 dark:border-stone-800 shadow-sm p-5 space-y-3">
+                @if (song()!.toque.length) {
+                  <div class="flex items-start gap-3 text-sm">
+                    <span class="text-lg shrink-0 mt-0.5">🥁</span>
+                    <div>
+                      <p class="text-xs text-stone-400 font-medium mb-0.5">Ritmo</p>
+                      <p class="text-stone-700 dark:text-stone-200 font-medium">{{ song()!.toque.map(toqueName).join(', ') }}</p>
+                    </div>
+                  </div>
+                }
+                @if (instruments()) {
+                  <div class="flex items-start gap-3 text-sm">
+                    <span class="text-lg shrink-0 mt-0.5">🎸</span>
+                    <div>
+                      <p class="text-xs text-stone-400 font-medium mb-0.5">Instrumentos</p>
+                      <p class="text-stone-700 dark:text-stone-200 font-medium">{{ instruments() }}</p>
+                    </div>
+                  </div>
+                }
+                @if (author()) {
+                  <div class="flex items-start gap-3 text-sm">
+                    <span class="text-lg shrink-0 mt-0.5">👤</span>
+                    <div>
+                      <p class="text-xs text-stone-400 font-medium mb-0.5">Compositor</p>
+                      <p class="text-stone-700 dark:text-stone-200 font-medium">{{ author() }}</p>
+                    </div>
+                  </div>
+                }
+                @if (song()!.album) {
+                  <div class="flex items-start gap-3 text-sm">
+                    <span class="text-lg shrink-0 mt-0.5">💿</span>
+                    <div>
+                      <p class="text-xs text-stone-400 font-medium mb-0.5">Álbum</p>
+                      <p class="text-stone-700 dark:text-stone-200 font-medium">{{ song()!.album }}</p>
+                    </div>
+                  </div>
+                }
               </div>
-            }
+            </div>
 
           </div>
 
@@ -174,50 +247,8 @@ import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/
               </div>
             }
 
-            <!-- Detalhes da música -->
-            <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-100 dark:border-stone-800 shadow-sm p-5 space-y-3">
-              <h2 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4">Detalhes da Música</h2>
-
-              @if (song()!.toque.length) {
-                <div class="flex items-start gap-3 text-sm">
-                  <span class="text-lg shrink-0 mt-0.5">🥁</span>
-                  <div>
-                    <p class="text-xs text-stone-400 font-medium mb-0.5">Ritmo</p>
-                    <p class="text-stone-700 dark:text-stone-200 font-medium">{{ song()!.toque.map(toqueName).join(', ') }}</p>
-                  </div>
-                </div>
-              }
-
-              @if (instruments()) {
-                <div class="flex items-start gap-3 text-sm">
-                  <span class="text-lg shrink-0 mt-0.5">🎸</span>
-                  <div>
-                    <p class="text-xs text-stone-400 font-medium mb-0.5">Instrumentos</p>
-                    <p class="text-stone-700 dark:text-stone-200 font-medium">{{ instruments() }}</p>
-                  </div>
-                </div>
-              }
-
-              @if (author()) {
-                <div class="flex items-start gap-3 text-sm">
-                  <span class="text-lg shrink-0 mt-0.5">👤</span>
-                  <div>
-                    <p class="text-xs text-stone-400 font-medium mb-0.5">Autor</p>
-                    <p class="text-stone-700 dark:text-stone-200 font-medium">{{ author() }}</p>
-                  </div>
-                </div>
-              }
-
-              @if (song()!.album) {
-                <div class="flex items-start gap-3 text-sm">
-                  <span class="text-lg shrink-0 mt-0.5">💿</span>
-                  <div>
-                    <p class="text-xs text-stone-400 font-medium mb-0.5">Álbum</p>
-                    <p class="text-stone-700 dark:text-stone-200 font-medium">{{ song()!.album }}</p>
-                  </div>
-                </div>
-              }
-            </div>
+            <!-- Song details are not repeated here: they live behind the Sobre tab,
+                 so the sidebar stays media plus what to sing next. -->
 
             <!-- Músicas relacionadas -->
             @if (relatedSongs().length) {
@@ -259,6 +290,62 @@ export class SongDetailComponent {
   private roda = inject(RodaService);
 
   song = computed(() => this.data.songById().get(this.id()));
+
+  /** Only sections with something in them become tabs. */
+  readonly tabs = computed<TabOption<SongTab>[]>(() => {
+    const song = this.song();
+    if (!song) return [];
+    const tabs: TabOption<SongTab>[] = [];
+    if (song.refrao) tabs.push({ value: 'coro', label: 'Coro' });
+    if (song.lyrics) tabs.push({ value: 'letra', label: 'Letra' });
+    tabs.push({ value: 'sobre', label: 'Sobre' });
+    return tabs;
+  });
+
+  /** Keeps the chosen tab across songs when it still exists, and falls back to the
+   *  first available one when it does not — otherwise moving from a song with a coro
+   *  to one without would leave every panel hidden. */
+  readonly activeTab = linkedSignal<TabOption<SongTab>[], SongTab>({
+    source: () => this.tabs(),
+    computation: (tabs, previous) => {
+      const kept = previous?.value;
+      return kept && tabs.some(t => t.value === kept) ? kept : (tabs[0]?.value ?? 'letra');
+    },
+  });
+
+  readonly languages: SegmentOption<Language>[] = [
+    { value: 'both', label: 'Ambos' },
+    { value: 'pt', label: 'Português' },
+    { value: 'en', label: 'Inglês' },
+  ];
+  readonly language = signal<Language>(this.storedLanguage());
+
+  /** The choice only means something where a translation exists to choose between. */
+  readonly showLanguage = computed(() => {
+    const song = this.song();
+    if (!song) return false;
+    if (this.activeTab() === 'coro') return !!song.refraoTranslation;
+    if (this.activeTab() === 'letra') return !!song.translation;
+    return false;
+  });
+
+  setLanguage(language: Language): void {
+    this.language.set(language);
+    try {
+      localStorage.setItem(LANGUAGE_KEY, language);
+    } catch {
+      // storage unavailable (private mode) — the choice still holds for this session
+    }
+  }
+
+  private storedLanguage(): Language {
+    try {
+      const stored = localStorage.getItem(LANGUAGE_KEY);
+      return stored === 'pt' || stored === 'en' ? stored : 'both';
+    } catch {
+      return 'both';
+    }
+  }
   isAccessible = computed(() => true);
   isFavorite = computed(() => this.firebase.favorites().has(this.id()));
   isLearned = computed(() => this.firebase.learnedSongs().has(this.id()));

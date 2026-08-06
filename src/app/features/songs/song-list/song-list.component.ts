@@ -4,6 +4,7 @@ import { Collection, SearchService } from '../../../core/services/search.service
 import { DataService } from '../../../core/services/data.service';
 import { FirebaseService } from '../../../core/services/firebase.service';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
+import { SongCardComponent } from '../../../shared/components/song-card/song-card.component';
 import { Song } from '../../../core/models/song.model';
 import { Toque } from '../../../core/models/toque.model';
 
@@ -16,7 +17,7 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-song-list',
   standalone: true,
-  imports: [RouterLink, SearchBarComponent],
+  imports: [RouterLink, SearchBarComponent, SongCardComponent],
   template: `
     <div class="space-y-6">
       <div>
@@ -80,21 +81,7 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
         @for (song of search.filteredSongs(); track song.id) {
           @if (isAccessible(song)) {
-            <a [routerLink]="['/musicas', song.id]"
-               class="group flex flex-col gap-2 p-3 sm:p-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
-              <div class="flex items-center gap-1.5 justify-end">
-                @if (firebase.learnedSongs().has(song.id)) {
-                  <span title="Aprendida" class="text-emerald-500 text-xs leading-none">✓</span>
-                }
-                @if (firebase.favorites().has(song.id)) {
-                  <span title="Favorita" class="text-red-400 text-xs leading-none">♥</span>
-                }
-              </div>
-              <span class="text-[15px] font-bold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug line-clamp-2">{{ song.title }}</span>
-              @if (song.toque.length) {
-                <span class="text-xs text-stone-500 font-medium truncate mt-auto">{{ toqueName(song.toque[0]) }}</span>
-              }
-            </a>
+            <app-song-card [song]="song" />
           } @else {
             <div class="flex flex-col gap-2 p-3 sm:p-4 rounded-2xl bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 cursor-default opacity-70">
               <span class="text-[15px] font-bold text-stone-500 dark:text-stone-500 leading-snug line-clamp-2">{{ song.title }}</span>

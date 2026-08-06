@@ -23,17 +23,27 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
         <!-- Desktop nav -->
         <nav class="hidden md:flex items-center gap-1 text-sm font-medium ml-2">
           @for (link of navLinks; track link.path) {
-            <a [routerLink]="link.path" routerLinkActive="text-capoeira-gold"
-               class="px-3 py-1.5 rounded-md text-stone-600 dark:text-stone-300 hover:text-capoeira-brown dark:hover:text-capoeira-cream hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+            <a [routerLink]="link.path" routerLinkActive #a="routerLinkActive"
+               [attr.aria-current]="a.isActive ? 'page' : null"
+               class="px-3 py-1.5 rounded-md transition-colors"
+               [class]="a.isActive ? activeClass : idleClass">
               {{ link.label }}
             </a>
           }
-          <a routerLink="/roda" routerLinkActive="text-capoeira-gold"
-             class="px-3 py-1.5 rounded-md text-stone-600 dark:text-stone-300 hover:text-capoeira-brown dark:hover:text-capoeira-cream hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+          <a routerLink="/roda" routerLinkActive #ar="routerLinkActive"
+             [attr.aria-current]="ar.isActive ? 'page' : null"
+             class="px-3 py-1.5 rounded-md transition-colors"
+             [class]="ar.isActive ? activeClass : idleClass">
             Roda
             @if (roda.count()) {
               <span class="text-capoeira-gold font-semibold">({{ roda.count() }})</span>
             }
+          </a>
+          <a routerLink="/minhas" routerLinkActive #an="routerLinkActive"
+             [attr.aria-current]="an.isActive ? 'page' : null"
+             class="px-3 py-1.5 rounded-md transition-colors"
+             [class]="an.isActive ? activeClass : idleClass">
+            Minhas
           </a>
           @if (firebase.isAdmin()) {
             <a routerLink="/admin" routerLinkActive="text-capoeira-gold"
@@ -160,22 +170,10 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
         <div class="flex-1 overflow-y-auto px-4 py-3 space-y-2">
           <app-search-bar />
 
+          <!-- No Músicas / Toques / Roda / Minhas here: the bottom tab bar carries
+               them on exactly the screens this drawer opens on. What is left is the
+               account, and the pages that are not destinations. -->
           <nav class="flex flex-col gap-1 pt-1">
-            @for (link of navLinks; track link.path) {
-              <a [routerLink]="link.path" routerLinkActive="text-capoeira-gold"
-                 (click)="mobileOpen.set(false)"
-                 class="px-3 py-2 rounded-md text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 text-sm font-medium">
-                {{ link.label }}
-              </a>
-            }
-            <a routerLink="/roda" routerLinkActive="text-capoeira-gold"
-               (click)="mobileOpen.set(false)"
-               class="px-3 py-2 rounded-md text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 text-sm font-medium">
-              Roda
-              @if (roda.count()) {
-                <span class="text-capoeira-gold font-semibold">({{ roda.count() }})</span>
-              }
-            </a>
             @if (firebase.isAdmin()) {
               <a routerLink="/admin" (click)="mobileOpen.set(false)"
                  class="px-3 py-2 rounded-md text-capoeira-gold hover:bg-capoeira-gold/10 text-sm font-semibold">
@@ -245,6 +243,12 @@ export class HeaderComponent {
     { path: '/musicas', label: 'Músicas' },
     { path: '/toques', label: 'Toques' },
   ];
+
+  // Swapped, not stacked: handing "text-capoeira-gold" to routerLinkActive left two
+  // text-colour utilities of equal specificity on the link, and the idle grey won on
+  // emit order — so the current page was never actually marked.
+  readonly activeClass = 'text-capoeira-gold font-semibold';
+  readonly idleClass = 'text-stone-600 dark:text-stone-300 hover:text-capoeira-brown dark:hover:text-capoeira-cream hover:bg-stone-100 dark:hover:bg-stone-800';
 
   /** Horizontal start of a drag on the drawer, for swipe-to-close. */
   private touchStartX: number | null = null;

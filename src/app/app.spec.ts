@@ -14,10 +14,7 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, capoeira-musica-library');
-  });
+  // The generated "should render title" test looked for an <h1> reading
+  // "Hello, capoeira-musica-library". App renders a <router-outlet /> and never had
+  // that heading, so the test had been failing since the scaffold was replaced.
 });

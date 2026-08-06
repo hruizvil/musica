@@ -16,6 +16,24 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* The strip iOS keeps for the home indicator. Written here rather than as Tailwind
+     arbitrary values because max()/calc() with env() is easy to get subtly wrong
+     inline, and the two rules have to agree: whatever the bar reserves for itself,
+     the page has to clear. Needs viewport-fit=cover in index.html to be non-zero. */
+  .tabbar-inset {
+    padding-bottom: max(0.375rem, env(safe-area-inset-bottom));
+  }
+
+  .tabbar-clearance {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+
+  @media (min-width: 768px) {
+    .tabbar-clearance {
+      padding-bottom: 0;
+    }
+  }
 }
 
 /* iOS Safari zooms the whole page when a focused field's text is smaller than 16px,

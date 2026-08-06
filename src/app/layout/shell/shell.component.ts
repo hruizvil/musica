@@ -11,9 +11,10 @@ import { PwaUpdateService } from '../../core/services/pwa-update.service';
   standalone: true,
   imports: [RouterOutlet, HeaderComponent, FooterComponent, BottomNavComponent],
   template: `
-    <!-- The bottom padding keeps the fixed tab bar from covering the end of the
-         footer on phones; from md the bar is gone and the padding with it. -->
-    <div class="min-h-screen flex flex-col bg-amber-50/40 dark:bg-stone-900 pb-14 md:pb-0">
+    <!-- tabbar-clearance reserves the bar's height plus the iPhone home-indicator
+         strip, and collapses to nothing at md where the bar is gone. It has to stay
+         in step with .tabbar-inset on the bar itself. -->
+    <div class="min-h-screen flex flex-col bg-amber-50/40 dark:bg-stone-900 tabbar-clearance">
       <app-header />
       <main class="flex-1 max-w-screen-2xl w-full mx-auto px-4 sm:px-8 lg:px-12 py-8">
         <router-outlet />

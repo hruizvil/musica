@@ -45,22 +45,26 @@ const CATEGORY_LABELS: Record<VideoCategory, string> = {
           @for (video of filteredVideos(); track video.id) {
             <div class="space-y-2">
               <app-youtube-embed [videoId]="video.youtubeId" [title]="video.title" />
-              <div>
-                <h3 class="font-medium text-stone-800 dark:text-stone-200 text-sm">{{ video.title }}</h3>
-                <span class="text-xs text-stone-400">{{ CATEGORY_LABELS[video.category] }}</span>
+              <!-- The toque link stretches over this text block only. Stretching it over
+                   the card would cover the embed and swallow the tap that plays the video. -->
+              <div class="relative space-y-2">
+                <div>
+                  <h3 class="font-medium text-stone-800 dark:text-stone-200 text-sm">{{ video.title }}</h3>
+                  <span class="text-xs text-stone-400">{{ CATEGORY_LABELS[video.category] }}</span>
+                </div>
+                @if (video.description) {
+                  <p class="text-xs text-stone-500 dark:text-stone-400">{{ video.description }}</p>
+                }
+                @if (toqueOf(video); as toque) {
+                  <a [routerLink]="['/toques', toque.id]"
+                     class="inline-flex items-center gap-1 text-xs font-medium text-capoeira-brown dark:text-capoeira-gold hover:underline py-1 after:absolute after:inset-0">
+                    Ver o toque {{ toque.name }}
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </a>
+                }
               </div>
-              @if (video.description) {
-                <p class="text-xs text-stone-500 dark:text-stone-400">{{ video.description }}</p>
-              }
-              @if (toqueOf(video); as toque) {
-                <a [routerLink]="['/toques', toque.id]"
-                   class="inline-flex items-center gap-1 text-xs font-medium text-capoeira-brown dark:text-capoeira-gold hover:underline py-1">
-                  Ver o toque {{ toque.name }}
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                  </svg>
-                </a>
-              }
             </div>
           }
         </div>

@@ -2,7 +2,7 @@ import {
   ApplicationConfig, isDevMode, provideBrowserGlobalErrorListeners, provideEnvironmentInitializer,
   inject,
 } from '@angular/core';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideServiceWorker } from '@angular/service-worker';
 
@@ -13,7 +13,15 @@ import { offlineOptedIn } from './core/services/offline.service';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes, withComponentInputBinding()),
+    // Angular leaves the scroll position alone by default, so opening a song from
+    // halfway down the list lands you halfway down the song. 'enabled' sends a new
+    // navigation to the top and restores your old position on Back, which is what
+    // both the browser's back button and a long song list need.
+    provideRouter(
+      routes,
+      withComponentInputBinding(),
+      withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' }),
+    ),
     provideHttpClient(withFetch()),
     // Offline caching is opt-in, so this only registers for someone who turned it on
     // (OfflineService writes that preference). isDevMode() keeps it out of `ng serve`

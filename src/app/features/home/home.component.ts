@@ -82,13 +82,18 @@ const CATEGORY_LABELS: Record<string, string> = {
       </h2>
       <div class="grid sm:grid-cols-3 gap-4">
         @for (reason of whyUs; track reason.title) {
-          <div class="flex flex-col p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:ring-1 hover:ring-capoeira-gold/20 transition-all duration-200">
+          <!-- The gold link stretches over the whole card (relative + after:inset-0), so
+               tapping anywhere goes to it instead of hunting for the small text. A card
+               with nowhere to go drops the hover lift too — the lift is a promise of a
+               tap, and one that can't be honoured is what makes a card feel broken. -->
+          <div class="relative flex flex-col p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm transition-all duration-200"
+               [class]="reason.link ? 'hover:shadow-md hover:-translate-y-0.5 hover:ring-1 hover:ring-capoeira-gold/20' : ''">
             <div class="text-2xl mb-4 w-12 h-12 rounded-2xl bg-capoeira-gold/10 flex items-center justify-center">{{ reason.icon }}</div>
             <h3 class="font-bold text-stone-800 dark:text-stone-100 mb-2">{{ reason.title }}</h3>
             <p class="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">{{ reason.body }}</p>
             @if (reason.link) {
               <a [routerLink]="reason.link"
-                 class="mt-4 w-fit py-1 text-xs font-semibold text-capoeira-gold hover:underline">
+                 class="mt-4 w-fit py-1 text-xs font-semibold text-capoeira-gold hover:underline after:absolute after:inset-0 after:rounded-2xl">
                 {{ reason.linkLabel }} →
               </a>
             }

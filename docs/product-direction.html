@@ -1,0 +1,337 @@
+<title>Abadá Música — Duas posturas, um app</title>
+
+<style>
+  :root{
+    --gold:#D4A017;--brown:#6B3A2A;--green:#2D5016;--cream:#F5F0E8;--night:#1A1208;
+    --ground:#F5F0E8;--surface:#FFFDF9;--surface-alt:#EFE7DA;--line:#E0D5C4;
+    --ink:#2E2419;--ink-soft:#6F6354;--ink-faint:#9A8F7E;
+    --accent:#B8860B;--accent-bg:rgba(212,160,23,.12);--heading:#6B3A2A;
+    --display:"Playfair Display","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --body:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--ground:#14100A;--surface:#1F1811;--surface-alt:#292018;--line:#3A2E23;
+      --ink:#EDE4D6;--ink-soft:#B3A694;--ink-faint:#7E7364;--accent:#E5B53C;
+      --accent-bg:rgba(229,181,60,.14);--heading:#E8C9A0;}
+  }
+  :root[data-theme="dark"]{--ground:#14100A;--surface:#1F1811;--surface-alt:#292018;--line:#3A2E23;
+    --ink:#EDE4D6;--ink-soft:#B3A694;--ink-faint:#7E7364;--accent:#E5B53C;
+    --accent-bg:rgba(229,181,60,.14);--heading:#E8C9A0;}
+  :root[data-theme="light"]{--ground:#F5F0E8;--surface:#FFFDF9;--surface-alt:#EFE7DA;--line:#E0D5C4;
+    --ink:#2E2419;--ink-soft:#6F6354;--ink-faint:#9A8F7E;--accent:#B8860B;
+    --accent-bg:rgba(212,160,23,.12);--heading:#6B3A2A;}
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);
+    font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1040px;margin:0 auto;padding:40px 22px 90px;display:flex;flex-direction:column;gap:46px}
+
+  .eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,5.4vw,46px);line-height:1.04;
+    margin:8px 0 0;color:var(--heading);text-wrap:balance}
+  .lede{margin:14px 0 0;color:var(--ink-soft);max-width:62ch;font-size:16.5px}
+
+  section{display:flex;flex-direction:column;gap:18px}
+  .sec-head{border-top:2px solid var(--heading);padding-top:13px;display:flex;flex-direction:column;gap:4px}
+  .sec-head h2{font-family:var(--display);font-size:24px;margin:0;color:var(--heading)}
+  .sec-head p{margin:0;color:var(--ink-soft);font-size:14px;max-width:72ch}
+
+  .cols{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;
+    display:flex;flex-direction:column;gap:12px}
+  .card h3{font-size:15px;margin:0;font-weight:750}
+  .card p{margin:0;font-size:13.5px;color:var(--ink-soft)}
+
+  /* posture cards */
+  .posture{border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:12px;border:1px solid var(--line)}
+  .posture.study{background:var(--surface)}
+  .posture.roda{background:linear-gradient(155deg,#3A2718,var(--night));border-color:transparent;color:var(--cream)}
+  .posture h3{font-family:var(--display);font-size:21px;margin:0}
+  .posture.study h3{color:var(--heading)}
+  .posture.roda h3{color:var(--gold)}
+  .posture dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13.5px}
+  .posture dt{font-weight:700;color:var(--ink-faint)}
+  .posture.roda dt{color:rgba(245,240,232,.55)}
+  .posture dd{margin:0;color:var(--ink-soft)}
+  .posture.roda dd{color:rgba(245,240,232,.9)}
+
+  .flag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    padding:4px 10px;border-radius:999px;background:var(--accent-bg);color:var(--accent);align-self:flex-start}
+  .posture.roda .flag{background:rgba(212,160,23,.18);color:var(--gold)}
+
+  /* phone mocks */
+  .phone{border:1px solid var(--line);border-radius:20px;overflow:hidden;background:var(--ground);
+    display:flex;flex-direction:column;min-height:330px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+  .ph-top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;
+    border-bottom:1px solid var(--line);background:var(--surface)}
+  .ph-logo{font-family:var(--display);font-size:12px;font-weight:700;color:var(--heading)}
+  .ph-body{flex:1;padding:12px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+  .ph-h{font-family:var(--display);font-size:16px;color:var(--heading);margin:0}
+  .ph-card{border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface)}
+  .ph-card b{font-size:10.5px;display:block}
+  .ph-card span{font-size:8.5px;color:var(--ink-faint)}
+  .icon{color:var(--ink-faint);font-size:15px;line-height:1}
+
+  .rodabar{background:var(--brown);color:var(--cream);padding:9px 12px;display:flex;align-items:center;gap:10px}
+  .rodabar .pl{width:26px;height:26px;border-radius:50%;background:var(--gold);color:var(--night);
+    display:grid;place-items:center;font-size:12px;flex:none;font-weight:800}
+  .rodabar .tx{flex:1;min-width:0}
+  .rodabar .tx b{display:block;font-size:10.5px}
+  .rodabar .tx span{font-size:8.5px;opacity:.7}
+  .rodabar .nx{font-size:15px;opacity:.85}
+
+  .tabbar{display:flex;border-top:1px solid var(--line);background:var(--surface)}
+  .tabbar div{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px 10px;
+    font-size:8.5px;color:var(--ink-faint);font-weight:650}
+  .tabbar div i{font-style:normal;font-size:16px;line-height:1}
+  .tabbar div[data-on]{color:var(--accent)}
+
+  .stage{flex:1;background:var(--night);color:var(--cream);display:flex;flex-direction:column;
+    justify-content:center;gap:14px;padding:26px 20px;text-align:center}
+  .stage .k{font-size:9.5px;letter-spacing:.14em;color:var(--gold);font-weight:800}
+  .stage .l{font-family:var(--display);font-size:23px;line-height:1.25}
+  .stage .sub{font-family:var(--display);font-style:italic;font-size:15px;opacity:.55}
+  .stage .hint{font-size:9px;opacity:.4;letter-spacing:.06em}
+
+  ul.pts{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+  ul.pts li{position:relative;padding-left:20px;font-size:13.5px;color:var(--ink-soft)}
+  ul.pts li::before{content:"→";position:absolute;left:0;color:var(--accent);font-weight:800}
+
+  .callout{border-left:3px solid var(--accent);background:var(--accent-bg);padding:15px 18px;
+    border-radius:0 12px 12px 0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+  .callout b{color:var(--heading)}
+
+  .rank{display:flex;flex-direction:column;gap:14px}
+  .opt{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
+  .opt > header{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--surface-alt);
+    border-bottom:1px solid var(--line)}
+  .opt > header .n{font-family:var(--display);font-size:22px;color:var(--accent);line-height:1}
+  .opt > header h3{margin:0;font-size:15.5px;font-weight:750;flex:1}
+  .opt > header .tag{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--ink-faint)}
+  .opt .inner{padding:18px;display:grid;gap:18px;grid-template-columns:minmax(200px,260px) 1fr;align-items:start}
+  @media (max-width:640px){.opt .inner{grid-template-columns:1fr}}
+
+  .verdict-box{background:var(--heading);color:var(--cream);border-radius:16px;padding:26px;
+    display:flex;flex-direction:column;gap:12px}
+  .verdict-box .eyebrow{color:rgba(245,240,232,.6)}
+  .verdict-box h2{font-family:var(--display);font-size:25px;margin:0;color:var(--cream)}
+  .verdict-box p{margin:0;color:rgba(245,240,232,.86);max-width:72ch}
+  .verdict-box .gold{color:var(--gold);font-weight:700}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Direção de produto · Abadá Música</div>
+    <h1>Duas posturas, um app</h1>
+    <p class="lede">
+      A pergunta não é barra inferior ou menu. É que este app é usado em duas posturas
+      completamente diferentes — e hoje trata as duas igual. Resolver isso vale muito
+      mais do que qualquer discussão de navegação.
+    </p>
+  </header>
+
+  <!-- THE INSIGHT -->
+  <section>
+    <div class="sec-head">
+      <h2>O que ninguém mais tem</h2>
+      <p>Sites de letra de capoeira existem. O que existe só aqui é a fila da roda e o Modo Coro —
+         alguém usando o app <em>enquanto joga</em>. É esse o produto. E é justamente o momento
+         que a interface atual não serve.</p>
+    </div>
+
+    <div class="cols">
+      <div class="posture study">
+        <span class="flag">Postura 1 · em casa</span>
+        <h3>Estudando</h3>
+        <dl>
+          <dt>Onde</dt><dd>Sentado, sozinho, com tempo</dd>
+          <dt>Mãos</dt><dd>Duas, sem pressa</dd>
+          <dt>Sessão</dt><dd>Minutos. Lê, compara tradução, favorita</dd>
+          <dt>Precisa</dt><dd>Navegar, buscar, ler lado a lado</dd>
+        </dl>
+        <p>Para isso o app já está bom. Abas, busca, tradução, favoritas — tudo serve esta postura.</p>
+      </div>
+
+      <div class="posture roda">
+        <span class="flag">Postura 2 · na roda</span>
+        <h3>Cantando</h3>
+        <dl>
+          <dt>Onde</dt><dd>De pé, na roda, sendo visto</dd>
+          <dt>Mãos</dt><dd>Uma. A outra bate palma</dd>
+          <dt>Sessão</dt><dd>Segundos por olhada, entre versos</dd>
+          <dt>Precisa</dt><dd>A próxima linha. Só isso.</dd>
+        </dl>
+        <p>Aqui o app falha: letra pequena, tela apaga, e é preciso procurar onde parou.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <b>A conclusão que muda a decisão:</b>
+      <span>
+        A parte de baixo da tela é o espaço mais valioso de um celular — é onde o polegar chega.
+        Hoje ela guarda quatro links de navegação. Na roda, ela deveria guardar
+        <em>a música que você está cantando</em>. Foi por isso que a barra te incomodou: não pelo tamanho,
+        mas porque ela está ocupando o melhor lugar com a coisa menos importante.
+      </span>
+    </div>
+  </section>
+
+  <!-- DIRECTIONS -->
+  <section>
+    <div class="sec-head">
+      <h2>Três direções, em ordem do que eu construiria</h2>
+      <p>Nenhuma delas é ajuste de UI. Todas mudam o que o app é capaz de fazer.</p>
+    </div>
+
+    <div class="rank">
+
+      <!-- 1 -->
+      <div class="opt">
+        <header>
+          <span class="n">1</span>
+          <h3>Barra da roda — a fila vira o rodapé</h3>
+          <span class="tag">maior ganho</span>
+        </header>
+        <div class="inner">
+          <div class="phone">
+            <div class="ph-top"><span class="ph-logo">Abadá Música</span><span class="icon">☰</span></div>
+            <div class="ph-body">
+              <p class="ph-h">Músicas</p>
+              <div class="ph-card"><b>Zum Zum Zum</b><span>São Bento Grande</span></div>
+              <div class="ph-card"><b>Paranauê, Paranauá</b><span>São Bento Grande</span></div>
+              <div class="ph-card"><b>Hoje Tem Capoeira</b><span>São Bento Grande</span></div>
+            </div>
+            <div class="rodabar">
+              <span class="pl">▶</span>
+              <span class="tx"><b>É roda, vem jogar</b><span>1 de 3 na fila</span></span>
+              <span class="nx">›</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <p style="margin:0;font-size:14px;color:var(--ink-soft)">
+              Quando existe fila, o rodapé deixa de ser navegação e passa a ser a roda: a música atual,
+              a posição na fila, e um toque para entrar no Modo Coro. Quando não existe fila, o rodapé
+              simplesmente não existe.
+            </p>
+            <ul class="pts">
+              <li>O melhor espaço da tela passa a servir o momento que só nós atendemos</li>
+              <li>Some sozinho quando não está em uso — nada de altura desperdiçada</li>
+              <li>Padrão que todo mundo já conhece de app de música</li>
+              <li>E resolve o seu incômodo: os quatro links saem de baixo</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="opt">
+        <header>
+          <span class="n">2</span>
+          <h3>Modo Coro que aguenta uma roda de verdade</h3>
+          <span class="tag">o app existe para isto</span>
+        </header>
+        <div class="inner">
+          <div class="phone">
+            <div class="stage">
+              <span class="k">É RODA, VEM JOGAR · 2/4</span>
+              <span class="l">Quero ver bater<br>Quero ver cair</span>
+              <span class="sub">I want to see you hit<br>I want to see you fall</span>
+              <span class="hint">TOQUE PARA AVANÇAR · TELA NÃO APAGA</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <p style="margin:0;font-size:14px;color:var(--ink-soft)">
+              Hoje o Modo Coro existe, mas não sobrevive a uma roda: a tela apaga no meio da música,
+              avançar exige achar um botão pequeno, e a tradução compete com o verso.
+            </p>
+            <ul class="pts">
+              <li><b>Tela acordada</b> enquanto o modo está aberto (Screen Wake Lock)</li>
+              <li><b>Toque em qualquer lugar</b> avança o verso — alvo do tamanho da tela</li>
+              <li><b>Arrasta</b> para a próxima música da fila</li>
+              <li><b>Fundo escuro</b> por padrão: não cega ninguém numa roda à noite</li>
+              <li>Tradução em segundo plano, discreta, porque na roda canta-se em português</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="opt">
+        <header>
+          <span class="n">3</span>
+          <h3>A fila vira repertório compartilhado</h3>
+          <span class="tag">mais adiante</span>
+        </header>
+        <div class="inner">
+          <div class="phone" style="min-height:0">
+            <div class="ph-top"><span class="ph-logo">Roda de sexta</span><span class="icon">↗</span></div>
+            <div class="ph-body" style="min-height:0">
+              <div class="ph-card"><b>1 · Zum Zum Zum</b><span>São Bento Grande</span></div>
+              <div class="ph-card"><b>2 · É roda, vem jogar</b><span>São Bento da Abadá</span></div>
+              <div class="ph-card"><b>3 · Paranauê</b><span>São Bento Grande</span></div>
+              <div style="font-size:10px;color:var(--ink-faint);padding-top:4px">Compartilhado com a turma</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <p style="margin:0;font-size:14px;color:var(--ink-soft)">
+              Uma fila salva e nomeada deixa de ser rascunho e passa a ser aula: o professor monta
+              o repertório da roda de sexta e manda o link para a turma estudar antes.
+            </p>
+            <ul class="pts">
+              <li>Transforma o app de referência individual em ferramenta de turma</li>
+              <li>Dá um motivo real para criar conta — hoje quase não existe</li>
+              <li>Precisa de escrita no Firestore, então é o mais custoso dos três</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- WHAT ABOUT NAV -->
+  <section>
+    <div class="sec-head">
+      <h2>E a navegação, então?</h2>
+      <p>Ela deixa de ser a pergunta principal — e o seu instinto se confirma, por um motivo melhor
+         do que “os ícones estão pequenos”.</p>
+    </div>
+    <div class="cols">
+      <div class="card">
+        <h3>Você estava certo sobre o rodapé</h3>
+        <p>
+          Não porque barra inferior seja ruim, mas porque <b>esse espaço tem uso melhor</b>. Se a barra
+          da roda vai morar ali, os quatro destinos não podem morar ali também. Um dos dois sai — e o
+          que sai é a navegação, que é usada entre sessões, não durante.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Onde os destinos ficam melhor</h3>
+        <p>
+          Com quatro itens e uso pouco frequente, um menu no topo resolve sem custo — que é
+          exatamente o que você pediu. A diferença é que agora ele não é um retrocesso: é uma escolha
+          para liberar o rodapé para a roda.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="verdict-box">
+    <div class="eyebrow">Minha recomendação, agora sim como responsável do produto</div>
+    <h2>Devolve o menu — e entrega o rodapé para a roda.</h2>
+    <p>
+      Eu estava defendendo a barra pelo motivo errado. O certo é: <span class="gold">os quatro destinos voltam
+      para o menu</span>, e o rodapé passa a ser a <span class="gold">barra da roda</span>, aparecendo só quando
+      existe fila. Junto com um Modo Coro que não apaga a tela e avança com um toque, isso torna o app
+      utilizável no único lugar onde ele é insubstituível: dentro da roda.
+    </p>
+    <p style="font-size:13.5px;opacity:.82">
+      Ordem que eu faria: menu de volta (rápido) → barra da roda → Modo Coro à prova de roda → fila compartilhada.
+    </p>
+  </div>
+
+</div>

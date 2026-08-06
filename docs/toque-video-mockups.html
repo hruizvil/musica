@@ -1,0 +1,348 @@
+<title>Página do toque — hoje vs. proposta</title>
+
+<style>
+  :root{
+    --gold:#D4A017;--brown:#6B3A2A;--cream:#F5F0E8;--night:#1A1208;
+    --ground:#F7F3EC;--surface:#FFFFFF;--page:#FDFBF7;
+    --line:#E7DFD2;--line-soft:#F0E9DD;
+    --ink:#2E2419;--ink-soft:#6F6354;--ink-faint:#A09684;
+    --heading:#6B3A2A;--accent:#B8860B;--accent-bg:#FBF3DF;
+    --blue-bg:#DBEAFE;--blue-tx:#1D4ED8;
+    --yellow-bg:#FEF3C7;--yellow-tx:#A16207;
+    --red-bg:#FEE2E2;--red-tx:#B91C1C;
+    --stone-bg:#F1EFEC;
+    --bad:#A6432B;--bad-bg:#FBEAE5;--good:#3F6B2B;--good-bg:#EAF2E4;
+    --display:"Playfair Display","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --body:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--ground:#15110B;--surface:#221A12;--page:#1C1610;--line:#3A2E23;--line-soft:#2C2219;
+      --ink:#EDE4D6;--ink-soft:#B3A694;--ink-faint:#7E7364;--heading:#E8C9A0;--accent:#E5B53C;
+      --accent-bg:#3A2C10;--stone-bg:#2C2219;
+      --blue-bg:#1E3A5F;--blue-tx:#93C5FD;--yellow-bg:#43350F;--yellow-tx:#FCD34D;
+      --red-bg:#4A1D1D;--red-tx:#FCA5A5;
+      --bad:#E08768;--bad-bg:#3A211A;--good:#8FBF6A;--good-bg:#25311C;}
+  }
+  :root[data-theme="dark"]{--ground:#15110B;--surface:#221A12;--page:#1C1610;--line:#3A2E23;--line-soft:#2C2219;
+    --ink:#EDE4D6;--ink-soft:#B3A694;--ink-faint:#7E7364;--heading:#E8C9A0;--accent:#E5B53C;
+    --accent-bg:#3A2C10;--stone-bg:#2C2219;--blue-bg:#1E3A5F;--blue-tx:#93C5FD;
+    --yellow-bg:#43350F;--yellow-tx:#FCD34D;--red-bg:#4A1D1D;--red-tx:#FCA5A5;
+    --bad:#E08768;--bad-bg:#3A211A;--good:#8FBF6A;--good-bg:#25311C;}
+  :root[data-theme="light"]{--ground:#F7F3EC;--surface:#FFFFFF;--page:#FDFBF7;--line:#E7DFD2;--line-soft:#F0E9DD;
+    --ink:#2E2419;--ink-soft:#6F6354;--ink-faint:#A09684;--heading:#6B3A2A;--accent:#B8860B;
+    --accent-bg:#FBF3DF;--stone-bg:#F1EFEC;--blue-bg:#DBEAFE;--blue-tx:#1D4ED8;
+    --yellow-bg:#FEF3C7;--yellow-tx:#A16207;--red-bg:#FEE2E2;--red-tx:#B91C1C;
+    --bad:#A6432B;--bad-bg:#FBEAE5;--good:#3F6B2B;--good-bg:#EAF2E4;}
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);
+    font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:36px 20px 80px;display:flex;flex-direction:column;gap:40px}
+
+  .eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(27px,5vw,40px);line-height:1.06;
+    margin:8px 0 0;color:var(--heading);text-wrap:balance}
+  .lede{margin:12px 0 0;color:var(--ink-soft);max-width:62ch;font-size:16px}
+
+  section{display:flex;flex-direction:column;gap:16px}
+  .sec-head{border-top:2px solid var(--heading);padding-top:12px}
+  .sec-head h2{font-family:var(--display);font-size:22px;margin:0;color:var(--heading)}
+  .sec-head p{margin:4px 0 0;color:var(--ink-soft);font-size:14px;max-width:72ch}
+
+  .pair{display:grid;gap:26px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+  .col{display:flex;flex-direction:column;gap:12px}
+  .col > .cap{display:flex;align-items:center;gap:10px}
+  .col > .cap h3{margin:0;font-size:15px;font-weight:750}
+  .badge{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .badge.bad{color:var(--bad);background:var(--bad-bg)}
+  .badge.good{color:var(--good);background:var(--good-bg)}
+
+  /* ── phone ─────────────────────────────── */
+  .phone{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:var(--page);
+    box-shadow:0 3px 14px rgba(0,0,0,.09);display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;
+    background:var(--surface);border-bottom:1px solid var(--line-soft)}
+  .bar .lg{font-family:var(--display);font-size:13px;font-weight:700;color:var(--heading)}
+  .bar .lg em{font-style:normal;color:var(--gold)}
+  .bar .ic{display:flex;gap:11px;color:var(--ink-faint);font-size:13px}
+  .screen{padding:13px;display:flex;flex-direction:column;gap:11px}
+
+  .back{font-size:11px;color:var(--ink-faint)}
+  .pills{display:flex;flex-wrap:wrap;gap:5px}
+  .pill{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--stone-bg);color:var(--ink-soft)}
+  .pill.blue{background:var(--blue-bg);color:var(--blue-tx)}
+  .pill.yellow{background:var(--yellow-bg);color:var(--yellow-tx)}
+  .pill.red{background:var(--red-bg);color:var(--red-tx)}
+  .title{font-family:var(--display);font-size:25px;font-weight:700;color:var(--heading);margin:0;line-height:1.1}
+
+  .tabs{display:flex;gap:6px}
+  .tab{font-size:11.5px;font-weight:700;padding:6px 13px;border-radius:10px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink-faint)}
+  .tab[data-on]{background:var(--accent-bg);border-color:var(--gold);color:var(--heading)}
+
+  .player{aspect-ratio:16/9;border-radius:10px;background:linear-gradient(150deg,#4A3520,#241708);
+    display:grid;place-items:center;position:relative;overflow:hidden}
+  .player::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 30% 40%,rgba(212,160,23,.18),transparent 60%)}
+  .player .play{width:44px;height:31px;border-radius:8px;background:#F0281E;display:grid;place-items:center;
+    position:relative;z-index:1}
+  .player .play::before{content:"";width:0;height:0;border-left:12px solid #fff;
+    border-top:7px solid transparent;border-bottom:7px solid transparent;margin-left:3px}
+  .player .yt{position:absolute;bottom:7px;right:9px;color:rgba(255,255,255,.85);font-size:8px;font-weight:700;z-index:1}
+
+  .ctrls{display:flex;flex-wrap:wrap;gap:5px}
+  .ctrl{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:650;
+    padding:5px 9px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft)}
+  .toggle{width:20px;height:11px;border-radius:999px;background:var(--gold);position:relative}
+  .toggle::after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;
+    top:1.5px;right:1.5px}
+  .ctrl .on{background:var(--accent-bg);color:var(--heading);border-radius:5px;padding:1px 5px;font-weight:800}
+
+  .lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:12px;
+    display:flex;flex-direction:column;gap:9px}
+  .panel p{margin:0;font-size:10.5px;color:var(--ink-soft);line-height:1.5}
+  .panel p.it{font-style:italic;color:var(--ink-faint)}
+  .insts{display:flex;flex-wrap:wrap;gap:4px}
+  .inst{font-size:9.5px;padding:4px 8px;border-radius:8px;background:var(--accent-bg);
+    color:var(--heading);border:1px solid rgba(212,160,23,.3)}
+
+  /* hidden-video marker */
+  .ghost{border:1px dashed var(--bad);border-radius:10px;padding:9px 11px;background:var(--bad-bg);
+    display:flex;align-items:center;gap:8px}
+  .ghost .x{color:var(--bad);font-size:14px;font-weight:800;line-height:1}
+  .ghost span{font-size:10px;color:var(--bad);font-weight:650;line-height:1.35}
+
+  /* list rows */
+  .row{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 12px;
+    display:flex;flex-direction:column;gap:5px}
+  .row .top{display:flex;align-items:center;gap:7px}
+  .row .nm{font-family:var(--display);font-size:12.5px;font-weight:700;color:var(--ink);flex:1;line-height:1.15}
+  .row p{margin:0;font-size:9.5px;color:var(--ink-faint);line-height:1.45}
+  .vmark{display:inline-flex;align-items:center;gap:3px;font-size:8.5px;font-weight:800;
+    padding:3px 7px;border-radius:999px;background:var(--accent-bg);color:var(--heading);
+    border:1px solid rgba(212,160,23,.35);white-space:nowrap}
+  .vmark i{font-style:normal;font-size:8px}
+
+  .chips{display:flex;gap:5px;flex-wrap:wrap}
+  .chip{font-size:10px;font-weight:650;padding:5px 11px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink-soft)}
+  .chip[data-on]{background:var(--accent-bg);border-color:var(--gold);color:var(--heading);font-weight:750}
+
+  .notes{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .note{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:17px;
+    display:flex;flex-direction:column;gap:7px}
+  .note h4{margin:0;font-size:13.5px;font-weight:750}
+  .note p{margin:0;font-size:13px;color:var(--ink-soft)}
+
+  .callout{border-left:3px solid var(--gold);background:var(--accent-bg);padding:14px 17px;
+    border-radius:0 12px 12px 0;font-size:14px;color:var(--ink)}
+  .callout b{color:var(--heading)}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Decisão · página do toque</div>
+    <h1>O vídeo está escondido atrás de uma aba</h1>
+    <p class="lede">
+      Mesma página, mesmo conteúdo, mesmo toque (Benguela). A única diferença é se o vídeo
+      exige um toque para aparecer ou não.
+    </p>
+  </header>
+
+  <!-- BEFORE / AFTER -->
+  <section>
+    <div class="sec-head">
+      <h2>1 · Página do toque</h2>
+      <p>À esquerda, como está em produção agora. À direita, a proposta.</p>
+    </div>
+
+    <div class="pair">
+
+      <!-- TODAY -->
+      <div class="col">
+        <div class="cap">
+          <h3>Hoje</h3>
+          <span class="badge bad">vídeo exige 1 toque</span>
+        </div>
+        <div class="phone">
+          <div class="bar"><span class="lg">Abadá <em>Música</em></span><span class="ic">☀ ☰</span></div>
+          <div class="screen">
+            <span class="back">‹ Toques</span>
+            <div class="pills">
+              <span class="pill">Abadá</span>
+              <span class="pill blue">Lento</span>
+              <span class="pill">50–80 BPM</span>
+            </div>
+            <h4 class="title">Benguela</h4>
+
+            <div class="tabs">
+              <span class="tab" data-on>Sobre</span>
+              <span class="tab">Vídeos</span>
+            </div>
+
+            <div class="ghost">
+              <span class="x">✕</span>
+              <span>O vídeo está atrás desta aba.<br>Nada na tela diz que ele existe.</span>
+            </div>
+
+            <div class="panel">
+              <span class="lbl">Descrição</span>
+              <p>Toque lento e fluido da tradição Abadá. Convida para o ‘jogo de floreios’ — um jogo bonito, cooperativo e de grande expressividade corporal.</p>
+              <span class="lbl">Contexto do jogo</span>
+              <p>Estimula um jogo próximo ao chão, cooperativo e esteticamente belo. Os capoeiristas mostram floreios, equilíbrio e criatividade.</p>
+              <span class="lbl">Caráter do jogo</span>
+              <p class="it">Fluido, cooperativo, bonito, expressivo, próximo ao chão</p>
+            </div>
+
+            <span class="lbl">Instrumentos</span>
+            <div class="insts">
+              <span class="inst">🎵 berimbau gunga</span>
+              <span class="inst">🎵 berimbau médio</span>
+              <span class="inst">🎵 pandeiro</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROPOSED -->
+      <div class="col">
+        <div class="cap">
+          <h3>Proposta</h3>
+          <span class="badge good">vídeo já visível</span>
+        </div>
+        <div class="phone">
+          <div class="bar"><span class="lg">Abadá <em>Música</em></span><span class="ic">☀ ☰</span></div>
+          <div class="screen">
+            <span class="back">‹ Toques</span>
+            <div class="pills">
+              <span class="pill">Abadá</span>
+              <span class="pill blue">Lento</span>
+              <span class="pill">50–80 BPM</span>
+            </div>
+            <h4 class="title">Benguela</h4>
+
+            <div class="player">
+              <span class="play"></span>
+              <span class="yt">▶ YouTube</span>
+            </div>
+            <div class="ctrls">
+              <span class="ctrl">↻ Repetir sem parar <span class="toggle"></span></span>
+              <span class="ctrl">Início <b>0:00</b> · AQUI</span>
+              <span class="ctrl">Velocidade <span class="on">1×</span> 0.75× 0.5×</span>
+            </div>
+
+            <div class="panel">
+              <span class="lbl">Descrição</span>
+              <p>Toque lento e fluido da tradição Abadá. Convida para o ‘jogo de floreios’ — um jogo bonito, cooperativo e de grande expressividade corporal.</p>
+              <span class="lbl">Contexto do jogo</span>
+              <p>Estimula um jogo próximo ao chão, cooperativo e esteticamente belo. Os capoeiristas mostram floreios, equilíbrio e criatividade.</p>
+              <span class="lbl">Caráter do jogo</span>
+              <p class="it">Fluido, cooperativo, bonito, expressivo, próximo ao chão</p>
+            </div>
+
+            <span class="lbl">Instrumentos</span>
+            <div class="insts">
+              <span class="inst">🎵 berimbau gunga</span>
+              <span class="inst">🎵 berimbau médio</span>
+              <span class="inst">🎵 pandeiro</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="callout">
+      <b>A troca:</b> as abas desaparecem e tudo passa a viver numa página só, com o vídeo no topo e o
+      texto embaixo — a mesma ordem que você pediu na página da música. Nada é removido, nada precisa
+      ser descoberto.
+    </div>
+  </section>
+
+  <!-- LIST -->
+  <section>
+    <div class="sec-head">
+      <h2>2 · Lista de toques — saber antes de entrar</h2>
+      <p>Hoje a lista não dá pista nenhuma de quais toques têm demonstração. Uma marca resolve isso
+         sem mudar mais nada na tela.</p>
+    </div>
+
+    <div class="pair">
+      <div class="col">
+        <div class="cap"><h3>Hoje</h3><span class="badge bad">nenhuma pista</span></div>
+        <div class="phone">
+          <div class="bar"><span class="lg">Abadá <em>Música</em></span><span class="ic">☀ ☰</span></div>
+          <div class="screen">
+            <h4 class="title" style="font-size:21px">Toques de Capoeira</h4>
+            <p style="margin:0;font-size:10px;color:var(--ink-faint)">Os ritmos do berimbau que comandam o jogo</p>
+            <div class="chips">
+              <span class="chip" data-on>Todos</span><span class="chip">Angola</span>
+              <span class="chip">Regional</span><span class="chip">Abadá</span>
+            </div>
+            <div class="row"><div class="top"><span class="nm">Angola</span><span class="pill blue">Lento</span></div>
+              <p>Tocado no início de todo jogo de Angola.</p></div>
+            <div class="row"><div class="top"><span class="nm">Benguela</span><span class="pill blue">Lento</span></div>
+              <p>Toque lento e fluido da tradição Abadá.</p></div>
+            <div class="row"><div class="top"><span class="nm">São Bento da Abadá</span><span class="pill red">Rápido</span></div>
+              <p>Toque principal da Capoeira Abadá.</p></div>
+            <div class="row"><div class="top"><span class="nm">Siriúna</span><span class="pill red">Rápido</span></div>
+              <p>Toque vibrante da Abadá-Capoeira.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="cap"><h3>Proposta</h3><span class="badge good">marca de vídeo</span></div>
+        <div class="phone">
+          <div class="bar"><span class="lg">Abadá <em>Música</em></span><span class="ic">☀ ☰</span></div>
+          <div class="screen">
+            <h4 class="title" style="font-size:21px">Toques de Capoeira</h4>
+            <p style="margin:0;font-size:10px;color:var(--ink-faint)">Os ritmos do berimbau que comandam o jogo</p>
+            <div class="chips">
+              <span class="chip" data-on>Todos</span><span class="chip">Angola</span>
+              <span class="chip">Regional</span><span class="chip">Abadá</span>
+            </div>
+            <div class="row"><div class="top"><span class="nm">Angola</span><span class="pill blue">Lento</span></div>
+              <p>Tocado no início de todo jogo de Angola.</p></div>
+            <div class="row"><div class="top"><span class="nm">Benguela</span><span class="vmark"><i>▶</i> Vídeo</span><span class="pill blue">Lento</span></div>
+              <p>Toque lento e fluido da tradição Abadá.</p></div>
+            <div class="row"><div class="top"><span class="nm">São Bento da Abadá</span><span class="vmark"><i>▶</i> Vídeo</span><span class="pill red">Rápido</span></div>
+              <p>Toque principal da Capoeira Abadá.</p></div>
+            <div class="row"><div class="top"><span class="nm">Siriúna</span><span class="vmark"><i>▶</i> Vídeo</span><span class="pill red">Rápido</span></div>
+              <p>Toque vibrante da Abadá-Capoeira.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTES -->
+  <section>
+    <div class="sec-head">
+      <h2>3 · O que isso custa</h2>
+    </div>
+    <div class="notes">
+      <div class="note">
+        <h4>Muda 3 dos 18 toques</h4>
+        <p>Só Benguela, São Bento da Abadá e Siriúna têm vídeo. Os outros 15 ficam exatamente como
+           estão hoje — a barra de abas já só aparecia quando havia vídeo.</p>
+      </div>
+      <div class="note">
+        <h4>Página um pouco mais longa</h4>
+        <p>O vídeo passa a ocupar espaço acima da descrição. É a mesma troca que você já aceitou na
+           página da música, e vale mais do que esconder.</p>
+      </div>
+      <div class="note">
+        <h4>A aba “Vídeos” deixa de existir</h4>
+        <p>A barra de abas do toque foi minha ideia, e foi ela que criou o problema. Sai fora. A rota
+           <code>/videos</code> com todos os vídeos continua existindo.</p>
+      </div>
+    </div>
+  </section>
+
+</div>

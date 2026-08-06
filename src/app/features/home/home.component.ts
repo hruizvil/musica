@@ -18,7 +18,7 @@ const CATEGORY_LABELS: Record<string, string> = {
     <!-- Negative margins cancel the padding on <main> so the art runs to the edges of
          the screen and starts flush under the header, instead of sitting in the page
          as a rounded tile. It ends on a clean edge; the section below simply follows. -->
-    <section class="-mx-4 sm:-mx-8 lg:-mx-12 -mt-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-capoeira-brown via-amber-900/90 to-capoeira-night text-white px-6 py-14 sm:px-10 lg:px-12 sm:py-20 relative overflow-hidden min-h-[60vh] flex flex-col justify-center">
+    <section class="-mx-4 sm:-mx-8 lg:-mx-12 -mt-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-capoeira-brown via-amber-900/90 to-capoeira-night text-white px-6 py-14 sm:px-10 lg:px-12 sm:py-20 mb-10 relative overflow-hidden min-h-[60vh] flex flex-col justify-center">
       <!-- Anchored right: the berimbaus live on the right of the photo, so bg-center
            would crop them out of a narrow viewport. The scrim below runs dark-to-clear
            left-to-right, keeping the headline legible over the open side of the image. -->
@@ -62,8 +62,7 @@ const CATEGORY_LABELS: Record<string, string> = {
     </section>
 
     <!-- Stats row -->
-    <section appReveal class="-mx-4 sm:-mx-8 lg:-mx-12 px-4 sm:px-8 lg:px-12 py-10">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <section appReveal class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
       @for (stat of stats(); track stat.label) {
         <a [routerLink]="stat.path"
            class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-capoeira-gold/30 transition-all duration-200">
@@ -75,11 +74,10 @@ const CATEGORY_LABELS: Record<string, string> = {
           </span>
         </a>
       }
-      </div>
     </section>
 
     <!-- Why us -->
-    <section appReveal class="-mx-4 sm:-mx-8 lg:-mx-12 px-4 sm:px-8 lg:px-12 py-10 bg-amber-100/50 dark:bg-stone-800/40">
+    <section appReveal class="mb-10">
       <h2 class="font-display text-xl font-bold text-stone-800 dark:text-stone-100 mb-5 border-l-4 border-capoeira-gold pl-4">
         Por que somos diferentes
       </h2>
@@ -101,7 +99,7 @@ const CATEGORY_LABELS: Record<string, string> = {
     </section>
 
     <!-- Recent songs -->
-    <section appReveal class="-mx-4 sm:-mx-8 lg:-mx-12 px-4 sm:px-8 lg:px-12 py-10">
+    <section appReveal class="mb-10">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-display text-lg font-bold text-stone-800 dark:text-stone-100 border-l-4 border-capoeira-gold pl-4">Últimas adicionadas</h2>
         <a routerLink="/musicas" class="text-xs text-capoeira-gold hover:underline font-medium py-2 -my-2">Ver todas →</a>
@@ -121,8 +119,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
     <!-- Add to Home Screen prompt -->
     @if (showInstall()) {
-      <section class="-mx-4 sm:-mx-8 lg:-mx-12 px-4 sm:px-8 lg:px-12 pb-10">
-      <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 p-5 relative">
+      <section class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 p-5 relative">
         <button (click)="dismissInstall()"
           class="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-full text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors text-sm"
           aria-label="Fechar">✕</button>
@@ -166,7 +163,6 @@ const CATEGORY_LABELS: Record<string, string> = {
             }
           </div>
         </div>
-      </div>
       </section>
     }
   `,

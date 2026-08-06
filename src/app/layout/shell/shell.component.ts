@@ -2,19 +2,15 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
-import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
 import { ThemeService } from '../../core/services/theme.service';
 import { PwaUpdateService } from '../../core/services/pwa-update.service';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, BottomNavComponent],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent],
   template: `
-    <!-- tabbar-clearance reserves the bar's height plus the iPhone home-indicator
-         strip, and collapses to nothing at md where the bar is gone. It has to stay
-         in step with .tabbar-inset on the bar itself. -->
-    <div class="min-h-screen flex flex-col bg-amber-50/40 dark:bg-stone-900 tabbar-clearance">
+    <div class="min-h-screen flex flex-col bg-amber-50/40 dark:bg-stone-900">
       <app-header />
       <main class="flex-1 max-w-screen-2xl w-full mx-auto px-4 sm:px-8 lg:px-12 py-8">
         <router-outlet />
@@ -22,7 +18,6 @@ import { PwaUpdateService } from '../../core/services/pwa-update.service';
       <app-footer />
     </div>
 
-    <app-bottom-nav />
 
     <!-- New build waiting. Offered rather than applied, so a song playing at a roda
          isn't cut off by a reload nobody asked for. -->

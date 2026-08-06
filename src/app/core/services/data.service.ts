@@ -12,6 +12,13 @@ import { FirebaseService, SongOverride } from './firebase.service';
 const OVERRIDES_CACHE_KEY = 'capoeira-overrides-cache';
 const EXTRA_CACHE_KEY = 'capoeira-extra-cache';
 
+/** Old toque id -> the id that replaced it. "Banguela" was a misspelling of the
+ *  Benguela this school actually plays; the two were separate entries for a while,
+ *  and songs saved against the wrong one are still in Firestore. */
+const RENAMED_TOQUES: Record<string, string> = {
+  banguela: 'benguela',
+};
+
 @Injectable({ providedIn: 'root' })
 export class DataService {
   private http = inject(HttpClient);
@@ -39,8 +46,8 @@ export class DataService {
     const overrides = this.overrides();
     const merged: Song[] = this.baseSongs().map(song => {
       const ov = overrides.get(song.id);
-      if (!ov || ov.deleted) return ov?.deleted ? null : song;
-      return {
+      if (!ov || ov.deleted) return ov?.deleted ? null : this.withRenamedToques(song);
+      return this.withRenamedToques({
         ...song,
         title: ov.title ?? song.title,
         toque: ov.toque ?? song.toque,
@@ -59,10 +66,12 @@ export class DataService {
           youtube: ov.youtube ?? song.audioLinks.youtube,
           spotify: ov.spotify ?? song.audioLinks.spotify,
         },
-      };
+      });
     }).filter((s): s is Song => s !== null);
 
-    const extraFiltered = this.extraSongs().filter(s => !overrides.get(s.id)?.deleted).map(s => this.withLegacyComposer(s));
+    const extraFiltered = this.extraSongs()
+      .filter(s => !overrides.get(s.id)?.deleted)
+      .map(s => this.withRenamedToques(this.withLegacyComposer(s)));
     return [...merged, ...extraFiltered];
   });
 
@@ -71,6 +80,16 @@ export class DataService {
     if (song.composer) return song;
     const legacy = (song as { mestre?: string | null }).mestre;
     return legacy ? { ...song, composer: legacy } : song;
+  }
+
+  /** Points a song at the current id for a toque that has been renamed. Songs saved
+   *  under the old spelling live in Firestore, which this app only reads, so the
+   *  correction has to happen here or those songs point at a toque that is gone. */
+  private withRenamedToques(song: Song): Song {
+    if (!song.toque?.some(id => id in RENAMED_TOQUES)) return song;
+    const renamed = song.toque.map(id => RENAMED_TOQUES[id] ?? id);
+    // A song tagged with both spellings would end up with the target twice.
+    return { ...song, toque: [...new Set(renamed)] };
   }
 
   readonly songsLoaded = computed(() => this.baseSongs().length > 0);

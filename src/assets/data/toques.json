@@ -6,12 +6,26 @@
       "category": "angola",
       "description": "O toque mais antigo e fundamental da Capoeira Angola. Ritmo lento e profundo, tocado pelo berimbau gunga, que estabelece o tom filosófico e cauteloso do jogo.",
       "tempo": "slow",
-      "tempoBPM": { "min": 40, "max": 70 },
+      "tempoBPM": {
+        "min": 40,
+        "max": 70
+      },
       "context": "Tocado no início de todo jogo de Angola. Define um jogo próximo ao chão, de grande malícia e contemplação. O mestre mais graduado toca o gunga e comanda a roda.",
-      "instruments": ["berimbau gunga", "berimbau médio", "berimbau viola", "pandeiro", "atabaque", "agogô", "reco-reco"],
+      "instruments": [
+        "berimbau gunga",
+        "berimbau médio",
+        "berimbau viola",
+        "pandeiro",
+        "atabaque",
+        "agogô",
+        "reco-reco"
+      ],
       "gameCharacter": "Lento, rasteiro, malicioso, filosófico",
       "videoLinks": [],
-      "relatedToques": ["sao-bento-grande-angola", "sao-bento-pequeno"]
+      "relatedToques": [
+        "sao-bento-grande-angola",
+        "sao-bento-pequeno"
+      ]
     },
     {
       "id": "sao-bento-pequeno",
@@ -19,12 +33,23 @@
       "category": "angola",
       "description": "Também chamado de 'Angola Invertida'. As notas altas e baixas do gunga são trocadas, criando uma variação sutil que indica um jogo próximo e cuidadoso.",
       "tempo": "medium",
-      "tempoBPM": { "min": 70, "max": 100 },
+      "tempoBPM": {
+        "min": 70,
+        "max": 100
+      },
       "context": "Jogo próximo, fechado, de muita atenção. Os capoeiristas ficam perto um do outro, lendo cada micro-movimento do adversário.",
-      "instruments": ["berimbau gunga", "berimbau médio", "berimbau viola", "pandeiro", "atabaque"],
+      "instruments": [
+        "berimbau gunga",
+        "berimbau médio",
+        "berimbau viola",
+        "pandeiro",
+        "atabaque"
+      ],
       "gameCharacter": "Próximo, fechado, atento, microscópico",
       "videoLinks": [],
-      "relatedToques": ["angola"]
+      "relatedToques": [
+        "angola"
+      ]
     },
     {
       "id": "sao-bento-grande-angola",
@@ -32,25 +57,26 @@
       "category": "angola",
       "description": "Ritmo rápido e expansivo da Capoeira Angola. Permite movimentos amplos e acrobáticos, mantendo a essência da mandinga angoleira.",
       "tempo": "fast",
-      "tempoBPM": { "min": 100, "max": 140 },
+      "tempoBPM": {
+        "min": 100,
+        "max": 140
+      },
       "context": "Tocado para jogos mais abertos e rápidos dentro da tradição Angola. Amplia o espaço do jogo sem perder a filosofia angoleira.",
-      "instruments": ["berimbau gunga", "berimbau médio", "berimbau viola", "pandeiro", "atabaque", "agogô", "reco-reco"],
+      "instruments": [
+        "berimbau gunga",
+        "berimbau médio",
+        "berimbau viola",
+        "pandeiro",
+        "atabaque",
+        "agogô",
+        "reco-reco"
+      ],
       "gameCharacter": "Rápido, expansivo, movimentos amplos",
       "videoLinks": [],
-      "relatedToques": ["angola", "sao-bento-grande-regional"]
-    },
-    {
-      "id": "banguela",
-      "name": "Banguela",
-      "category": "regional",
-      "description": "Um dos oito toques originais da Capoeira Regional de Mestre Bimba. Ritmo mais lento e gingado, que convida para um jogo malicioso e de grande fluidez.",
-      "tempo": "slow",
-      "tempoBPM": { "min": 60, "max": 90 },
-      "context": "Na tradição Regional, o Banguela é tocado para um jogo mais suave e próximo. Os capoeiristas exploram movimentos de ginga, esquivas baixas e diálogo corporal sem pressa.",
-      "instruments": ["berimbau", "pandeiro", "pandeiro"],
-      "gameCharacter": "Suave, fluido, gingado, malicioso",
-      "videoLinks": [],
-      "relatedToques": ["sao-bento-grande-regional", "iuna"]
+      "relatedToques": [
+        "angola",
+        "sao-bento-grande-regional"
+      ]
     },
     {
       "id": "sao-bento-grande-regional",
@@ -58,12 +84,22 @@
       "category": "regional",
       "description": "Criado por Mestre Bimba para a Capoeira Regional. Ritmo explosivo, rápido e marcado, que estimula um jogo dinâmico com golpes diretos e esquivas ágeis.",
       "tempo": "fast",
-      "tempoBPM": { "min": 120, "max": 160 },
+      "tempoBPM": {
+        "min": 120,
+        "max": 160
+      },
       "context": "Toque principal da Capoeira Regional. Define um jogo rápido, atlético e de longa distância. Muito usado também em rodas de Capoeira Contemporânea e Abadá.",
-      "instruments": ["berimbau", "pandeiro", "pandeiro"],
+      "instruments": [
+        "berimbau",
+        "pandeiro",
+        "pandeiro"
+      ],
       "gameCharacter": "Explosivo, atlético, distância ampla, golpes diretos",
       "videoLinks": [],
-      "relatedToques": ["banguela", "iuna"]
+      "relatedToques": [
+        "benguela",
+        "iuna"
+      ]
     },
     {
       "id": "iuna",
@@ -71,12 +107,22 @@
       "category": "regional",
       "description": "Toque de velocidade média, gracioso e elegante. Na Capoeira Regional, tocado exclusivamente para formados e mestres.",
       "tempo": "medium",
-      "tempoBPM": { "min": 80, "max": 110 },
+      "tempoBPM": {
+        "min": 80,
+        "max": 110
+      },
       "context": "Reservado para jogadores graduados em rodas de Regional. Exige maturidade técnica e filosófica. Na Abadá, pode ser tocado em momentos especiais como batizados.",
-      "instruments": ["berimbau", "pandeiro", "pandeiro"],
+      "instruments": [
+        "berimbau",
+        "pandeiro",
+        "pandeiro"
+      ],
       "gameCharacter": "Gracioso, elegante, técnico, reservado aos graduados",
       "videoLinks": [],
-      "relatedToques": ["banguela", "sao-bento-grande-regional"]
+      "relatedToques": [
+        "benguela",
+        "sao-bento-grande-regional"
+      ]
     },
     {
       "id": "santa-maria",
@@ -84,12 +130,22 @@
       "category": "regional",
       "description": "Um dos toques do esquema original de Mestre Bimba. Ritmo marcante e solene, associado a um jogo de precisão e respeito mútuo.",
       "tempo": "medium",
-      "tempoBPM": { "min": 75, "max": 105 },
+      "tempoBPM": {
+        "min": 75,
+        "max": 105
+      },
       "context": "Tocado em contextos de treino formal e eventos da Capoeira Regional. Incentiva um jogo técnico, de movimentos bem definidos e sem excessos.",
-      "instruments": ["berimbau", "pandeiro", "pandeiro"],
+      "instruments": [
+        "berimbau",
+        "pandeiro",
+        "pandeiro"
+      ],
       "gameCharacter": "Marcante, preciso, solene, técnico",
       "videoLinks": [],
-      "relatedToques": ["sao-bento-grande-regional", "idalina"]
+      "relatedToques": [
+        "sao-bento-grande-regional",
+        "idalina"
+      ]
     },
     {
       "id": "idalina",
@@ -97,12 +153,22 @@
       "category": "regional",
       "description": "Toque suave e delicado do repertório Regional. O nome é feminino, e o toque reflete essa elegância — convida para um jogo de movimentos fluidos e expressividade.",
       "tempo": "slow",
-      "tempoBPM": { "min": 55, "max": 85 },
+      "tempoBPM": {
+        "min": 55,
+        "max": 85
+      },
       "context": "Tocado para jogos de demonstração e momentos de maior leveza na roda. Valoriza a criatividade e a expressividade corporal sobre a potência.",
-      "instruments": ["berimbau", "pandeiro", "pandeiro"],
+      "instruments": [
+        "berimbau",
+        "pandeiro",
+        "pandeiro"
+      ],
       "gameCharacter": "Delicado, fluido, expressivo, elegante",
       "videoLinks": [],
-      "relatedToques": ["santa-maria", "banguela"]
+      "relatedToques": [
+        "santa-maria",
+        "benguela"
+      ]
     },
     {
       "id": "amazonas",
@@ -110,12 +176,22 @@
       "category": "regional",
       "description": "Toque dinâmico do repertório de Mestre Bimba, evocando a imensidão e a força da floresta amazônica. Ritmo oscilante que alterna tensão e leveza.",
       "tempo": "medium",
-      "tempoBPM": { "min": 90, "max": 120 },
+      "tempoBPM": {
+        "min": 90,
+        "max": 120
+      },
       "context": "Estimula um jogo de grande amplitude, com movimentos largos e uso criativo do espaço. Capoeiristas exploram acrobacias e projeções com fluidez.",
-      "instruments": ["berimbau", "pandeiro", "pandeiro"],
+      "instruments": [
+        "berimbau",
+        "pandeiro",
+        "pandeiro"
+      ],
       "gameCharacter": "Amplo, dinâmico, criativo, expansivo",
       "videoLinks": [],
-      "relatedToques": ["sao-bento-grande-regional", "santa-maria"]
+      "relatedToques": [
+        "sao-bento-grande-regional",
+        "santa-maria"
+      ]
     },
     {
       "id": "cavalaria",
@@ -124,10 +200,14 @@
       "description": "Toque historicamente usado para avisar os capoeiristas da chegada da cavalaria policial durante o período em que a capoeira era proibida no Brasil (antes de 1937).",
       "tempo": "variable",
       "context": "Ao soar a Cavalaria, os capoeiristas paravam o jogo e simulavam trabalhar. Hoje é tocado em eventos especiais e para fins educativos, lembrando a história de resistência da capoeira.",
-      "instruments": ["berimbau"],
+      "instruments": [
+        "berimbau"
+      ],
       "gameCharacter": "Histórico, alerta, sinal de perigo",
       "videoLinks": [],
-      "relatedToques": ["sao-bento-grande-regional"]
+      "relatedToques": [
+        "sao-bento-grande-regional"
+      ]
     },
     {
       "id": "sao-bento-abada",
@@ -135,12 +215,23 @@
       "category": "abada",
       "description": "Toque principal da Capoeira Abadá, desenvolvido dentro da tradição fundada por Mestre Camisa. Combina a energia do São Bento Regional com a identidade própria da Abadá.",
       "tempo": "fast",
-      "tempoBPM": { "min": 120, "max": 155 },
+      "tempoBPM": {
+        "min": 120,
+        "max": 155
+      },
       "context": "Tocado nas rodas e batizados da Abadá-Capoeira. Define o ritmo base do jogo na tradição da escola, estimulando velocidade, potência e precisão técnica.",
-      "instruments": ["berimbau", "pandeiro", "pandeiro", "atabaque"],
+      "instruments": [
+        "berimbau",
+        "pandeiro",
+        "pandeiro",
+        "atabaque"
+      ],
       "gameCharacter": "Rápido, potente, técnico, identidade Abadá",
       "videoLinks": [],
-      "relatedToques": ["benguela", "siriunha"]
+      "relatedToques": [
+        "benguela",
+        "siriunha"
+      ]
     },
     {
       "id": "benguela",
@@ -148,12 +239,24 @@
       "category": "abada",
       "description": "Toque lento e fluido da tradição Abadá. Convida para o 'jogo de floreios' — um jogo bonito, cooperativo e de grande expressividade corporal.",
       "tempo": "slow",
-      "tempoBPM": { "min": 50, "max": 80 },
+      "tempoBPM": {
+        "min": 50,
+        "max": 80
+      },
       "context": "Estimula um jogo próximo ao chão, cooperativo e esteticamente belo. Os capoeiristas mostram floreios, equilíbrio e criatividade. Não é um jogo de luta, mas de diálogo corporal.",
-      "instruments": ["berimbau gunga", "berimbau médio", "berimbau viola", "pandeiro", "atabaque"],
+      "instruments": [
+        "berimbau gunga",
+        "berimbau médio",
+        "berimbau viola",
+        "pandeiro",
+        "atabaque"
+      ],
       "gameCharacter": "Fluido, cooperativo, bonito, expressivo, próximo ao chão",
       "videoLinks": [],
-      "relatedToques": ["sao-bento-abada", "siriunha"]
+      "relatedToques": [
+        "sao-bento-abada",
+        "siriunha"
+      ]
     },
     {
       "id": "siriunha",
@@ -161,12 +264,23 @@
       "category": "abada",
       "description": "Toque vibrante da Abadá-Capoeira, também grafado como Siriúna. Ritmo animado que energiza a roda e convida para um jogo ágil e alegre.",
       "tempo": "fast",
-      "tempoBPM": { "min": 115, "max": 150 },
+      "tempoBPM": {
+        "min": 115,
+        "max": 150
+      },
       "context": "Tocado para animar momentos de alto astral na roda da Abadá. Os capoeiristas respondem com movimentos mais vivos, acrobacias e interações lúdicas.",
-      "instruments": ["berimbau", "pandeiro", "pandeiro", "atabaque"],
+      "instruments": [
+        "berimbau",
+        "pandeiro",
+        "pandeiro",
+        "atabaque"
+      ],
       "gameCharacter": "Animado, ágil, alegre, energético",
       "videoLinks": [],
-      "relatedToques": ["sao-bento-abada", "jogo-dos-bichos"]
+      "relatedToques": [
+        "sao-bento-abada",
+        "jogo-dos-bichos"
+      ]
     },
     {
       "id": "jogo-dos-bichos",
@@ -175,10 +289,17 @@
       "description": "Toque lúdico e característico da Abadá-Capoeira. Os capoeiristas imitam os movimentos de animais — gato, macaco, cobra, jacaré — tornando o jogo um teatro de expressão corporal.",
       "tempo": "variable",
       "context": "Especialmente popular em aulas infantis e apresentações culturais. Desenvolve criatividade, consciência corporal e conexão com a natureza. Cada animal tem seu padrão de movimento.",
-      "instruments": ["berimbau", "pandeiro", "atabaque"],
+      "instruments": [
+        "berimbau",
+        "pandeiro",
+        "atabaque"
+      ],
       "gameCharacter": "Lúdico, criativo, teatral, imitação de animais",
       "videoLinks": [],
-      "relatedToques": ["siriunha", "capopasso"]
+      "relatedToques": [
+        "siriunha",
+        "capopasso"
+      ]
     },
     {
       "id": "capuxadama",
@@ -186,12 +307,23 @@
       "category": "abada",
       "description": "Toque característico da Abadá-Capoeira com ritmo marcante e identidade própria. Pouco conhecido fora da tradição Abadá, é parte do repertório ensinado aos graduados.",
       "tempo": "medium",
-      "tempoBPM": { "min": 85, "max": 115 },
+      "tempoBPM": {
+        "min": 85,
+        "max": 115
+      },
       "context": "Tocado em contextos internos da Abadá, como eventos de graduação e encontros regionais. Reforça a identidade e os laços da escola.",
-      "instruments": ["berimbau", "pandeiro", "pandeiro", "atabaque"],
+      "instruments": [
+        "berimbau",
+        "pandeiro",
+        "pandeiro",
+        "atabaque"
+      ],
       "gameCharacter": "Marcante, identidade Abadá, comunidade",
       "videoLinks": [],
-      "relatedToques": ["sao-bento-abada", "toque-do-berimbau"]
+      "relatedToques": [
+        "sao-bento-abada",
+        "toque-do-berimbau"
+      ]
     },
     {
       "id": "toque-do-berimbau",
@@ -199,12 +331,23 @@
       "category": "abada",
       "description": "Toque reverencial da Abadá-Capoeira que celebra o próprio berimbau e sua centralidade na capoeira. Ritmo contemplativo que convida para a reflexão sobre a musicalidade.",
       "tempo": "slow",
-      "tempoBPM": { "min": 50, "max": 80 },
+      "tempoBPM": {
+        "min": 50,
+        "max": 80
+      },
       "context": "Tocado para homenagear o berimbau em momentos especiais da roda Abadá. Os capoeiristas param para ouvir e absorver a musicalidade antes de retomar o jogo.",
-      "instruments": ["berimbau gunga", "berimbau médio", "berimbau viola", "pandeiro"],
+      "instruments": [
+        "berimbau gunga",
+        "berimbau médio",
+        "berimbau viola",
+        "pandeiro"
+      ],
       "gameCharacter": "Contemplativo, reverencial, musical, reflexivo",
       "videoLinks": [],
-      "relatedToques": ["benguela", "capuxadama"]
+      "relatedToques": [
+        "benguela",
+        "capuxadama"
+      ]
     },
     {
       "id": "capopasso",
@@ -212,12 +355,23 @@
       "category": "abada",
       "description": "Toque dinâmico da Abadá-Capoeira com característica rítmica marcante. Faz parte do vocabulário musical ensinado na tradição fundada por Mestre Camisa.",
       "tempo": "medium",
-      "tempoBPM": { "min": 90, "max": 120 },
+      "tempoBPM": {
+        "min": 90,
+        "max": 120
+      },
       "context": "Presente nas rodas internas da Abadá e nos currículos de formação musical. Desenvolve a habilidade dos músicos e a resposta corporal dos jogadores ao ritmo.",
-      "instruments": ["berimbau", "pandeiro", "pandeiro", "atabaque"],
+      "instruments": [
+        "berimbau",
+        "pandeiro",
+        "pandeiro",
+        "atabaque"
+      ],
       "gameCharacter": "Dinâmico, marcado, formativo, identidade Abadá",
       "videoLinks": [],
-      "relatedToques": ["sao-bento-abada", "jogo-dos-bichos"]
+      "relatedToques": [
+        "sao-bento-abada",
+        "jogo-dos-bichos"
+      ]
     },
     {
       "id": "samba-de-roda",
@@ -225,12 +379,22 @@
       "category": "other",
       "description": "Ritmo das tradicionais Sambas de Roda do Recôncavo Baiano, considerado um dos ritmos mais antigos do Brasil. Na capoeira, é tocado na viola como celebração após a roda.",
       "tempo": "medium",
-      "tempoBPM": { "min": 90, "max": 120 },
+      "tempoBPM": {
+        "min": 90,
+        "max": 120
+      },
       "context": "Tocado ao fim de rodas de Angola para celebração. Os capoeiristas e músicos cantam e dançam samba de roda ao redor da bateria. Também pode aparecer em apresentações culturais.",
-      "instruments": ["berimbau viola", "pandeiro", "atabaque", "agogô"],
+      "instruments": [
+        "berimbau viola",
+        "pandeiro",
+        "atabaque",
+        "agogô"
+      ],
       "gameCharacter": "Festivo, celebratório, dança coletiva",
       "videoLinks": [],
-      "relatedToques": ["angola"]
+      "relatedToques": [
+        "angola"
+      ]
     },
     {
       "id": "maculele",
@@ -238,9 +402,16 @@
       "category": "other",
       "description": "Ritmo da dança guerreira do Maculelê, originária de Santo Amaro da Purificação na Bahia. Usa paus (bastões de biriba) ou facões que se chocam no ritmo da música.",
       "tempo": "fast",
-      "tempoBPM": { "min": 110, "max": 150 },
+      "tempoBPM": {
+        "min": 110,
+        "max": 150
+      },
       "context": "Tocado durante apresentações de Maculelê — a dança dos guerreiros com bastões. Frequentemente apresentado em batizados e eventos culturais da Abadá como complemento à capoeira.",
-      "instruments": ["atabaque", "agogô", "pandeiro"],
+      "instruments": [
+        "atabaque",
+        "agogô",
+        "pandeiro"
+      ],
       "gameCharacter": "Guerreiro, percussivo, teatral, ritmo marcado",
       "videoLinks": [],
       "relatedToques": []

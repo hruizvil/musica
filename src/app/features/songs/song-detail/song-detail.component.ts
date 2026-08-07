@@ -152,13 +152,13 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
               <app-tab-bar
                 [tabs]="tabs()" [active]="activeTab()" idPrefix="song"
                 ariaLabel="Seções da música"
-                (select)="activeTab.set($any($event))" />
+                (selected)="activeTab.set($any($event))" />
 
               @if (showLanguage()) {
                 <app-segmented-control
                   [options]="languages" [value]="language()"
                   ariaLabel="Idioma da letra"
-                  (select)="setLanguage($any($event))" />
+                  (selected)="setLanguage($any($event))" />
               }
             </div>
 
@@ -430,7 +430,7 @@ export class SongDetailComponent {
       }
     }
 
-    let copied = false;
+    let copied: boolean;
     try {
       await navigator.clipboard.writeText(url);
       copied = true;
@@ -451,7 +451,7 @@ export class SongDetailComponent {
     field.style.opacity = '0';
     document.body.appendChild(field);
     field.select();
-    let ok = false;
+    let ok: boolean;
     try {
       ok = document.execCommand('copy');
     } catch {

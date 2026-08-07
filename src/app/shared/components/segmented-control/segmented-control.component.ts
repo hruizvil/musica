@@ -18,7 +18,7 @@ export interface SegmentOption<T extends string = string> {
       @for (option of options(); track option.value) {
         <button type="button"
           [attr.aria-pressed]="value() === option.value"
-          (click)="select.emit(option.value)"
+          (click)="selected.emit(option.value)"
           class="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
           [class]="value() === option.value
             ? 'bg-white dark:bg-stone-900 text-capoeira-brown dark:text-capoeira-gold shadow-sm'
@@ -34,5 +34,5 @@ export class SegmentedControlComponent {
   value = input.required<string>();
   ariaLabel = input<string>('Opções');
 
-  select = output<string>();
+  selected = output<string>();
 }

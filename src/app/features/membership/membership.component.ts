@@ -87,8 +87,8 @@ export class MembershipComponent {
       } else {
         this.error.set(data.error ?? 'Erro ao iniciar pagamento. Tente novamente.');
       }
-    } catch (e: any) {
-      this.error.set(e?.message ?? 'Erro ao iniciar pagamento. Tente novamente.');
+    } catch (e: unknown) {
+      this.error.set(e instanceof Error ? e.message : 'Erro ao iniciar pagamento. Tente novamente.');
     } finally {
       this.loading.set(false);
     }

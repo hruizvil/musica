@@ -47,7 +47,7 @@ const IDLE: Record<TabBarVariant, string> = {
           [attr.aria-selected]="active() === tab.value"
           [attr.aria-controls]="panelId() ?? idPrefix() + '-panel-' + tab.value"
           [tabindex]="active() === tab.value ? 0 : -1"
-          (click)="select.emit(tab.value)"
+          (click)="selected.emit(tab.value)"
           (keydown)="onKeydown($event)"
           [class]="buttonClass() + ' ' + (active() === tab.value ? activeClass() : idleClass())">
           {{ tab.label }}
@@ -69,7 +69,7 @@ export class TabBarComponent {
    */
   panelId = input<string | null>(null);
 
-  select = output<string>();
+  selected = output<string>();
 
   protected readonly containerClass = computed(() => CONTAINER[this.variant()]);
   protected readonly buttonClass = computed(() => BUTTON[this.variant()]);
@@ -83,7 +83,7 @@ export class TabBarComponent {
     event.preventDefault();
     const values = this.tabs().map(t => t.value);
     const next = values[(values.indexOf(this.active()) + step + values.length) % values.length];
-    this.select.emit(next);
+    this.selected.emit(next);
     // Move focus with the selection so the keyboard user lands on the new tab.
     const el = document.getElementById(`${this.idPrefix()}-tab-${next}`);
     el?.focus();

@@ -7,6 +7,12 @@ const CATEGORY_LABELS: Record<string, string> = {
   angola: 'Angola', regional: 'Regional', abada: 'Abadá', other: 'Outros',
 };
 
+/** Chromium's beforeinstallprompt event, which lib.dom does not declare. */
+interface InstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -171,7 +177,7 @@ export class HomeComponent implements OnInit {
 
   showInstall = signal(false);
   isIOS = signal(false);
-  private deferredPrompt: any = null;
+  private deferredPrompt: InstallPromptEvent | null = null;
 
   ngOnInit() {
     if (window.matchMedia('(display-mode: standalone)').matches) return;
@@ -184,7 +190,7 @@ export class HomeComponent implements OnInit {
     window.addEventListener('beforeinstallprompt', (e: Event) => {
       e.preventDefault();
       // Keep the prompt either way, so installApp() still works if we ever offer it.
-      this.deferredPrompt = e;
+      this.deferredPrompt = e as InstallPromptEvent;
       // Chromium fires this on desktop Chrome and Edge too, where the app installs to
       // its own window and there is no home screen — everything this card says would
       // be wrong. Desktop users who do want it still get Chrome's address-bar install.

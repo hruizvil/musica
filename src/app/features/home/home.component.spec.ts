@@ -31,14 +31,14 @@ function stubMatchMedia(isPhone: boolean): () => void {
     matches: query.includes('max-width: 767px') ? isPhone : false,
     media: query,
     onchange: null,
-    addListener: () => {}, removeListener: () => {},
-    addEventListener: () => {}, removeEventListener: () => {},
+    addListener: () => undefined, removeListener: () => undefined,
+    addEventListener: () => undefined, removeEventListener: () => undefined,
     dispatchEvent: () => false,
   })) as typeof window.matchMedia;
   return () => { window.matchMedia = original; };
 }
 
-let restoreMatchMedia: () => void = () => {};
+let restoreMatchMedia: () => void = () => undefined;
 
 beforeEach(() => {
   restoreMatchMedia = stubMatchMedia(false);

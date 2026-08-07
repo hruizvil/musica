@@ -30,12 +30,12 @@ const CATEGORY_LABELS: Record<VideoCategory, string> = {
            empty filter is a dead end. -->
       @if (categories().length > 1) {
         <div class="flex flex-wrap gap-2">
-          <app-filter-chip label="Todos" [active]="!activeCategory()" (toggle)="activeCategory.set(null)" />
+          <app-filter-chip label="Todos" [active]="!activeCategory()" (toggled)="activeCategory.set(null)" />
           @for (cat of categories(); track cat.value) {
             <app-filter-chip
               [label]="cat.label"
               [active]="activeCategory() === cat.value"
-              (toggle)="activeCategory.set(activeCategory() === cat.value ? null : cat.value)" />
+              (toggled)="activeCategory.set(activeCategory() === cat.value ? null : cat.value)" />
           }
         </div>
       }

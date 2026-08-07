@@ -3,6 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FirebaseService } from '../../core/services/firebase.service';
 
+/** Firebase throws FirebaseError, but a catch is typed unknown and anything at all can
+ *  be thrown. Pulls the code out when it is there, and '' when it is not. */
+function authErrorCode(e: unknown): string {
+  return typeof e === 'object' && e !== null && typeof (e as { code?: unknown }).code === 'string'
+    ? (e as { code: string }).code
+    : '';
+}
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -53,21 +61,21 @@ import { FirebaseService } from '../../core/services/firebase.service';
         <form (ngSubmit)="submit()" class="space-y-4">
           @if (mode === 'signup') {
             <div class="space-y-1.5">
-              <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Nome</label>
-              <input type="text" [(ngModel)]="displayName" name="displayName"
+              <label for="login-displayName" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Nome</label>
+              <input type="text" id="login-displayName" [(ngModel)]="displayName" name="displayName"
                 placeholder="Seu nome"
                 class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
             </div>
           }
           <div class="space-y-1.5">
-            <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Email</label>
-            <input type="email" [(ngModel)]="email" name="email"
+            <label for="login-email" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Email</label>
+            <input type="email" id="login-email" [(ngModel)]="email" name="email"
               placeholder="seu@email.com"
               class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
           </div>
           <div class="space-y-1.5">
-            <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Senha</label>
-            <input type="password" [(ngModel)]="password" name="password"
+            <label for="login-password" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Senha</label>
+            <input type="password" id="login-password" [(ngModel)]="password" name="password"
               placeholder="••••••••"
               class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
           </div>
@@ -107,8 +115,8 @@ export class LoginComponent {
     try {
       await this.fb.signInWithGoogle();
       this.router.navigate(['/']);
-    } catch (e: any) {
-      this.error = this.friendlyError(e.code);
+    } catch (e: unknown) {
+      this.error = this.friendlyError(authErrorCode(e));
     } finally {
       this.loading = false;
     }
@@ -130,13 +138,14 @@ export class LoginComponent {
         await this.fb.signUpWithEmailPublic(this.email, this.password, this.displayName);
       }
       this.router.navigate(['/']);
-    } catch (e: any) {
-      this.error = this.friendlyError(e.code);
+    } catch (e: unknown) {
+      this.error = this.friendlyError(authErrorCode(e));
     } finally {
       this.loading = false;
     }
   }
 
+  /** Falls back to '' so an error without a code still gets the generic message. */
   private friendlyError(code: string): string {
     const map: Record<string, string> = {
       'auth/wrong-password': 'Senha incorreta.',

@@ -42,7 +42,7 @@ const TAB_LABELS: Record<string, string> = {
            drives the one results region below, hence panelId. -->
       <app-tab-bar variant="strip" idPrefix="toques" panelId="toque-results"
         ariaLabel="Categorias de toque"
-        [tabs]="allTabs()" [active]="activeTab()" (select)="activeTab.set($event)" />
+        [tabs]="allTabs()" [active]="activeTab()" (selected)="activeTab.set($event)" />
 
       <div id="toque-results" role="tabpanel" [attr.aria-labelledby]="'toques-tab-' + activeTab()" class="space-y-6">
       @for (group of visibleGroups(); track group.category) {

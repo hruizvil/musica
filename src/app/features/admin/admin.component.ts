@@ -302,25 +302,25 @@ type PanelMode = 'none' | 'edit' | 'add';
 
                     <!-- Título -->
                     <div class="space-y-1.5">
-                      <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">
+                      <label for="admin-title" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">
                         Título@if (panelMode() === 'add') { <span class="text-red-400 normal-case font-normal"> *</span> }
                       </label>
-                      <input type="text" [(ngModel)]="editTitle" name="editTitle"
+                      <input type="text" id="admin-title" [(ngModel)]="editTitle" name="editTitle"
                         [placeholder]="panelMode() === 'add' ? 'Nome da música' : ''"
                         class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold transition-shadow" />
                     </div>
 
                     <!-- Compositor -->
                     <div class="space-y-1.5">
-                      <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Compositor</label>
-                      <input type="text" [(ngModel)]="editComposer" name="composer"
+                      <label for="admin-composer" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Compositor</label>
+                      <input type="text" id="admin-composer" [(ngModel)]="editComposer" name="composer"
                         placeholder="ex: Mestre Bimba, Mestre Camisa, Mosquito..."
                         class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold transition-shadow" />
                     </div>
 
                     <!-- Toque autocomplete -->
                     <div class="space-y-1.5">
-                      <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Toque</label>
+                      <label for="admin-toque" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Toque</label>
 
                       @if (editToque.length > 0) {
                         <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 text-sm">
@@ -337,7 +337,7 @@ type PanelMode = 'none' | 'edit' | 'add';
 
                       <div class="relative">
                         <input type="text"
-                          [ngModel]="toqueSearchQuery()"
+                          id="admin-toque" [ngModel]="toqueSearchQuery()"
                           (ngModelChange)="toqueSearchQuery.set($event)"
                           (focus)="showToqueDropdown.set(true)"
                           (blur)="showToqueDropdown.set(false)"
@@ -374,7 +374,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                       <div class="flex items-center justify-between">
-                        <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Coro (Português)</label>
+                        <label for="admin-refrao" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Coro (Português)</label>
                         @if (editRefraoTranslation.trim()) {
                           <a [href]="googleTranslateUrl(editRefraoTranslation, 'en', 'pt')"
                             target="_blank" rel="noopener"
@@ -383,14 +383,14 @@ type PanelMode = 'none' | 'edit' | 'add';
                           </a>
                         }
                       </div>
-                      <textarea [(ngModel)]="editRefrao" name="refrao" rows="3"
+                      <textarea id="admin-refrao" [(ngModel)]="editRefrao" name="refrao" rows="3"
                         placeholder="Verso que se repete entre as partes..."
                         class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm leading-relaxed placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold resize-y">
                       </textarea>
                     </div>
                     <div class="space-y-1.5">
                       <div class="flex items-center justify-between">
-                        <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">
+                        <label for="admin-refrao-en" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">
                           Coro (Inglês) <span class="normal-case font-normal text-stone-300 dark:text-stone-600">opcional</span>
                         </label>
                         @if (editRefrao.trim()) {
@@ -401,7 +401,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                           </a>
                         }
                       </div>
-                      <textarea [(ngModel)]="editRefraoTranslation" name="refraoTranslation" rows="3"
+                      <textarea id="admin-refrao-en" [(ngModel)]="editRefraoTranslation" name="refraoTranslation" rows="3"
                         placeholder="Chorus translation..."
                         class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm leading-relaxed placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold resize-y">
                       </textarea>
@@ -413,7 +413,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div class="space-y-1.5">
                         <div class="flex items-center justify-between">
-                          <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Letra (Português)</label>
+                          <label for="admin-lyrics" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Letra (Português)</label>
                           @if (editTranslation.trim()) {
                             <a [href]="googleTranslateUrl(editTranslation, 'en', 'pt')"
                               target="_blank" rel="noopener"
@@ -422,13 +422,13 @@ type PanelMode = 'none' | 'edit' | 'add';
                             </a>
                           }
                         </div>
-                        <textarea [(ngModel)]="editLyrics" name="lyrics" rows="16"
+                        <textarea id="admin-lyrics" [(ngModel)]="editLyrics" name="lyrics" rows="16"
                           class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm leading-relaxed placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold resize-y">
                         </textarea>
                       </div>
                       <div class="space-y-1.5">
                         <div class="flex items-center justify-between">
-                          <label class="text-xs font-semibold text-stone-400 uppercase tracking-wide">
+                          <label for="admin-translation" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">
                             Tradução (Inglês) <span class="normal-case font-normal text-stone-300 dark:text-stone-600">opcional</span>
                           </label>
                           @if (editLyrics.trim()) {
@@ -439,7 +439,7 @@ type PanelMode = 'none' | 'edit' | 'add';
                             </a>
                           }
                         </div>
-                        <textarea [(ngModel)]="editTranslation" name="translation" rows="16"
+                        <textarea id="admin-translation" [(ngModel)]="editTranslation" name="translation" rows="16"
                           class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm leading-relaxed placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold resize-y">
                         </textarea>
                       </div>
@@ -472,13 +472,13 @@ type PanelMode = 'none' | 'edit' | 'add';
 
                   <!-- YouTube -->
                   <div class="space-y-1.5">
-                    <label class="flex items-center gap-1.5 text-xs font-semibold text-stone-400 uppercase tracking-wide">
+                    <label for="admin-youtube" class="flex items-center gap-1.5 text-xs font-semibold text-stone-400 uppercase tracking-wide">
                       <svg class="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                       </svg>
                       YouTube
                     </label>
-                    <input type="text" [(ngModel)]="editYoutube" name="youtube"
+                    <input type="text" id="admin-youtube" [(ngModel)]="editYoutube" name="youtube"
                       placeholder="https://youtube.com/watch?v=..."
                       class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
                     @if (editYoutube.trim()) {
@@ -565,13 +565,13 @@ type PanelMode = 'none' | 'edit' | 'add';
 
                   <!-- Spotify -->
                   <div class="space-y-1.5">
-                    <label class="flex items-center gap-1.5 text-xs font-semibold text-stone-400 uppercase tracking-wide">
+                    <label for="admin-spotify" class="flex items-center gap-1.5 text-xs font-semibold text-stone-400 uppercase tracking-wide">
                       <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.5 17.3c-.2.36-.66.47-1 .25-2.8-1.7-6.3-2.1-10.44-1.15-.4.1-.78-.16-.87-.55-.1-.4.16-.78.55-.87 4.53-1.04 8.4-.6 11.53 1.32.35.2.46.66.24 1zm1.47-3.27c-.27.44-.85.58-1.3.3-3.2-1.96-8.06-2.53-11.83-1.38-.5.15-1.02-.13-1.17-.62-.15-.5.13-1.02.62-1.17 4.32-1.3 9.68-.67 13.37 1.6.44.26.58.84.3 1.28zm.13-3.4C15.24 8.35 8.94 8.14 5.28 9.25c-.6.18-1.22-.16-1.4-.74-.18-.6.15-1.22.74-1.4 4.2-1.28 11.2-1.03 15.6 1.58.53.32.7 1 .4 1.54-.32.53-1.02.7-1.55.4z"/>
                       </svg>
                       Spotify
                     </label>
-                    <input type="text" [(ngModel)]="editSpotify" name="spotify"
+                    <input type="text" id="admin-spotify" [(ngModel)]="editSpotify" name="spotify"
                       placeholder="https://open.spotify.com/track/..."
                       class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
                     @if (!validYoutubeId() && validSpotifyUri(); as spUri) {
@@ -759,7 +759,7 @@ export class AdminComponent implements OnInit {
     const labels: Record<string, string> = { angola: 'Angola', regional: 'Regional', abada: 'Abadá', other: 'Outros' };
     const map = new Map<string, Toque[]>();
     for (const t of this.data.toques()) {
-      const cat = (t as any).category ?? 'other';
+      const cat: string = t.category ?? 'other';
       if (!map.has(cat)) map.set(cat, []);
       map.get(cat)!.push(t);
     }
@@ -1157,7 +1157,7 @@ export class AdminComponent implements OnInit {
   toggleBulkSelect(songId: string, event: Event): void {
     event.stopPropagation();
     const s = new Set(this.bulkSelected());
-    s.has(songId) ? s.delete(songId) : s.add(songId);
+    if (s.has(songId)) s.delete(songId); else s.add(songId);
     this.bulkSelected.set(s);
   }
 

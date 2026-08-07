@@ -146,10 +146,12 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
       [class.pointer-events-none]="!mobileOpen()"
       [attr.inert]="mobileOpen() ? null : ''">
 
-      <!-- Dimmed page -->
-      <div (click)="mobileOpen.set(false)"
-        class="absolute inset-0 bg-stone-900/40 backdrop-blur-sm transition-opacity duration-200"
-        [class]="mobileOpen() ? 'opacity-100' : 'opacity-0'"></div>
+      <!-- Dimmed page. A button, not a div: tapping outside to close should also be
+           reachable by keyboard, and a button brings focus and Enter/Space with it.
+           The drawer is inert while closed, so this stays out of the tab order then. -->
+      <button type="button" (click)="mobileOpen.set(false)" aria-label="Fechar menu"
+        class="absolute inset-0 bg-stone-900/40 backdrop-blur-sm transition-opacity duration-200 cursor-default"
+        [class]="mobileOpen() ? 'opacity-100' : 'opacity-0'"></button>
 
       <!-- Panel -->
       <div id="mobile-drawer" role="dialog" aria-modal="true" aria-label="Menu"

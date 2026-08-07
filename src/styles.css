@@ -6,6 +6,42 @@
   html {
     font-family: theme('fontFamily.sans');
   }
+
+  /* One focus ring for the whole app. Nothing defined focus styles before, so keyboard
+     and switch users navigated on whatever the browser happened to draw — and Tailwind's
+     preflight removes even that on some controls. :focus-visible keeps the ring off
+     mouse clicks, and a modern outline follows the element's own border-radius. */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid theme('colors.capoeira-gold');
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Grows a link's hit area to cover its nearest positioned ancestor, so a whole card
+     is tappable instead of only the small text inside it. Add it to the link and put
+     `relative` on the element that should become the target.
+
+     The focus ring moves to that covered area too: the link's own box may be a few
+     words wide while its hit area is a whole card, and a keyboard user needs to see
+     what Enter is about to activate, not where the text sits. */
+  .stretched-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .stretched-link:focus-visible {
+    outline: none;
+  }
+  .stretched-link:focus-visible::after {
+    outline: 2px solid theme('colors.capoeira-gold');
+    outline-offset: -2px;
+  }
 }
 
 @layer utilities {

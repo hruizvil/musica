@@ -106,3 +106,87 @@ describe('DataService — deleted-song flash', () => {
     expect(service.songs().map(s => s.id)).toContain('E9');
   });
 });
+
+// "Banguela" was a misspelling of Benguela. Firestore is read-only from the app, so
+// songs saved under the wrong id are corrected as they load. A song reaches songs()
+// by three different routes and the correction has to cover all three — miss one and
+// those songs point at a toque that no longer exists, with nothing to show for it.
+describe('DataService — Banguela is corrected to Benguela on load', () => {
+  let http: HttpTestingController;
+  let resolveOverrides!: (m: Map<string, SongOverride>) => void;
+  let resolveExtra!: (s: Song[]) => void;
+
+  const fakeFb = {
+    getSongOverrides: () => new Promise<Map<string, SongOverride>>(r => { resolveOverrides = r; }),
+    getExtraSongs: () => new Promise<Song[]>(r => { resolveExtra = r; }),
+  };
+
+  beforeEach(() => localStorage.clear());
+  afterEach(() => { http.verify(); localStorage.clear(); });
+
+  function construct(baseSongs: Song[]): DataService {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: FirebaseService, useValue: fakeFb },
+      ],
+    });
+    const service = TestBed.inject(DataService);
+    http = TestBed.inject(HttpTestingController);
+    http.expectOne('assets/data/songs.json').flush({ songs: baseSongs });
+    http.expectOne('assets/data/toques.json').flush({ toques: [] });
+    http.expectOne('assets/data/videos.json').flush({ videos: [] });
+    return service;
+  }
+
+  const toqueOf = (service: DataService, id: string) =>
+    service.songs().find(s => s.id === id)!.toque;
+
+  it('renames it on a song shipped in songs.json', () => {
+    const service = construct([makeSong({ id: 'B1', title: 'Base Banguela', toque: ['banguela'] })]);
+    expect(toqueOf(service, 'B1')).toEqual(['benguela']);
+  });
+
+  it('renames it when an admin override supplies the toque', async () => {
+    const service = construct([makeSong({ id: 'B2', title: 'Overridden', toque: ['angola'] })]);
+
+    // The admin re-tagged this song and saved the old spelling.
+    resolveOverrides(new Map<string, SongOverride>([['B2', { toque: ['banguela'] } as SongOverride]]));
+    resolveExtra([]);
+    await new Promise(r => setTimeout(r));
+
+    expect(toqueOf(service, 'B2')).toEqual(['benguela']);
+  });
+
+  it('renames it on a Firestore-only song, which never passes through songs.json', async () => {
+    const service = construct([]);
+
+    resolveOverrides(new Map<string, SongOverride>());
+    resolveExtra([makeSong({ id: 'B3', title: 'Extra Banguela', toque: ['banguela'] })]);
+    await new Promise(r => setTimeout(r));
+
+    expect(toqueOf(service, 'B3')).toEqual(['benguela']);
+  });
+
+  it('does not list Benguela twice when a song carries both spellings', () => {
+    const service = construct([
+      makeSong({ id: 'B4', title: 'Both', toque: ['banguela', 'benguela'] }),
+    ]);
+    expect(toqueOf(service, 'B4')).toEqual(['benguela']);
+  });
+
+  it('leaves every other toque alone', () => {
+    const service = construct([
+      makeSong({ id: 'B5', title: 'Untouched', toque: ['angola', 'sao-bento-grande'] }),
+    ]);
+    expect(toqueOf(service, 'B5')).toEqual(['angola', 'sao-bento-grande']);
+  });
+
+  it('groups the corrected song under Benguela, so the toque page finds it', () => {
+    const service = construct([makeSong({ id: 'B6', title: 'Grouped', toque: ['banguela'] })]);
+
+    expect(service.songsByToque().get('benguela')?.map(s => s.id)).toEqual(['B6']);
+    expect(service.songsByToque().has('banguela')).toBe(false);
+  });
+});

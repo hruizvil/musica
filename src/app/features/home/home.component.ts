@@ -1,6 +1,7 @@
 import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
+import { SongCardComponent } from '../../shared/components/song-card/song-card.component';
 
 const CATEGORY_LABELS: Record<string, string> = {
   angola: 'Angola', regional: 'Regional', abada: 'Abadá', other: 'Outros',
@@ -9,7 +10,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, SongCardComponent],
   template: `
     <!-- Hero. The photo layer is optional: drop a file at public/hero.jpg and it
          appears behind the scrim. Until then the gradient below carries the section,
@@ -93,7 +94,7 @@ const CATEGORY_LABELS: Record<string, string> = {
             <p class="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">{{ reason.body }}</p>
             @if (reason.link) {
               <a [routerLink]="reason.link"
-                 class="mt-4 w-fit py-1 text-xs font-semibold text-capoeira-gold hover:underline after:absolute after:inset-0 after:rounded-2xl">
+                 class="mt-4 w-fit py-1 text-xs font-semibold text-capoeira-gold hover:underline stretched-link after:rounded-2xl">
                 {{ reason.linkLabel }} →
               </a>
             }
@@ -110,13 +111,7 @@ const CATEGORY_LABELS: Record<string, string> = {
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3">
         @for (song of data.recentSongs(); track song.id) {
-          <a [routerLink]="['/musicas', song.id]"
-             class="group flex flex-col gap-2 p-3 sm:p-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
-            <span class="text-[15px] font-bold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug line-clamp-2">{{ song.title }}</span>
-            @if (song.toque.length) {
-              <span class="text-[11px] text-stone-400 dark:text-stone-500 truncate mt-auto">{{ toqueName(song.toque[0]) }}</span>
-            }
-          </a>
+          <app-song-card [song]="song" />
         }
       </div>
     </section>
@@ -188,9 +183,20 @@ export class HomeComponent implements OnInit {
     }
     window.addEventListener('beforeinstallprompt', (e: Event) => {
       e.preventDefault();
+      // Keep the prompt either way, so installApp() still works if we ever offer it.
       this.deferredPrompt = e;
-      this.showInstall.set(true);
+      // Chromium fires this on desktop Chrome and Edge too, where the app installs to
+      // its own window and there is no home screen — everything this card says would
+      // be wrong. Desktop users who do want it still get Chrome's address-bar install.
+      if (this.isPhoneSized()) this.showInstall.set(true);
     });
+  }
+
+  /** The same breakpoint styles.css treats as a phone, so the two agree. The iOS
+   *  branch above does not need it: that path is already gated on the user agent,
+   *  and an iPhone held sideways is wider than this. */
+  private isPhoneSized(): boolean {
+    return window.matchMedia('(max-width: 767px)').matches;
   }
 
   dismissInstall() {
@@ -247,10 +253,6 @@ export class HomeComponent implements OnInit {
       },
     ];
   });
-
-  toqueName(id: string): string {
-    return this.data.toqueById().get(id)?.name ?? id;
-  }
 
   readonly heroBadges = [
     { icon: '💬', title: 'Traduções em inglês', body: 'Letras lado a lado' },

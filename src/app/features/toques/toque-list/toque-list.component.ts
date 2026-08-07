@@ -2,6 +2,7 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../../core/services/data.service';
 import { Toque } from '../../../core/models/toque.model';
+import { TabBarComponent, TabOption } from '../../../shared/components/tab-bar/tab-bar.component';
 
 const TEMPO_LABELS: Record<string, string> = {
   slow: 'Lento', medium: 'Médio', fast: 'Rápido', variable: 'Variável'
@@ -28,7 +29,7 @@ const TAB_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-toque-list',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TabBarComponent],
   template: `
     <div class="space-y-6">
       <div>
@@ -36,19 +37,14 @@ const TAB_LABELS: Record<string, string> = {
         <p class="text-stone-400 text-sm mt-1">Os ritmos do berimbau que comandam o jogo</p>
       </div>
 
-      <!-- Tabs -->
-      <div class="flex gap-1 p-1 rounded-xl bg-stone-100 dark:bg-stone-800 overflow-x-auto scrollbar-hide">
-        @for (tab of allTabs(); track tab.key) {
-          <button (click)="activeTab.set(tab.key)"
-            class="px-4 py-2 text-sm font-medium whitespace-nowrap transition-all duration-150 rounded-lg shrink-0"
-            [class]="activeTab() === tab.key
-              ? 'bg-white dark:bg-stone-700 text-capoeira-brown dark:text-capoeira-gold shadow-sm'
-              : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'">
-            {{ tab.label }}
-          </button>
-        }
-      </div>
+      <!-- The shared tab bar rather than a local copy: it carries the tablist roles and
+           arrow-key movement, which the hand-rolled strip here never had. Every tab
+           drives the one results region below, hence panelId. -->
+      <app-tab-bar variant="strip" idPrefix="toques" panelId="toque-results"
+        ariaLabel="Categorias de toque"
+        [tabs]="allTabs()" [active]="activeTab()" (select)="activeTab.set($event)" />
 
+      <div id="toque-results" role="tabpanel" [attr.aria-labelledby]="'toques-tab-' + activeTab()" class="space-y-6">
       @for (group of visibleGroups(); track group.category) {
         <section class="space-y-3">
           @if (activeTab() === 'all') {
@@ -92,6 +88,7 @@ const TAB_LABELS: Record<string, string> = {
           </div>
         </section>
       }
+      </div>
     </div>
   `,
 })
@@ -113,11 +110,11 @@ export class ToqueListComponent {
       .map(c => ({ category: c, label: CATEGORY_LABELS[c] ?? c, toques: byCategory.get(c)! }));
   });
 
-  allTabs = computed(() => [
-    { key: 'all', label: 'Toques' },
+  allTabs = computed<TabOption[]>(() => [
+    { value: 'all', label: 'Toques' },
     ...CATEGORY_ORDER
       .filter(c => this.grouped().some(g => g.category === c))
-      .map(c => ({ key: c, label: TAB_LABELS[c] ?? c })),
+      .map(c => ({ value: c, label: TAB_LABELS[c] ?? c })),
   ]);
 
   visibleGroups = computed(() =>

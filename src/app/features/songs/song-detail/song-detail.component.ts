@@ -6,6 +6,7 @@ import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/
 import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/spotify-embed.component';
 import { TabBarComponent, TabOption } from '../../../shared/components/tab-bar/tab-bar.component';
 import { SegmentedControlComponent, SegmentOption } from '../../../shared/components/segmented-control/segmented-control.component';
+import { ActionBarComponent, ActionItem } from '../../../shared/components/action-bar/action-bar.component';
 
 /** Coro is always on screen, so only these two are ever tabbed — and only on a phone. */
 type SongTab = 'letra' | 'sobre';
@@ -27,7 +28,10 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
 @Component({
   selector: 'app-song-detail',
   standalone: true,
-  imports: [RouterLink, YoutubeEmbedComponent, SpotifyEmbedComponent, TabBarComponent, SegmentedControlComponent],
+  imports: [
+    RouterLink, YoutubeEmbedComponent, SpotifyEmbedComponent, TabBarComponent,
+    SegmentedControlComponent, ActionBarComponent,
+  ],
   template: `
     @if (song()) {
       <div class="w-full">
@@ -77,139 +81,65 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
             <div class="order-3 space-y-6">
 
               <!-- ─── The single action row ─── -->
-              <div class="relative flex items-center gap-2 no-print">
+              <!-- One bar at every width now. It keeps whatever fits on the line and
+                   folds the rest into ⋯, measured from real space rather than a
+                   breakpoint — the sidebar changes width without the window doing so. -->
+              <div class="no-print">
+                <app-action-bar
+                  [actions]="actions()" ariaLabel="Ações da música"
+                  (triggered)="onAction($event)">
 
-                @if (player(); as p) {
-                  <!-- Playback lives inline in the sidebar from lg; on smaller screens it
-                       folds into these two, so the row stays one row. -->
-                  <button type="button" (click)="p.toggleLoop()" role="switch"
-                    [attr.aria-checked]="p.loop()"
-                    [attr.title]="p.loop() ? 'A música vai repetir sem parar' : 'Repetir a música sem parar'"
-                    aria-label="Repetir sem parar"
-                    [class]="iconBtn + ' lg:hidden ' + (p.loop() ? iconOn : iconIdle)">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
-                  </button>
+                  @if (speedPanelOpen() && player(); as p) {
+                    <button type="button" (click)="speedPanelOpen.set(false)"
+                      aria-label="Fechar velocidade" class="fixed inset-0 z-40 cursor-default"></button>
 
-                  @if (!p.apiFailed()) {
-                    <button type="button" (click)="toggleMenu('playback')"
-                      [attr.aria-expanded]="openMenu() === 'playback'"
-                      title="Velocidade e início do loop" aria-label="Velocidade e início do loop"
-                      [class]="iconBtn + ' lg:hidden w-auto px-3 gap-1.5 ' + (p.speed() !== 1 || p.startSeconds() > 0 ? iconOn : iconIdle)">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="9" stroke-width="2"/>
-                        <path stroke-linecap="round" stroke-width="2" d="M12 7v5l3 2"/>
-                      </svg>
-                      <span class="text-xs font-bold">{{ p.speed() }}×</span>
-                    </button>
+                    <div class="absolute right-0 top-12 z-50 w-64 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-xl p-3 space-y-3">
+                      <div>
+                        <p class="text-[11px] font-bold uppercase tracking-widest text-stone-400 mb-1.5">Velocidade</p>
+                        <div class="flex gap-1.5">
+                          @for (rate of p.speedOptions; track rate) {
+                            <button type="button" (click)="p.setSpeed(rate)"
+                              [attr.aria-pressed]="p.speed() === rate"
+                              class="flex-1 py-2 rounded-lg text-xs font-bold transition-colors"
+                              [class]="p.speed() === rate
+                                ? 'bg-capoeira-gold/15 text-capoeira-brown dark:text-capoeira-gold'
+                                : 'text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'">
+                              {{ rate }}×
+                            </button>
+                          }
+                        </div>
+                      </div>
+                      <div>
+                        <p class="text-[11px] font-bold uppercase tracking-widest text-stone-400 mb-1.5">Início do loop</p>
+                        <div class="flex items-center gap-1.5">
+                          <input #startField type="text" inputmode="numeric"
+                            [value]="p.startLabel()" (change)="p.onStartInput(startField)"
+                            aria-label="Tempo de início do loop (m:ss)"
+                            class="w-16 py-2 bg-transparent border border-stone-200 dark:border-stone-700 rounded-lg text-xs font-semibold text-center text-capoeira-brown dark:text-capoeira-gold outline-none focus:ring-1 focus:ring-capoeira-gold/50" />
+                          <button type="button" (click)="p.captureCurrentTime()"
+                            class="px-2.5 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wide text-stone-400 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
+                            Aqui
+                          </button>
+                          @if (p.startSeconds() > 0) {
+                            <button type="button" (click)="p.setStart(0)" title="Voltar o início para 0:00"
+                              class="w-8 h-8 shrink-0 flex items-center justify-center rounded-full text-stone-300 dark:text-stone-600 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
+                              ×
+                            </button>
+                          }
+                        </div>
+                      </div>
+                    </div>
                   }
-                }
-
-                @if (firebase.currentUser() && !firebase.isAdmin()) {
-                  <button type="button" (click)="toggleFavorite()"
-                    [attr.aria-pressed]="isFavorite()"
-                    [attr.aria-label]="isFavorite() ? 'Remover dos favoritos' : 'Favoritar'"
-                    [attr.title]="isFavorite() ? 'Remover dos favoritos' : 'Favoritar'"
-                    [class]="iconBtn + ' ' + (isFavorite()
-                      ? 'border-red-200 bg-red-50 text-red-500 dark:bg-red-900/20 dark:border-red-800'
-                      : iconIdle)">
-                    <span class="text-base leading-none">{{ isFavorite() ? '♥' : '♡' }}</span>
-                  </button>
-                  <button type="button" (click)="toggleLearned()"
-                    [attr.aria-pressed]="isLearned()"
-                    [attr.aria-label]="isLearned() ? 'Marcar como não aprendida' : 'Marcar como aprendida'"
-                    [attr.title]="isLearned() ? 'Marcar como não aprendida' : 'Marcar como aprendida'"
-                    [class]="iconBtn + ' ' + (isLearned()
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:border-emerald-800'
-                      : iconIdle)">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                  </button>
-                }
-
-                <!-- Print and share are done sitting down, once. They do not earn a
-                     permanent slot next to the controls used mid-roda. -->
-                <button type="button" (click)="toggleMenu('more')"
-                  [attr.aria-expanded]="openMenu() === 'more'"
-                  title="Mais ações" aria-label="Mais ações"
-                  [class]="iconBtn + ' ' + (openMenu() === 'more' ? iconOn : iconIdle)">
-                  <span class="text-base leading-none">⋯</span>
-                </button>
+                </app-action-bar>
 
                 @if (shareLabel() !== 'Compartilhar') {
-                  <span class="text-xs font-semibold"
+                  <p class="mt-2 text-right text-xs font-semibold"
                     [class]="shared() ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-500'">
                     {{ shareLabel() }}
-                  </span>
-                }
-
-                <!-- Popovers. The backdrop is a button so a tap anywhere closes it and
-                     Escape-by-keyboard has something focusable to land on. -->
-                @if (openMenu()) {
-                  <button type="button" (click)="openMenu.set(null)" aria-label="Fechar as ações da música"
-                    class="fixed inset-0 z-40 cursor-default"></button>
-                }
-
-                @if (openMenu() === 'playback' && player(); as p) {
-                  <div class="absolute left-0 top-12 z-50 w-64 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-xl p-3 space-y-3">
-                    <div>
-                      <p class="text-[11px] font-bold uppercase tracking-widest text-stone-400 mb-1.5">Velocidade</p>
-                      <div class="flex gap-1.5">
-                        @for (rate of p.speedOptions; track rate) {
-                          <button type="button" (click)="p.setSpeed(rate)"
-                            [attr.aria-pressed]="p.speed() === rate"
-                            class="flex-1 py-2 rounded-lg text-xs font-bold transition-colors"
-                            [class]="p.speed() === rate
-                              ? 'bg-capoeira-gold/15 text-capoeira-brown dark:text-capoeira-gold'
-                              : 'text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'">
-                            {{ rate }}×
-                          </button>
-                        }
-                      </div>
-                    </div>
-                    <div>
-                      <p class="text-[11px] font-bold uppercase tracking-widest text-stone-400 mb-1.5">Início do loop</p>
-                      <div class="flex items-center gap-1.5">
-                        <input #startField type="text" inputmode="numeric"
-                          [value]="p.startLabel()" (change)="p.onStartInput(startField)"
-                          aria-label="Tempo de início do loop (m:ss)"
-                          class="w-16 py-2 bg-transparent border border-stone-200 dark:border-stone-700 rounded-lg text-xs font-semibold text-center text-capoeira-brown dark:text-capoeira-gold outline-none focus:ring-1 focus:ring-capoeira-gold/50" />
-                        <button type="button" (click)="p.captureCurrentTime()"
-                          class="px-2.5 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wide text-stone-400 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
-                          Aqui
-                        </button>
-                        @if (p.startSeconds() > 0) {
-                          <button type="button" (click)="p.setStart(0)" title="Voltar o início para 0:00"
-                            class="w-8 h-8 shrink-0 flex items-center justify-center rounded-full text-stone-300 dark:text-stone-600 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
-                            ×
-                          </button>
-                        }
-                      </div>
-                    </div>
-                  </div>
-                }
-
-                @if (openMenu() === 'more') {
-                  <div class="absolute left-0 top-12 z-50 w-56 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-xl py-1.5">
-                    <button type="button" (click)="print(); openMenu.set(null)"
-                      class="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
-                      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
-                      </svg>
-                      PDF / Imprimir
-                    </button>
-                    <button type="button" (click)="share(); openMenu.set(null)"
-                      class="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
-                      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.7 10.7a3 3 0 100 2.6m0-2.6l6.6-3.4m-6.6 6l6.6 3.4M18 7a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm0 10a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-                      </svg>
-                      Compartilhar
-                    </button>
-                  </div>
+                  </p>
                 }
               </div>
+
 
               <!-- Coro. Never behind a tab: it is what someone reaches for mid-roda. -->
               @if (song()!.refrao) {
@@ -285,61 +215,16 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
           <div class="contents lg:block lg:space-y-5 lg:sticky lg:top-6 no-print">
 
             <!-- Video. Second on a phone, first in the sidebar from lg. Its own controls
-                 are off: they live in the action row below, or inline here at lg. -->
+                 are off: loop, speed and loop-start all live in the action bar. -->
             @if (song()!.audioLinks.youtube) {
               <div class="order-2">
                 <h2 class="hidden lg:block text-xs font-bold text-stone-400 uppercase tracking-widest mb-3">Vídeo</h2>
                 <app-youtube-embed
                   [videoId]="song()!.audioLinks.youtube!" [title]="song()!.title"
                   [showControls]="false" />
-
-                @if (player(); as p) {
-                  <div class="hidden lg:flex flex-wrap items-center gap-2 mt-3">
-                    <button type="button" (click)="p.toggleLoop()" role="switch"
-                      [attr.aria-checked]="p.loop()"
-                      class="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm transition-colors hover:border-capoeira-gold/50">
-                      <span class="text-xs font-semibold transition-colors"
-                        [class]="p.loop() ? 'text-capoeira-brown dark:text-capoeira-gold' : 'text-stone-500 dark:text-stone-400'">
-                        Repetir sem parar
-                      </span>
-                      <span class="relative shrink-0 w-10 h-5 rounded-full transition-colors duration-200"
-                        [class]="p.loop() ? 'bg-capoeira-gold' : 'bg-stone-300 dark:bg-stone-700'">
-                        <span class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200"
-                          [class]="p.loop() ? 'translate-x-5' : 'translate-x-0'"></span>
-                      </span>
-                    </button>
-
-                    @if (!p.apiFailed()) {
-                      <div class="inline-flex items-center gap-1 pl-3 pr-1.5 py-0.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm">
-                        <span class="text-xs font-semibold text-stone-500 dark:text-stone-400 mr-0.5">Velocidade</span>
-                        @for (rate of p.speedOptions; track rate) {
-                          <button type="button" (click)="p.setSpeed(rate)"
-                            [attr.aria-pressed]="p.speed() === rate"
-                            class="min-w-[34px] px-2 py-1.5 rounded-lg text-[11px] font-bold transition-colors"
-                            [class]="p.speed() === rate
-                              ? 'bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold'
-                              : 'text-stone-400 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800'">
-                            {{ rate }}×
-                          </button>
-                        }
-                      </div>
-
-                      <div class="inline-flex items-center gap-1.5 pl-3 pr-2 py-0.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm">
-                        <span class="text-xs font-semibold text-stone-500 dark:text-stone-400">Início</span>
-                        <input #deskStart type="text" inputmode="numeric"
-                          [value]="p.startLabel()" (change)="p.onStartInput(deskStart)"
-                          aria-label="Tempo de início do loop (m:ss)"
-                          class="w-12 py-1.5 bg-transparent text-xs font-semibold text-center text-capoeira-brown dark:text-capoeira-gold rounded-lg outline-none focus:ring-1 focus:ring-capoeira-gold/50" />
-                        <button type="button" (click)="p.captureCurrentTime()"
-                          class="px-2 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wide text-stone-400 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
-                          Aqui
-                        </button>
-                      </div>
-                    }
-                  </div>
-                }
               </div>
             }
+
 
             <!-- Details and what to sing next -->
             <div class="order-4 space-y-5">
@@ -437,13 +322,58 @@ export class SongDetailComponent {
 
   song = computed(() => this.data.songById().get(this.id()));
 
-  readonly iconBtn = 'h-10 min-w-[2.5rem] shrink-0 flex items-center justify-center rounded-xl border text-sm font-semibold transition-colors shadow-sm';
-  readonly iconIdle = 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-500 dark:text-stone-400 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:border-capoeira-gold';
-  readonly iconOn = 'border-capoeira-gold/50 bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold';
+  readonly speedPanelOpen = signal(false);
 
-  readonly openMenu = signal<'playback' | 'more' | null>(null);
-  toggleMenu(which: 'playback' | 'more'): void {
-    this.openMenu.update(current => (current === which ? null : which));
+  /**
+   * Priority order — the earliest survives longest as the row narrows. Playback comes
+   * first because it is what gets touched while a song is running; printing and sharing
+   * are done once, sitting down, and are the first to fold into the menu.
+   */
+  readonly actions = computed<ActionItem[]>(() => {
+    const items: ActionItem[] = [];
+    const p = this.player();
+
+    if (p) {
+      items.push({
+        id: 'loop', label: 'Repetir sem parar', icon: 'loop',
+        active: p.loop(), state: p.loop() ? 'sim' : 'não',
+      });
+      if (!p.apiFailed()) {
+        items.push({
+          id: 'speed', label: 'Velocidade e início do loop', icon: 'clock',
+          badge: p.speed() + '×',
+          active: p.speed() !== 1 || p.startSeconds() > 0,
+          state: p.speed() + '× · início ' + p.startLabel(),
+        });
+      }
+    }
+
+    if (this.firebase.currentUser() && !this.firebase.isAdmin()) {
+      items.push({
+        id: 'favorite',
+        label: this.isFavorite() ? 'Remover dos favoritos' : 'Favoritar',
+        icon: this.isFavorite() ? 'heart-filled' : 'heart',
+        active: this.isFavorite(), tone: 'favorite',
+      });
+      items.push({
+        id: 'learned',
+        label: this.isLearned() ? 'Marcar como não aprendida' : 'Marcar como aprendida',
+        icon: 'check', active: this.isLearned(), tone: 'learned',
+      });
+    }
+
+    items.push({ id: 'print', label: 'PDF / Imprimir', icon: 'print' });
+    items.push({ id: 'share', label: 'Compartilhar', icon: 'share' });
+    return items;
+  });
+
+  onAction(id: string): void {
+    if (id === 'loop') this.player()?.toggleLoop();
+    else if (id === 'speed') this.speedPanelOpen.update(open => !open);
+    else if (id === 'favorite') void this.toggleFavorite();
+    else if (id === 'learned') void this.toggleLearned();
+    else if (id === 'print') this.print();
+    else if (id === 'share') void this.share();
   }
 
   /** Phone-only tabs, so only the two long sections are ever hidden. */

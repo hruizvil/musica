@@ -4,6 +4,7 @@ import { DataService } from '../../../core/services/data.service';
 import { FirebaseService } from '../../../core/services/firebase.service';
 import { Song } from '../../../core/models/song.model';
 import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/youtube-embed.component';
+import { ActionBarComponent, ActionItem } from '../../../shared/components/action-bar/action-bar.component';
 
 /**
  * Plays through the favourites, one after another. This replaces the roda queue: the
@@ -16,7 +17,7 @@ import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/
 @Component({
   selector: 'app-favorites-player',
   standalone: true,
-  imports: [RouterLink, YoutubeEmbedComponent],
+  imports: [RouterLink, YoutubeEmbedComponent, ActionBarComponent],
   template: `
     <div class="space-y-5">
 
@@ -29,14 +30,6 @@ import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/
           <p class="text-xs font-bold uppercase tracking-widest text-stone-400">
             A tocar · {{ activeIndex() + 1 }} de {{ playlist().length }}
           </p>
-          <button type="button" (click)="toggleShuffle()"
-            [attr.aria-pressed]="!!shuffled()"
-            class="ml-auto flex items-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-xl border text-sm font-semibold transition-colors shadow-sm"
-            [class]="shuffled()
-              ? 'border-capoeira-gold/50 bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold'
-              : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-500 dark:text-stone-400 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:border-capoeira-gold'">
-            🔀 Aleatório
-          </button>
         }
       </div>
 
@@ -78,19 +71,16 @@ import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/
               </div>
             }
 
-            <div class="flex items-center justify-between gap-2">
-              <button type="button" (click)="prev()" [disabled]="activeIndex() <= 0"
-                class="px-4 py-2 sm:py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-semibold text-stone-600 dark:text-stone-300 hover:border-capoeira-gold disabled:opacity-30 transition-colors shadow-sm">
-                ← Anterior
-              </button>
+            <!-- Anterior and Próxima are pinned: transport that hides in a menu is
+                 worse than useless. Only Aleatório may fold away. -->
+            <div class="flex items-center justify-between gap-3">
               <a [routerLink]="['/musicas', activeSong()!.id]"
-                 class="px-1.5 py-2 rounded text-xs text-stone-400 hover:text-capoeira-gold hover:underline">
+                 class="shrink-0 px-1.5 py-2 rounded text-xs text-stone-400 hover:text-capoeira-gold hover:underline">
                 Ver letra completa
               </a>
-              <button type="button" (click)="next()" [disabled]="activeIndex() >= playlist().length - 1"
-                class="px-4 py-2 sm:py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-semibold text-stone-600 dark:text-stone-300 hover:border-capoeira-gold disabled:opacity-30 transition-colors shadow-sm">
-                Próxima →
-              </button>
+              <app-action-bar class="flex-1 min-w-0"
+                [actions]="transport()" ariaLabel="Controles de reprodução"
+                (triggered)="onAction($event)" />
             </div>
           </div>
 
@@ -168,6 +158,28 @@ export class FavoritesPlayerComponent {
     const active = this.activeSong();
     return active ? this.playlist().findIndex(s => s.id === active.id) : -1;
   });
+
+  /** Pinned first, as the action bar expects: transport keeps its place, shuffle folds. */
+  readonly transport = computed<ActionItem[]>(() => [
+    {
+      id: 'prev', label: 'Anterior', icon: 'prev', pinned: true,
+      disabled: this.activeIndex() <= 0,
+    },
+    {
+      id: 'next', label: 'Próxima', icon: 'next', pinned: true,
+      disabled: this.activeIndex() >= this.playlist().length - 1,
+    },
+    {
+      id: 'shuffle', label: 'Aleatório', icon: 'shuffle',
+      active: !!this.shuffled(), state: this.shuffled() ? 'ligado' : 'desligado',
+    },
+  ]);
+
+  onAction(id: string): void {
+    if (id === 'prev') this.prev();
+    else if (id === 'next') this.next();
+    else if (id === 'shuffle') this.toggleShuffle();
+  }
 
   play(id: string): void {
     this.activeId.set(id);

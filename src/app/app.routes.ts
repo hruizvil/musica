@@ -32,13 +32,16 @@ export const routes: Routes = [
         loadComponent: () => import('./features/videos/video-list/video-list.component').then(m => m.VideoListComponent),
       },
       {
-        path: 'roda',
-        loadComponent: () => import('./features/roda/roda.component').then(m => m.RodaComponent),
-      },
-      {
         path: 'minhas',
         loadComponent: () => import('./features/minhas/minhas.component').then(m => m.MinhasComponent),
       },
+      {
+        path: 'minhas/tocar',
+        loadComponent: () =>
+          import('./features/minhas/player/favorites-player.component').then(m => m.FavoritesPlayerComponent),
+      },
+      // /roda is gone; anyone with it bookmarked lands on the list that replaced it.
+      { path: 'roda', redirectTo: 'minhas' },
       {
         path: 'membership',
         loadComponent: () => import('./features/membership/membership.component').then(m => m.MembershipComponent),

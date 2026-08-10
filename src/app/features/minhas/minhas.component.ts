@@ -2,14 +2,12 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
 import { FirebaseService } from '../../core/services/firebase.service';
-import { RodaService } from '../../core/services/roda.service';
 import { SongCardComponent } from '../../shared/components/song-card/song-card.component';
 import { Song } from '../../core/models/song.model';
 
 /**
- * Everything the user has marked, in one place: favourites, learned, and the roda
- * queue. Favourites and learned live on the account; the queue is on the device,
- * so this page is still worth opening while signed out.
+ * Everything the user has marked, in one place: favourites and learned. Both live on
+ * the account, so this page asks for a sign-in before it has anything to show.
  */
 @Component({
   selector: 'app-minhas',
@@ -20,52 +18,25 @@ import { Song } from '../../core/models/song.model';
 
       <div>
         <h1 class="font-display text-3xl font-bold text-capoeira-brown dark:text-capoeira-cream">Minhas</h1>
-        <p class="text-stone-400 text-sm mt-1">Suas favoritas, aprendidas e a fila da roda.</p>
+        <p class="text-stone-400 text-sm mt-1">Suas favoritas e aprendidas.</p>
       </div>
-
-      <!-- Fila da roda. Device-local, so it shows whether or not anyone is signed in. -->
-      <section class="space-y-3">
-        <div class="flex items-baseline justify-between gap-3">
-          <h2 class="text-xs font-bold text-stone-400 uppercase tracking-widest">Fila da roda</h2>
-          @if (rodaSongs().length) {
-            <a routerLink="/roda" class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline">
-              Abrir a roda →
-            </a>
-          }
-        </div>
-        @if (rodaSongs().length) {
-          <ol class="space-y-2">
-            @for (song of rodaSongs(); track song.id; let i = $index) {
-              <li>
-                <a [routerLink]="['/musicas', song.id]"
-                   class="flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:border-capoeira-gold/40 transition-colors">
-                  <span class="w-6 h-6 shrink-0 rounded-full bg-capoeira-gold/15 text-capoeira-brown dark:text-capoeira-gold text-xs font-bold flex items-center justify-center">
-                    {{ i + 1 }}
-                  </span>
-                  <span class="flex-1 min-w-0">
-                    <span class="block text-sm font-semibold text-stone-800 dark:text-stone-100 truncate">{{ song.title }}</span>
-                    @if (song.toque.length) {
-                      <span class="block text-xs text-stone-400 truncate">{{ toqueName(song.toque[0]) }}</span>
-                    }
-                  </span>
-                </a>
-              </li>
-            }
-          </ol>
-        } @else {
-          <p class="text-sm text-stone-400">
-            A fila está vazia. Abra uma música e toque em <span class="font-medium">Adicionar à roda</span>.
-          </p>
-        }
-      </section>
 
       @if (firebase.currentUser()) {
 
         <section class="space-y-3">
-          <h2 class="text-xs font-bold text-stone-400 uppercase tracking-widest">
-            Favoritas
-            @if (favorites().length) { <span class="text-stone-300 dark:text-stone-600">· {{ favorites().length }}</span> }
-          </h2>
+          <div class="flex items-center gap-3 flex-wrap">
+            <h2 class="text-xs font-bold text-stone-400 uppercase tracking-widest">
+              Favoritas
+              @if (favorites().length) { <span class="text-stone-300 dark:text-stone-600">· {{ favorites().length }}</span> }
+            </h2>
+            <!-- The favourites are the setlist now, and this is the way in to playing them. -->
+            @if (favorites().length) {
+              <a routerLink="/minhas/tocar"
+                 class="flex items-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-capoeira-gold text-capoeira-brown text-sm font-bold hover:bg-amber-400 transition-colors shadow-sm">
+                ▶ Tocar favoritas
+              </a>
+            }
+          </div>
           @if (favorites().length) {
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               @for (song of favorites(); track song.id) {
@@ -111,25 +82,18 @@ import { Song } from '../../core/models/song.model';
 })
 export class MinhasComponent {
   private data = inject(DataService);
-  private roda = inject(RodaService);
   readonly firebase = inject(FirebaseService);
 
-  /** Queue order is the roda's order, so map over the ids rather than the songs. */
-  readonly rodaSongs = computed<Song[]>(() => {
+  /** Starred order, so the grid here and the player read in the same sequence. */
+  readonly favorites = computed<Song[]>(() => {
     const byId = this.data.songById();
-    return this.roda.ids()
+    return [...this.firebase.favorites()]
       .map(id => byId.get(id))
       .filter((song): song is Song => !!song);
   });
 
-  readonly favorites = computed(() => this.pick(this.firebase.favorites()));
-  readonly learned = computed(() => this.pick(this.firebase.learnedSongs()));
-
-  private pick(ids: ReadonlySet<string>): Song[] {
+  readonly learned = computed(() => {
+    const ids = this.firebase.learnedSongs();
     return this.data.songs().filter(song => ids.has(song.id));
-  }
-
-  toqueName(id: string): string {
-    return this.data.toqueById().get(id)?.name ?? id;
-  }
+  });
 }

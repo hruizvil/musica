@@ -2,7 +2,6 @@ import { Component, ElementRef, HostListener, effect, inject, signal } from '@an
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
 import { FirebaseService } from '../../core/services/firebase.service';
-import { RodaService } from '../../core/services/roda.service';
 import { SearchBarComponent } from '../../shared/components/search-bar/search-bar.component';
 
 @Component({
@@ -30,15 +29,6 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
               {{ link.label }}
             </a>
           }
-          <a routerLink="/roda" routerLinkActive #ar="routerLinkActive"
-             [attr.aria-current]="ar.isActive ? 'page' : null"
-             class="px-3 py-1.5 rounded-md transition-colors"
-             [class]="ar.isActive ? activeClass : idleClass">
-            Roda
-            @if (roda.count()) {
-              <span class="text-capoeira-gold font-semibold">({{ roda.count() }})</span>
-            }
-          </a>
           <a routerLink="/minhas" routerLinkActive #an="routerLinkActive"
              [attr.aria-current]="an.isActive ? 'page' : null"
              class="px-3 py-1.5 rounded-md transition-colors"
@@ -184,16 +174,6 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
                 {{ link.label }}
               </a>
             }
-            <a routerLink="/roda" routerLinkActive #dr="routerLinkActive"
-               [attr.aria-current]="dr.isActive ? 'page' : null"
-               (click)="mobileOpen.set(false)"
-               class="px-3 py-2.5 rounded-md text-sm transition-colors"
-               [class]="dr.isActive ? drawerActiveClass : drawerIdleClass">
-              Roda
-              @if (roda.count()) {
-                <span class="text-capoeira-gold font-semibold">({{ roda.count() }})</span>
-              }
-            </a>
             <a routerLink="/minhas" routerLinkActive #dn="routerLinkActive"
                [attr.aria-current]="dn.isActive ? 'page' : null"
                (click)="mobileOpen.set(false)"
@@ -256,7 +236,6 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
 export class HeaderComponent {
   theme = inject(ThemeService);
   firebase = inject(FirebaseService);
-  roda = inject(RodaService);
   private el = inject(ElementRef);
 
   mobileOpen = signal(false);

@@ -88,6 +88,5 @@ export class FooterComponent {
   readonly nav = [
     { path: '/musicas', label: 'Músicas' },
     { path: '/toques', label: 'Toques' },
-    { path: '/roda', label: 'Roda' },
   ];
 }

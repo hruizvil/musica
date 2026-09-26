@@ -52,7 +52,11 @@ type PanelMode = 'none' | 'edit' | 'add';
   standalone: true,
   imports: [FormsModule, NgClass],
   template: `
-    <div class="h-screen flex flex-col overflow-hidden bg-stone-50 dark:bg-stone-900">
+    <!-- 100vh on a phone is the viewport as if the browser chrome were hidden, so the
+         layout ends up taller than what is actually on screen and the top of it — the
+         header holding Salvar — can sit above the visible area. 100dvh tracks the real
+         one; h-screen stays as the fallback for anything without dvh. -->
+    <div class="h-screen supports-[height:100dvh]:h-[100dvh] flex flex-col overflow-hidden bg-stone-50 dark:bg-stone-900">
 
       <!-- ── GLOBAL HEADER ─────────────────────────────────────────── -->
       <header class="h-14 shrink-0 backdrop-blur-md bg-white/90 dark:bg-stone-950/90 border-b border-stone-200/60 dark:border-stone-800/60 flex items-center px-5 gap-3 z-20">
@@ -266,21 +270,48 @@ type PanelMode = 'none' | 'edit' | 'add';
           }
 
           @if (panelMode() !== 'none') {
-            <!-- Mobile back button -->
-            <div class="md:hidden flex items-center gap-2 px-4 py-2.5 border-b border-stone-200/60 dark:border-stone-800/60 bg-white/90 dark:bg-stone-950/90 backdrop-blur-md shrink-0">
+            <!-- Mobile bar. This is the only save within reach of the form: the global
+                 header lives outside this scroll container, and on a phone it can sit
+                 off screen entirely once the keyboard opens. Sticky so it stays put
+                 while the form scrolls under it. -->
+            <div class="md:hidden sticky top-0 z-10 flex items-center gap-2 px-4 py-2.5 border-b border-stone-200/60 dark:border-stone-800/60 bg-white/95 dark:bg-stone-950/95 backdrop-blur-md shrink-0">
               <button (click)="closePanel()" class="flex items-center gap-1.5 text-sm text-capoeira-brown dark:text-capoeira-gold font-medium px-2 py-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
                 Músicas
               </button>
+
               @if (isDirty()) {
                 <span class="ml-auto flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full">
                   <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                   Não salvo
                 </span>
+              } @else if (saveSuccess()) {
+                <!-- The desktop "Salvo" pill is hidden below sm, so a phone had no way of
+                     telling whether the save had gone through. -->
+                <span class="ml-auto flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Salvo
+                </span>
               }
+
+              <button (click)="panelMode() === 'edit' ? save() : addSong()"
+                [disabled]="saving() || (panelMode() === 'add' && !editTitle.trim())"
+                class="ml-auto shrink-0 px-4 py-2 rounded-xl bg-capoeira-brown text-white text-sm font-semibold hover:bg-capoeira-brown/90 disabled:opacity-50 transition-colors shadow-sm whitespace-nowrap">
+                {{ saving() ? 'Salvando…' : (panelMode() === 'add' ? 'Adicionar' : 'Salvar') }}
+              </button>
             </div>
+
+            @if (saveError()) {
+              <!-- Same reason: the header's error text is hidden below sm, so a failed
+                   save looked exactly like nothing happening. -->
+              <p class="md:hidden px-4 py-2 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border-b border-red-100 dark:border-red-900/40">
+                {{ saveError() }}
+              </p>
+            }
 
             <div class="w-full px-4 md:px-6 py-5 space-y-4">
 

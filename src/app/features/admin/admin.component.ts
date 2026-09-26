@@ -80,15 +80,15 @@ type PanelMode = 'none' | 'edit' | 'add';
             <span class="text-sm font-medium text-stone-700 dark:text-stone-200 truncate max-w-[9rem] sm:max-w-[16rem]">
               {{ panelMode() === 'add' ? 'Nova música' : (editTitle || selectedSong()?.title || '') }}
             </span>
-            <!-- Both status pills are repeated in the mobile back bar below. -->
+            <!-- Both pills belong to the mobile bar below md; these are the md+ copies. -->
             @if (isDirty()) {
-              <span class="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 shrink-0 ml-1 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full">
+              <span class="hidden md:flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 shrink-0 ml-1 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full">
                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                 Não salvo
               </span>
             }
             @if (saveSuccess()) {
-              <span class="hidden sm:flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 shrink-0 ml-1">
+              <span class="hidden md:flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 shrink-0 ml-1">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -103,24 +103,24 @@ type PanelMode = 'none' | 'edit' | 'add';
         <!-- Header actions -->
         <div class="flex items-center gap-2 shrink-0">
           @if (saveError()) {
-            <span class="text-xs text-red-500 hidden sm:inline">{{ saveError() }}</span>
+            <span class="text-xs text-red-500 hidden md:inline">{{ saveError() }}</span>
           }
           @if (panelMode() !== 'none') {
-            <!-- The mobile back bar already offers this action. -->
+            <!-- Both of these are the mobile bar's job below md, where it carries the
+                 back button and the save. Two of each on one screen is one too many. -->
             <button (click)="closePanel()"
-              class="hidden sm:block px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-600 text-stone-500 dark:text-stone-400 text-sm hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
+              class="hidden md:block px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-600 text-stone-500 dark:text-stone-400 text-sm hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
               Cancelar
             </button>
             <button (click)="panelMode() === 'edit' ? save() : addSong()"
               [disabled]="saving() || (panelMode() === 'add' && !editTitle.trim())"
-              class="px-4 py-2 sm:py-1.5 rounded-xl bg-capoeira-brown text-white text-sm font-semibold hover:bg-capoeira-brown/90 disabled:opacity-50 transition-colors shadow-sm shadow-capoeira-gold/10 whitespace-nowrap">
+              class="hidden md:block px-4 py-1.5 rounded-xl bg-capoeira-brown text-white text-sm font-semibold hover:bg-capoeira-brown/90 disabled:opacity-50 transition-colors shadow-sm shadow-capoeira-gold/10 whitespace-nowrap">
               @if (saving()) {
                 Salvando…
               } @else if (panelMode() === 'add') {
                 Adicionar
               } @else {
-                <span class="sm:hidden">Salvar</span>
-                <span class="hidden sm:inline">Salvar alterações</span>
+                Salvar alterações
               }
             </button>
           }
@@ -135,9 +135,14 @@ type PanelMode = 'none' | 'edit' | 'add';
       <div class="flex flex-1 overflow-hidden">
 
         <!-- Left sidebar: song list -->
+        <!-- A column at every width, not just from md. As a plain block on a phone the
+             list had no height to be bounded by, so overflow-y-auto never scrolled and
+             the Adicionar button below it sat past the bottom of the screen with no way
+             to reach it. md:flex stays so the sidebar survives a panel opening on
+             desktop, where the hidden class would otherwise take it away. -->
         <aside
           [ngClass]="{ 'hidden': panelMode() !== 'none' }"
-          class="md:flex md:flex-col w-full md:w-64 md:shrink-0 border-r border-stone-200/60 dark:border-stone-800/60 bg-white dark:bg-stone-950">
+          class="flex flex-col md:flex w-full md:w-64 md:shrink-0 border-r border-stone-200/60 dark:border-stone-800/60 bg-white dark:bg-stone-950">
 
           <!-- Sidebar header -->
           <div class="px-3 py-3 border-b border-stone-100 dark:border-stone-700 space-y-2 shrink-0">

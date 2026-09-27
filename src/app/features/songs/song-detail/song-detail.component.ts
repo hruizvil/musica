@@ -2,6 +2,7 @@ import { Component, inject, input, computed, signal, linkedSignal, viewChild } f
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../../core/services/data.service';
 import { FirebaseService } from '../../../core/services/firebase.service';
+import { FavoritesService } from '../../../core/services/favorites.service';
 import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/youtube-embed.component';
 import { SpotifyEmbedComponent } from '../../../shared/components/spotify-embed/spotify-embed.component';
 import { TabBarComponent, TabOption } from '../../../shared/components/tab-bar/tab-bar.component';
@@ -315,6 +316,7 @@ export class SongDetailComponent {
   id = input.required<string>();
   private data = inject(DataService);
   readonly firebase = inject(FirebaseService);
+  private readonly favorites = inject(FavoritesService);
 
   /** Read through a viewChild rather than a template variable: the embed sits inside an
    *  @if, and a reference declared in an embedded view is not visible to its siblings. */
@@ -333,6 +335,16 @@ export class SongDetailComponent {
     const items: ActionItem[] = [];
     const p = this.player();
 
+    // First, and for everyone. It used to be hidden from signed-out visitors and from
+    // the admin account, so the feature was invisible to most people who opened a song.
+    // Signed out, the heart opens the sign-in prompt rather than doing nothing.
+    items.push({
+      id: 'favorite',
+      label: this.isFavorite() ? 'Remover dos favoritos' : 'Favoritar',
+      icon: this.isFavorite() ? 'heart-filled' : 'heart',
+      active: this.isFavorite(), tone: 'favorite',
+    });
+
     if (p) {
       items.push({
         id: 'loop', label: 'Repetir sem parar', icon: 'loop',
@@ -348,13 +360,7 @@ export class SongDetailComponent {
       }
     }
 
-    if (this.firebase.currentUser() && !this.firebase.isAdmin()) {
-      items.push({
-        id: 'favorite',
-        label: this.isFavorite() ? 'Remover dos favoritos' : 'Favoritar',
-        icon: this.isFavorite() ? 'heart-filled' : 'heart',
-        active: this.isFavorite(), tone: 'favorite',
-      });
+    if (this.firebase.currentUser()) {
       items.push({
         id: 'learned',
         label: this.isLearned() ? 'Marcar como não aprendida' : 'Marcar como aprendida',
@@ -370,7 +376,7 @@ export class SongDetailComponent {
   onAction(id: string): void {
     if (id === 'loop') this.player()?.toggleLoop();
     else if (id === 'speed') this.speedPanelOpen.update(open => !open);
-    else if (id === 'favorite') void this.toggleFavorite();
+    else if (id === 'favorite') void this.favorites.toggle(this.id());
     else if (id === 'learned') void this.toggleLearned();
     else if (id === 'print') this.print();
     else if (id === 'share') void this.share();
@@ -452,16 +458,8 @@ export class SongDetailComponent {
   });
   toqueName = (id: string): string => this.data.toqueById().get(id)?.name ?? id;
 
-  /** Awaited so a failed write cannot become an unhandled rejection; the mark simply
-   *  stays as it was rather than the page pretending it saved. */
-  async toggleFavorite(): Promise<void> {
-    try {
-      await this.firebase.toggleFavorite(this.id());
-    } catch {
-      // offline or the write was refused — nothing changed, nothing to undo
-    }
-  }
-
+  /** Awaited so a failed write cannot become an unhandled rejection; the mark is put
+   *  back by the service rather than the page pretending it saved. */
   async toggleLearned(): Promise<void> {
     try {
       await this.firebase.toggleLearned(this.id());

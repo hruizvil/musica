@@ -85,16 +85,17 @@ describe('HomeComponent — recent songs use the shared card', () => {
     expect(el.querySelectorAll('app-song-card').length).toBe(1);
   });
 
-  it('shows the favourite heart on a recent song, which the inline copy never did', () => {
+  // The heart is a button on every card now, so the state lives in aria-pressed.
+  it('shows the favourite heart filled on a recent song, which the inline copy never did', () => {
     const el: HTMLElement = render(new Set(['s1'])).nativeElement;
-    const card = el.querySelector('app-song-card')!;
-    expect(card.querySelector('[title="Favorita"]')).not.toBeNull();
+    const heart = el.querySelector('app-song-card button[aria-pressed]')!;
+    expect(heart.getAttribute('aria-pressed')).toBe('true');
   });
 
-  it('leaves the heart off a song that is not favourited', () => {
+  it('shows an empty heart on a song that is not favourited', () => {
     const el: HTMLElement = render().nativeElement;
-    const card = el.querySelector('app-song-card')!;
-    expect(card.querySelector('[title="Favorita"]')).toBeNull();
+    const heart = el.querySelector('app-song-card button[aria-pressed]')!;
+    expect(heart.getAttribute('aria-pressed')).toBe('false');
   });
 });
 

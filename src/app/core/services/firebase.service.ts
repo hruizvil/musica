@@ -77,7 +77,9 @@ export class FirebaseService {
     // must never await ready(), which is the promise this function is still settling.
     a.onAuthStateChanged(sdk.auth, async user => {
       this.currentUser.set(user);
-      if (user && user.email !== environment.adminEmail) {
+      // Every signed-in account keeps favourites, admin included — admin used to be
+      // skipped here, which is why its heart never showed.
+      if (user) {
         await this.loadUserData(sdk, user.uid);
       } else {
         this.clearUserData();
@@ -175,15 +177,28 @@ export class FirebaseService {
     const uid = this.currentUser()?.uid;
     if (!uid) return;
 
-    const { db, f } = await this.ready();
-    const had = local().has(songId);
-    const next = new Set(local());
+    const previous = local();
+    const had = previous.has(songId);
+    const next = new Set(previous);
     if (had) next.delete(songId); else next.add(songId);
 
-    await f.updateDoc(f.doc(db, 'users', uid), {
-      [field]: had ? f.arrayRemove(songId) : f.arrayUnion(songId),
-    });
+    // Optimistic: the heart fills on the tap, not after a round trip on a phone at a
+    // roda. A failed write puts it back and rethrows so the caller can say so.
     local.set(next);
+    try {
+      const { db, f } = await this.ready();
+      // merge rather than updateDoc: an account that never went through the public
+      // sign-up (the admin one) has no user document yet, and updateDoc refuses to
+      // write to a document that does not exist.
+      await f.setDoc(
+        f.doc(db, 'users', uid),
+        { [field]: had ? f.arrayRemove(songId) : f.arrayUnion(songId) },
+        { merge: true },
+      );
+    } catch (error) {
+      local.set(previous);
+      throw error;
+    }
   }
 
   // ── Firestore: song overrides & extra songs ───────────────────────────────

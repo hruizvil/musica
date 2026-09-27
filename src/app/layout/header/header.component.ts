@@ -61,7 +61,10 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
 
         <!-- User area (desktop) -->
         <div class="relative hidden md:flex items-center">
-          @if (firebase.currentUser() && !firebase.isAdmin()) {
+          <!-- Every signed-in account gets the avatar, admin included. Admin used to be
+               excluded here and was not covered by the Entrar branch either, so it had no
+               sign-in indicator and no way to sign out. -->
+          @if (firebase.currentUser()) {
             <!-- Avatar button -->
             <button (click)="toggleDropdown()"
               class="w-8 h-8 rounded-full bg-capoeira-gold text-capoeira-night text-sm font-bold flex items-center justify-center hover:bg-amber-400 transition-colors shadow-sm"
@@ -76,12 +79,23 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
                 <!-- User info -->
                 <div class="px-4 py-3 border-b border-stone-100 dark:border-stone-700">
                   <p class="text-sm font-semibold text-stone-800 dark:text-stone-100 truncate">
-                    {{ firebase.currentUser()?.displayName || 'Usuário' }}
+                    {{ firebase.isAdmin() ? 'Administrador' : (firebase.currentUser()?.displayName || 'Usuário') }}
                   </p>
                   <p class="text-xs text-stone-400 truncate">{{ firebase.currentUser()?.email }}</p>
                 </div>
 
-                <!-- Membership row -->
+                <!-- Admin gets a way into the panel; everyone else the membership row. -->
+                @if (firebase.isAdmin()) {
+                  <div class="px-4 py-3 border-b border-stone-100 dark:border-stone-700 flex items-center justify-between gap-2">
+                    <span class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold bg-capoeira-gold/15 px-2 py-0.5 rounded-full shrink-0">
+                      Administrador
+                    </span>
+                    <a routerLink="/admin" (click)="closeDropdown()"
+                      class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline transition-colors">
+                      Abrir painel
+                    </a>
+                  </div>
+                } @else {
                 <div class="px-4 py-3 border-b border-stone-100 dark:border-stone-700 flex items-center justify-between gap-2">
                   @if (firebase.membershipActive()) {
                     <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full shrink-0">
@@ -99,6 +113,7 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
                     </a>
                   }
                 </div>
+                }
 
                 <!-- Sign out -->
                 <div class="px-4 py-2">
@@ -187,17 +202,18 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
                 Admin
               </a>
             }
-            @if (firebase.currentUser() && !firebase.isAdmin()) {
+            @if (firebase.currentUser()) {
               <!-- User info row -->
               <div class="flex items-center gap-2 px-3 py-2 border-t border-stone-100 dark:border-stone-700 mt-1 pt-2">
                 <span class="w-7 h-7 rounded-full bg-capoeira-gold/20 text-capoeira-brown dark:text-capoeira-gold text-xs font-bold flex items-center justify-center shrink-0">
                   {{ userInitial() }}
                 </span>
                 <span class="text-sm text-stone-600 dark:text-stone-300 truncate">
-                  {{ firebase.currentUser()?.displayName || firebase.currentUser()?.email }}
+                  {{ firebase.isAdmin() ? 'Administrador' : (firebase.currentUser()?.displayName || firebase.currentUser()?.email) }}
                 </span>
               </div>
-              <!-- Membership row -->
+              <!-- Membership row; admin already has its Admin link above. -->
+              @if (!firebase.isAdmin()) {
               <div class="flex items-center justify-between px-3 py-1">
                 @if (firebase.membershipActive()) {
                   <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
@@ -215,6 +231,7 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
                   </a>
                 }
               </div>
+              }
               <!-- Sign out -->
               <button (click)="signOut(); mobileOpen.set(false)"
                 class="px-3 py-2 text-xs text-stone-400 hover:text-red-500 transition-colors text-left w-full">

@@ -3,6 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../../core/services/data.service';
 import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/youtube-embed.component';
+import { SongCardComponent } from '../../../shared/components/song-card/song-card.component';
 
 const TEMPO_LABELS: Record<string, string> = {
   slow: 'Lento', medium: 'Médio', fast: 'Rápido', variable: 'Variável'
@@ -11,7 +12,7 @@ const TEMPO_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-toque-detail',
   standalone: true,
-  imports: [RouterLink, YoutubeEmbedComponent],
+  imports: [RouterLink, YoutubeEmbedComponent, SongCardComponent],
   template: `
     @if (toque()) {
       <div class="max-w-2xl space-y-8">
@@ -68,6 +69,24 @@ const TEMPO_LABELS: Record<string, string> = {
           </div>
         }
 
+        <!-- The songs sung to this toque. The song page's ritmo tag and "Ver todas" both
+             land here, and the toque list promises a count, so the list has to be here —
+             before the reading, since it is what those links came for. -->
+        <section aria-labelledby="toque-songs" class="space-y-3">
+          <h2 id="toque-songs" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">
+            Músicas · {{ songs().length }}
+          </h2>
+          @if (songs().length) {
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              @for (song of songs(); track song.id) {
+                <app-song-card [song]="song" />
+              }
+            </div>
+          } @else {
+            <p class="text-sm text-stone-400">Ainda não há músicas cadastradas para este toque.</p>
+          }
+        </section>
+
         <!-- Description -->
         <div class="bg-white dark:bg-stone-800 rounded-xl p-6 border border-stone-200 dark:border-stone-700 space-y-4">
           <div>
@@ -118,6 +137,10 @@ export class ToqueDetailComponent {
       if (toque) this.titleService.setTitle(`${toque.name} · Toques · Abadá Música`);
     });
   }
+  /** A to Z, so a long list is scannable; songs tagged with several toques appear under each. */
+  readonly songs = computed(() =>
+    [...(this.data.songsByToque().get(this.id()) ?? [])].sort((a, b) => a.title.localeCompare(b.title, 'pt')));
+
   demoVideos = computed(() => this.data.videosByToque().get(this.id()) ?? []);
 
   readonly hasVideos = computed(() =>

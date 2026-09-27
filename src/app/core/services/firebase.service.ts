@@ -141,30 +141,13 @@ export class FirebaseService {
 
   // ── Public user auth ──────────────────────────────────────────────────────
 
+  /** Google is the only way in for students: one flow, no password to set or forget.
+   *  The first sign-in creates the account (ensureUserDoc). The admin keeps its own
+   *  password sign-in above. */
   async signInWithGoogle(): Promise<void> {
     const sdk = await this.ready();
     const result = await sdk.a.signInWithPopup(sdk.auth, new sdk.a.GoogleAuthProvider());
     await this.ensureUserDoc(sdk, result.user);
-  }
-
-  async signInWithEmailPublic(email: string, password: string): Promise<void> {
-    const sdk = await this.ready();
-    const result = await sdk.a.signInWithEmailAndPassword(sdk.auth, email, password);
-    await this.ensureUserDoc(sdk, result.user);
-  }
-
-  async signUpWithEmailPublic(email: string, password: string, displayName: string): Promise<void> {
-    const sdk = await this.ready();
-    const result = await sdk.a.createUserWithEmailAndPassword(sdk.auth, email, password);
-    await sdk.a.updateProfile(result.user, { displayName });
-    await this.ensureUserDoc(sdk, result.user);
-  }
-
-  /** Sends Firebase's reset-password email. Only email-and-password accounts need it: a
-   *  Google account has no password to forget. */
-  async sendPasswordReset(email: string): Promise<void> {
-    const { auth, a } = await this.ready();
-    await a.sendPasswordResetEmail(auth, email);
   }
 
   private async ensureUserDoc({ db, f }: Sdk, user: User): Promise<void> {

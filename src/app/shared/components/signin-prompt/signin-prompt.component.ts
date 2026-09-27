@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FavoritesService } from '../../../core/services/favorites.service';
 
 /**
@@ -32,7 +32,7 @@ import { FavoritesService } from '../../../core/services/favorites.service';
             Entre na sua conta para guardar suas favoritas em qualquer aparelho e tocá-las em sequência em Minhas.
           </p>
           <div class="self-stretch flex flex-col gap-2 mt-1">
-            <a routerLink="/login" (click)="favorites.closePrompt()"
+            <a routerLink="/login" [queryParams]="{ returnUrl: router.url }" (click)="favorites.closePrompt()"
               class="h-12 rounded-xl bg-capoeira-gold text-capoeira-night font-bold flex items-center justify-center hover:bg-amber-400 transition-colors">
               Entrar para salvar
             </a>
@@ -48,4 +48,6 @@ import { FavoritesService } from '../../../core/services/favorites.service';
 })
 export class SigninPromptComponent {
   readonly favorites = inject(FavoritesService);
+  /** Signing in from here returns you to the song you were trying to favourite. */
+  readonly router = inject(Router);
 }

@@ -64,6 +64,17 @@ import { Song } from '../../core/models/song.model';
           }
         </section>
 
+      } @else if (firebase.pendingSignedIn()) {
+        <!-- Returning user, Firebase still loading: hold the space instead of asking
+             someone who is signed in to sign in. -->
+        <div aria-hidden="true" class="space-y-3">
+          <div class="h-4 w-28 rounded bg-stone-200 dark:bg-stone-800 animate-pulse"></div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+            <div class="h-28 rounded-2xl bg-stone-100 dark:bg-stone-800/60 animate-pulse"></div>
+            <div class="h-28 rounded-2xl bg-stone-100 dark:bg-stone-800/60 animate-pulse"></div>
+            <div class="h-28 rounded-2xl bg-stone-100 dark:bg-stone-800/60 animate-pulse"></div>
+          </div>
+        </div>
       } @else {
         <section class="rounded-xl border border-capoeira-gold/30 bg-capoeira-gold/5 dark:bg-capoeira-gold/10 p-5 space-y-2">
           <h2 class="text-sm font-bold text-capoeira-brown dark:text-capoeira-gold">Favoritas e aprendidas</h2>

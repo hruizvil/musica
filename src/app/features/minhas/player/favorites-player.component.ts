@@ -33,7 +33,9 @@ import { ActionBarComponent, ActionItem } from '../../../shared/components/actio
         }
       </div>
 
-      @if (!firebase.currentUser()) {
+      @if (!firebase.currentUser() && firebase.pendingSignedIn()) {
+        <div aria-hidden="true" class="h-64 rounded-xl bg-stone-100 dark:bg-stone-800/60 animate-pulse"></div>
+      } @else if (!firebase.currentUser()) {
         <div class="rounded-xl border border-capoeira-gold/30 bg-capoeira-gold/5 dark:bg-capoeira-gold/10 p-6 text-center space-y-3">
           <p class="text-sm text-stone-600 dark:text-stone-300">
             Entre na sua conta para guardar favoritas e tocá-las em sequência.

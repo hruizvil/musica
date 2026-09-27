@@ -6,6 +6,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   YT_CUED, YT_ENDED, YT_UNSTARTED, YtPlayer, formatTime, loadYouTubeApi, parseTime,
 } from './youtube-api';
+import { ActionBarComponent, ActionItem } from '../action-bar/action-bar.component';
 
 const LOOP_KEY = 'capoeira-video-loop';
 const START_KEY = 'capoeira-video-start';
@@ -14,6 +15,7 @@ const SPEED_KEY = 'capoeira-video-speed';
 @Component({
   selector: 'app-youtube-embed',
   standalone: true,
+  imports: [ActionBarComponent],
   template: `
     @if (resolvedId()) {
       <div class="relative w-full aspect-video rounded-lg overflow-hidden bg-capoeira-night
@@ -35,65 +37,53 @@ const SPEED_KEY = 'capoeira-video-speed';
       </div>
 
       @if (showControls()) {
-        <div class="no-print mt-2 flex flex-wrap items-center gap-2">
-
-          <!-- Loop switch -->
-          <button type="button" role="switch" (click)="toggleLoop()"
-            [attr.aria-checked]="loop()"
-            [title]="loop() ? 'A música vai repetir sem parar' : 'Repetir a música sem parar'"
-            class="inline-flex items-center gap-2.5 px-3 py-2 sm:py-1.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm transition-colors hover:border-capoeira-gold/50">
-            <span class="flex items-center gap-1.5 text-xs font-semibold transition-colors"
-              [class]="loop() ? 'text-capoeira-brown dark:text-capoeira-gold' : 'text-stone-500 dark:text-stone-400'">
-              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-              </svg>
-              Repetir sem parar
-            </span>
-            <span class="relative shrink-0 w-10 h-5 rounded-full transition-colors duration-200"
-              [class]="loop() ? 'bg-capoeira-gold' : 'bg-stone-300 dark:bg-stone-700'">
-              <span class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200"
-                [class]="loop() ? 'translate-x-5' : 'translate-x-0'"></span>
-            </span>
-          </button>
-
-          <!-- Start time -->
-          @if (!apiFailed()) {
-            <div class="inline-flex items-center gap-1.5 pl-3 pr-2 py-1 sm:py-0.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm">
-              <span class="text-xs font-semibold text-stone-500 dark:text-stone-400">Início</span>
-              <input #startInput type="text" inputmode="numeric"
-                [value]="startLabel()" (change)="onStartInput(startInput)"
-                aria-label="Tempo de início do loop (m:ss)"
-                title="Onde o loop recomeça — 0:00 por padrão"
-                class="w-12 py-1.5 bg-transparent text-xs font-semibold text-center text-capoeira-brown dark:text-capoeira-gold rounded-lg outline-none focus:ring-1 focus:ring-capoeira-gold/50" />
-              <button type="button" (click)="captureCurrentTime()"
-                title="Usar o tempo atual do vídeo como início"
-                class="px-2 py-2 sm:py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wide text-stone-400 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
-                Aqui
-              </button>
-              @if (startSeconds() > 0) {
-                <button type="button" (click)="setStart(0)" title="Voltar o início para 0:00"
-                  class="w-8 h-8 sm:w-7 sm:h-7 shrink-0 flex items-center justify-center rounded-full text-base leading-none text-stone-300 dark:text-stone-600 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
-                  ×
-                </button>
-              }
-            </div>
-
-            <!-- Playback speed -->
-            <div class="inline-flex items-center gap-1 pl-3 pr-1.5 py-1 sm:py-0.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm">
-              <span class="text-xs font-semibold text-stone-500 dark:text-stone-400 mr-0.5">Velocidade</span>
-              @for (rate of speedOptions; track rate) {
-                <button type="button" (click)="setSpeed(rate)"
-                  [attr.aria-pressed]="speed() === rate"
-                  [title]="'Reproduzir a ' + rate + 'x'"
-                  class="min-w-[34px] px-2 py-2 sm:py-1.5 rounded-lg text-[11px] font-bold transition-colors"
-                  [class]="speed() === rate
-                    ? 'bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold'
-                    : 'text-stone-400 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800'">
-                  {{ rate }}×
-                </button>
-              }
-            </div>
-          }
+        <!-- One right-aligned row — the same bar the song page uses — instead of the
+             three stacked rows of labelled controls this used to draw, which pushed the
+             content below the fold on a phone. Speed and the loop start sit behind the
+             clock so the row stays one row. -->
+        <div class="no-print mt-2">
+          <app-action-bar [actions]="controlActions()" ariaLabel="Controles do vídeo" (triggered)="onControl($event)">
+            @if (panelOpen() && !apiFailed()) {
+              <button type="button" (click)="panelOpen.set(false)" aria-label="Fechar velocidade"
+                class="fixed inset-0 z-40 cursor-default"></button>
+              <div class="absolute right-0 top-12 z-50 w-64 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-xl p-3 space-y-3">
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-widest text-stone-400 mb-1.5">Velocidade</p>
+                  <div class="flex gap-1.5">
+                    @for (rate of speedOptions; track rate) {
+                      <button type="button" (click)="setSpeed(rate)"
+                        [attr.aria-pressed]="speed() === rate"
+                        class="flex-1 h-11 rounded-lg text-xs font-bold transition-colors"
+                        [class]="speed() === rate
+                          ? 'bg-capoeira-gold/15 text-capoeira-brown dark:text-capoeira-gold'
+                          : 'text-stone-500 hover:bg-stone-50 dark:hover:bg-stone-800'">
+                        {{ rate }}×
+                      </button>
+                    }
+                  </div>
+                </div>
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-widest text-stone-400 mb-1.5">Início do loop</p>
+                  <div class="flex items-center gap-1.5">
+                    <input #startInput type="text" inputmode="numeric"
+                      [value]="startLabel()" (change)="onStartInput(startInput)"
+                      aria-label="Tempo de início do loop (m:ss)"
+                      class="w-16 h-11 bg-transparent border border-stone-200 dark:border-stone-700 rounded-lg text-xs font-semibold text-center text-capoeira-brown dark:text-capoeira-gold outline-none focus:ring-1 focus:ring-capoeira-gold/50" />
+                    <button type="button" (click)="captureCurrentTime()"
+                      class="h-11 px-3 rounded-lg text-[11px] font-bold uppercase tracking-wide text-stone-500 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
+                      Aqui
+                    </button>
+                    @if (startSeconds() > 0) {
+                      <button type="button" (click)="setStart(0)" aria-label="Voltar o início para 0:00" title="Voltar o início para 0:00"
+                        class="w-11 h-11 shrink-0 flex items-center justify-center rounded-full text-stone-400 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
+                        ×
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </app-action-bar>
         </div>
       }
     } @else {
@@ -109,6 +99,31 @@ export class YoutubeEmbedComponent implements OnDestroy {
   videoId = input.required<string>();
   title = input<string>('YouTube video');
   showControls = input<boolean>(true);
+
+  /** The speed / loop-start popover behind the clock button. */
+  readonly panelOpen = signal(false);
+
+  readonly controlActions = computed<ActionItem[]>(() => {
+    const items: ActionItem[] = [{
+      id: 'loop', label: 'Repetir sem parar', icon: 'loop',
+      active: this.loop(), state: this.loop() ? 'sim' : 'não',
+    }];
+    // The plain-iframe fallback cannot change speed or start time, so it only loops.
+    if (!this.apiFailed()) {
+      items.push({
+        id: 'speed', label: 'Velocidade e início do loop', icon: 'clock',
+        badge: this.speed() + '×',
+        active: this.speed() !== 1 || this.startSeconds() > 0,
+        state: this.speed() + '× · início ' + this.startLabel(),
+      });
+    }
+    return items;
+  });
+
+  onControl(id: string): void {
+    if (id === 'loop') this.toggleLoop();
+    else if (id === 'speed') this.panelOpen.update(open => !open);
+  }
 
   private readonly host = viewChild<ElementRef<HTMLElement>>('host');
   private player: YtPlayer | null = null;

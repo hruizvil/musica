@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FirebaseService } from '../../core/services/firebase.service';
 
 /** Firebase throws FirebaseError, but a catch is typed unknown and anything at all can
@@ -74,14 +74,26 @@ function authErrorCode(e: unknown): string {
               class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
           </div>
           <div class="space-y-1.5">
-            <label for="login-password" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Senha</label>
+            <div class="flex items-center justify-between">
+              <label for="login-password" class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Senha</label>
+              <!-- Email accounts only: Google sign-in has no password to forget. -->
+              @if (mode === 'login') {
+                <button type="button" (click)="resetPassword()" [disabled]="loading"
+                  class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline py-2 -my-2 disabled:opacity-50">
+                  Esqueci minha senha
+                </button>
+              }
+            </div>
             <input type="password" id="login-password" [(ngModel)]="password" name="password"
               placeholder="••••••••"
               class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-capoeira-gold" />
           </div>
 
           @if (error) {
-            <p class="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">{{ error }}</p>
+            <p role="alert" class="text-sm text-red-600 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">{{ error }}</p>
+          }
+          @if (notice) {
+            <p role="status" class="text-sm text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 rounded-lg">{{ notice }}</p>
           }
 
           <button type="submit" [disabled]="loading || !email || !password"
@@ -97,16 +109,51 @@ function authErrorCode(e: unknown): string {
 export class LoginComponent {
   private fb = inject(FirebaseService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   mode: 'login' | 'signup' = 'login';
   email = '';
   password = '';
   displayName = '';
   error = '';
+  notice = '';
   loading = false;
 
   constructor() {
-    if (this.fb.currentUser()) this.router.navigate(['/']);
+    // Checked after Firebase reports in. Checking straight away read null for everyone,
+    // because the SDK loads a beat after the page, so a signed-in visitor was never sent on.
+    void this.fb.waitForAuthReady().then(() => {
+      if (this.fb.currentUser()) this.goOn();
+    });
+  }
+
+  /** Back to the page that sent you here — the song you were trying to favourite, say —
+   *  or home. Only same-site paths: a returnUrl is anyone's to write into a link. */
+  private goOn(): void {
+    const target = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/';
+    const safe = target.startsWith('/') && !target.startsWith('//') ? target : '/';
+    this.router.navigateByUrl(safe);
+  }
+
+  async resetPassword() {
+    this.error = '';
+    this.notice = '';
+    const email = this.email.trim();
+    if (!email) {
+      this.error = 'Digite seu email acima e toque em "Esqueci minha senha" de novo.';
+      return;
+    }
+    this.loading = true;
+    try {
+      await this.fb.sendPasswordReset(email);
+      // Worded the same whether or not the account exists, so this cannot be used to
+      // find out who has one.
+      this.notice = 'Se houver uma conta com esse email, enviamos um link para redefinir a senha.';
+    } catch (e: unknown) {
+      this.error = this.friendlyError(authErrorCode(e));
+    } finally {
+      this.loading = false;
+    }
   }
 
   async signInWithGoogle() {
@@ -114,7 +161,7 @@ export class LoginComponent {
     this.error = '';
     try {
       await this.fb.signInWithGoogle();
-      this.router.navigate(['/']);
+      this.goOn();
     } catch (e: unknown) {
       this.error = this.friendlyError(authErrorCode(e));
     } finally {
@@ -137,7 +184,7 @@ export class LoginComponent {
         }
         await this.fb.signUpWithEmailPublic(this.email, this.password, this.displayName);
       }
-      this.router.navigate(['/']);
+      this.goOn();
     } catch (e: unknown) {
       this.error = this.friendlyError(authErrorCode(e));
     } finally {
@@ -154,6 +201,8 @@ export class LoginComponent {
       'auth/email-already-in-use': 'Este email já está cadastrado.',
       'auth/weak-password': 'A senha deve ter pelo menos 6 caracteres.',
       'auth/invalid-email': 'Email inválido.',
+      'auth/missing-email': 'Digite seu email.',
+      'auth/too-many-requests': 'Muitas tentativas. Espere um pouco e tente de novo.',
       'auth/popup-closed-by-user': 'Login cancelado.',
       'auth/cancelled-popup-request': 'Login cancelado.',
     };

@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal, OnInit } from '@angular/core';
+import { Component, inject, computed, signal, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
 import { SongCardComponent } from '../../shared/components/song-card/song-card.component';
@@ -113,7 +113,7 @@ interface InstallPromptEvent extends Event {
     <section class="mb-10">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-display text-lg font-bold text-stone-800 dark:text-stone-100 border-l-4 border-capoeira-gold pl-4">Últimas adicionadas</h2>
-        <a routerLink="/musicas" class="text-xs text-capoeira-gold hover:underline font-medium py-2 -my-2">Ver todas →</a>
+        <a routerLink="/musicas" class="inline-flex items-center min-h-[44px] -my-3 text-xs text-capoeira-gold hover:underline font-medium">Ver todas →</a>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3">
         @for (song of data.recentSongs(); track song.id) {
@@ -172,7 +172,7 @@ interface InstallPromptEvent extends Event {
     }
   `,
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   data = inject(DataService);
 
   showInstall = signal(false);
@@ -187,15 +187,7 @@ export class HomeComponent implements OnInit {
       this.isIOS.set(true);
       this.showInstall.set(true);
     }
-    window.addEventListener('beforeinstallprompt', (e: Event) => {
-      e.preventDefault();
-      // Keep the prompt either way, so installApp() still works if we ever offer it.
-      this.deferredPrompt = e as InstallPromptEvent;
-      // Chromium fires this on desktop Chrome and Edge too, where the app installs to
-      // its own window and there is no home screen — everything this card says would
-      // be wrong. Desktop users who do want it still get Chrome's address-bar install.
-      if (this.isPhoneSized()) this.showInstall.set(true);
-    });
+    window.addEventListener('beforeinstallprompt', this.onInstallPrompt);
   }
 
   /** The same breakpoint styles.css treats as a phone, so the two agree. The iOS
@@ -203,6 +195,23 @@ export class HomeComponent implements OnInit {
    *  and an iPhone held sideways is wider than this. */
   private isPhoneSized(): boolean {
     return window.matchMedia('(max-width: 767px)').matches;
+  }
+
+  /** A field, not an inline arrow, so ngOnDestroy can hand the same function back to
+   *  removeEventListener. Inline, a new listener stayed attached to window on every visit
+   *  to Home, each one holding on to a destroyed page. */
+  private readonly onInstallPrompt = (e: Event) => {
+    e.preventDefault();
+    // Keep the prompt either way, so installApp() still works if we ever offer it.
+    this.deferredPrompt = e as InstallPromptEvent;
+    // Chromium fires this on desktop Chrome and Edge too, where the app installs to
+    // its own window and there is no home screen — everything this card says would
+    // be wrong. Desktop users who do want it still get Chrome's address-bar install.
+    if (this.isPhoneSized()) this.showInstall.set(true);
+  };
+
+  ngOnDestroy(): void {
+    window.removeEventListener('beforeinstallprompt', this.onInstallPrompt);
   }
 
   dismissInstall() {

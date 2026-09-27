@@ -19,6 +19,27 @@ interface Sdk {
   f: FirestoreModule;
 }
 
+/** Remembers across visits whether someone was signed in, so the header can make a good
+ *  guess in the second or two before Firebase has loaded and can say for sure. */
+const SIGNED_IN_HINT = 'capoeira-signed-in';
+
+function readSignedInHint(): boolean {
+  try {
+    return localStorage.getItem(SIGNED_IN_HINT) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeSignedInHint(signedIn: boolean): void {
+  try {
+    if (signedIn) localStorage.setItem(SIGNED_IN_HINT, '1');
+    else localStorage.removeItem(SIGNED_IN_HINT);
+  } catch {
+    // storage unavailable — the guess just falls back to "signed out"
+  }
+}
+
 export interface SongOverride {
   title?: string;
   toque?: string[];
@@ -52,6 +73,15 @@ export class FirebaseService {
   readonly learnedSongs = signal<Set<string>>(new Set());
   readonly isAdmin = computed(() => this.currentUser()?.email === environment.adminEmail);
 
+  /** True once Firebase has reported who is signed in, if anyone. Until then currentUser()
+   *  is null for everyone, which is not the same as signed out. */
+  readonly authReady = signal(false);
+  /** The guess to use before authReady: signed in last time. Lets a signed-in visitor see
+   *  a placeholder rather than "Entrar" while Firebase loads. */
+  readonly likelySignedIn = signal(readSignedInHint());
+  /** Signed in as far as anyone can tell yet: known, or strongly suspected. */
+  readonly pendingSignedIn = computed(() => !this.authReady() && this.likelySignedIn());
+
   constructor() {
     // Warm it once the first paint is out of the way, so a signed-in user's header and
     // favourites appear on their own rather than waiting for something to touch them.
@@ -77,6 +107,9 @@ export class FirebaseService {
     // must never await ready(), which is the promise this function is still settling.
     a.onAuthStateChanged(sdk.auth, async user => {
       this.currentUser.set(user);
+      this.authReady.set(true);
+      this.likelySignedIn.set(!!user);
+      writeSignedInHint(!!user);
       // Every signed-in account keeps favourites, admin included — admin used to be
       // skipped here, which is why its heart never showed.
       if (user) {
@@ -125,6 +158,13 @@ export class FirebaseService {
     const result = await sdk.a.createUserWithEmailAndPassword(sdk.auth, email, password);
     await sdk.a.updateProfile(result.user, { displayName });
     await this.ensureUserDoc(sdk, result.user);
+  }
+
+  /** Sends Firebase's reset-password email. Only email-and-password accounts need it: a
+   *  Google account has no password to forget. */
+  async sendPasswordReset(email: string): Promise<void> {
+    const { auth, a } = await this.ready();
+    await a.sendPasswordResetEmail(auth, email);
   }
 
   private async ensureUserDoc({ db, f }: Sdk, user: User): Promise<void> {

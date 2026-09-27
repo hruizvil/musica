@@ -1,11 +1,9 @@
 import { Component, inject, computed } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { Collection, SearchService } from '../../../core/services/search.service';
 import { DataService } from '../../../core/services/data.service';
 import { FirebaseService } from '../../../core/services/firebase.service';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { SongCardComponent } from '../../../shared/components/song-card/song-card.component';
-import { Song } from '../../../core/models/song.model';
 import { Toque } from '../../../core/models/toque.model';
 
 // Same order as the Toques page: Abadá first, Outros last.
@@ -18,7 +16,7 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-song-list',
   standalone: true,
-  imports: [RouterLink, SearchBarComponent, SongCardComponent],
+  imports: [SearchBarComponent, SongCardComponent],
   template: `
     <div class="space-y-6">
       <div>
@@ -36,7 +34,7 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
           <select
             [value]="search.activeToqueFilter() ?? ''"
             (change)="search.activeToqueFilter.set($any($event.target).value || null)"
-            class="text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-3 py-1.5 text-stone-600 dark:text-stone-300 focus:outline-none focus:border-capoeira-gold cursor-pointer shadow-sm">
+            class="text-sm bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-3 py-1.5 min-h-[44px] sm:min-h-0 text-stone-600 dark:text-stone-300 focus:outline-none focus:border-capoeira-gold cursor-pointer shadow-sm">
             <option value="">Todos os toques</option>
             @for (group of groupedToques(); track group.label) {
               <optgroup [label]="group.label">
@@ -57,7 +55,7 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
               @for (option of collections; track option.value) {
                 <button type="button" (click)="search.activeCollection.set(option.value)"
                   [attr.aria-pressed]="search.activeCollection() === option.value"
-                  class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors"
+                  class="min-h-[44px] sm:min-h-0 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors"
                   [class]="search.activeCollection() === option.value
                     ? 'bg-capoeira-gold/10 border-capoeira-gold text-capoeira-brown dark:text-capoeira-gold'
                     : 'bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:border-capoeira-gold/50'">
@@ -81,17 +79,7 @@ const TOQUE_CATEGORY_LABELS: Record<string, string> = {
       <!-- Song grid -->
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
         @for (song of search.filteredSongs(); track song.id) {
-          @if (isAccessible(song)) {
-            <app-song-card [song]="song" />
-          } @else {
-            <div class="flex flex-col gap-2 p-3 sm:p-4 rounded-2xl bg-stone-50 dark:bg-stone-900/50 border border-stone-100 dark:border-stone-800 cursor-default opacity-70">
-              <span class="text-[15px] font-bold text-stone-500 dark:text-stone-500 leading-snug line-clamp-2">{{ song.title }}</span>
-              <a routerLink="/membership"
-                 class="text-xs text-capoeira-gold hover:underline mt-auto opacity-100 cursor-pointer">
-                Seja Membro →
-              </a>
-            </div>
-          }
+          <app-song-card [song]="song" />
         } @empty {
           <p class="col-span-full text-center text-stone-400 py-8">
             @switch (search.activeCollection()) {
@@ -133,10 +121,6 @@ export class SongListComponent {
       .filter(c => byCategory.has(c))
       .map(c => ({ label: TOQUE_CATEGORY_LABELS[c], toques: byCategory.get(c)! }));
   });
-
-  isAccessible(_song: Song): boolean {
-    return true;
-  }
 
   toqueName(id: string): string {
     return this.data.toqueById().get(id)?.name ?? id;

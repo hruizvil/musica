@@ -1,4 +1,5 @@
-import { Component, inject, input, computed } from '@angular/core';
+import { Component, effect, inject, input, computed } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../../core/services/data.service';
 import { YoutubeEmbedComponent } from '../../../shared/components/youtube-embed/youtube-embed.component';
@@ -107,6 +108,16 @@ export class ToqueDetailComponent {
   private data = inject(DataService);
 
   toque = computed(() => this.data.toqueById().get(this.id()));
+
+  private readonly titleService = inject(Title);
+
+  constructor() {
+    // Names the toque in the tab and history, as every other page now does.
+    effect(() => {
+      const toque = this.toque();
+      if (toque) this.titleService.setTitle(`${toque.name} · Toques · Abadá Música`);
+    });
+  }
   demoVideos = computed(() => this.data.videosByToque().get(this.id()) ?? []);
 
   readonly hasVideos = computed(() =>

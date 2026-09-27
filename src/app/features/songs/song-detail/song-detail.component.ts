@@ -1,4 +1,5 @@
-import { Component, inject, input, computed, signal, linkedSignal, viewChild } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, computed, signal, linkedSignal, viewChild } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../../core/services/data.service';
 import { FirebaseService } from '../../../core/services/firebase.service';
@@ -39,7 +40,7 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
 
         <!-- Breadcrumb -->
         <nav class="flex items-center gap-1.5 text-sm text-stone-400 mb-6 no-print">
-          <a routerLink="/musicas" class="py-1.5 -my-1.5 hover:text-capoeira-gold transition-colors">Músicas</a>
+          <a routerLink="/musicas" class="inline-flex items-center min-h-[44px] -my-3 hover:text-capoeira-gold transition-colors">Músicas</a>
           <span class="text-stone-300 dark:text-stone-600">›</span>
           <span class="text-stone-600 dark:text-stone-300 truncate max-w-[280px]">{{ song()!.title }}</span>
         </nav>
@@ -71,7 +72,7 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
               <div class="flex flex-wrap gap-2">
                 @for (t of song()!.toque; track t) {
                   <a [routerLink]="['/toques', t]"
-                     class="no-print px-3 py-1.5 rounded-full text-xs font-semibold bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold border border-capoeira-gold/20 hover:bg-capoeira-gold/20 transition-colors">
+                     class="no-print inline-flex items-center min-h-[44px] sm:min-h-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold border border-capoeira-gold/20 hover:bg-capoeira-gold/20 transition-colors">
                     RITMO: {{ toqueName(t).toUpperCase() }}
                   </a>
                 }
@@ -101,7 +102,7 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
                           @for (rate of p.speedOptions; track rate) {
                             <button type="button" (click)="p.setSpeed(rate)"
                               [attr.aria-pressed]="p.speed() === rate"
-                              class="flex-1 py-2 rounded-lg text-xs font-bold transition-colors"
+                              class="flex-1 h-11 rounded-lg text-xs font-bold transition-colors"
                               [class]="p.speed() === rate
                                 ? 'bg-capoeira-gold/15 text-capoeira-brown dark:text-capoeira-gold'
                                 : 'text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'">
@@ -116,14 +117,14 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
                           <input #startField type="text" inputmode="numeric"
                             [value]="p.startLabel()" (change)="p.onStartInput(startField)"
                             aria-label="Tempo de início do loop (m:ss)"
-                            class="w-16 py-2 bg-transparent border border-stone-200 dark:border-stone-700 rounded-lg text-xs font-semibold text-center text-capoeira-brown dark:text-capoeira-gold outline-none focus:ring-1 focus:ring-capoeira-gold/50" />
+                            class="w-16 h-11 bg-transparent border border-stone-200 dark:border-stone-700 rounded-lg text-xs font-semibold text-center text-capoeira-brown dark:text-capoeira-gold outline-none focus:ring-1 focus:ring-capoeira-gold/50" />
                           <button type="button" (click)="p.captureCurrentTime()"
-                            class="px-2.5 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wide text-stone-400 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
+                            class="h-11 px-3 rounded-lg text-[11px] font-bold uppercase tracking-wide text-stone-500 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
                             Aqui
                           </button>
                           @if (p.startSeconds() > 0) {
-                            <button type="button" (click)="p.setStart(0)" title="Voltar o início para 0:00"
-                              class="w-8 h-8 shrink-0 flex items-center justify-center rounded-full text-stone-300 dark:text-stone-600 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
+                            <button type="button" (click)="p.setStart(0)" aria-label="Voltar o início para 0:00" title="Voltar o início para 0:00"
+                              class="w-11 h-11 shrink-0 flex items-center justify-center rounded-full text-stone-300 dark:text-stone-600 hover:text-capoeira-gold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
                               ×
                             </button>
                           }
@@ -323,6 +324,31 @@ export class SongDetailComponent {
   readonly player = viewChild(YoutubeEmbedComponent);
 
   song = computed(() => this.data.songById().get(this.id()));
+
+  private readonly titleService = inject(Title);
+  private readonly meta = inject(Meta);
+
+  constructor() {
+    // The tab, bookmarks and history name the song, not the site. The description helps
+    // search engines, which run JavaScript; chat apps do not, and show the site card.
+    const defaultDescription = this.meta.getTag('name="description"')?.content ?? '';
+    effect(() => {
+      const song = this.song();
+      if (!song) return;
+      const toque = song.toque.length ? this.toqueName(song.toque[0]) : '';
+      this.titleService.setTitle(`${song.title} · Abadá Música`);
+      const description = `Letra${song.translation ? ' e tradução em inglês' : ''} de ${song.title}${toque ? ', toque ' + toque : ''}.`;
+      this.meta.updateTag({ name: 'description', content: description });
+      this.meta.updateTag({ property: 'og:title', content: song.title });
+      this.meta.updateTag({ property: 'og:description', content: description });
+    });
+    inject(DestroyRef).onDestroy(() => {
+      this.meta.updateTag({ name: 'description', content: defaultDescription });
+      this.meta.updateTag({ property: 'og:title', content: 'Abadá Música — Biblioteca musical da capoeira' });
+      this.meta.updateTag({ property: 'og:description', content: defaultDescription });
+      clearTimeout(this.sharedTimer);
+    });
+  }
 
   readonly speedPanelOpen = signal(false);
 

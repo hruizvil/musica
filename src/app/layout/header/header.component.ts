@@ -1,5 +1,7 @@
 import { Component, ElementRef, HostListener, effect, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs';
 import { ThemeService } from '../../core/services/theme.service';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { SearchBarComponent } from '../../shared/components/search-bar/search-bar.component';
@@ -84,7 +86,9 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
                   <p class="text-xs text-stone-400 truncate">{{ firebase.currentUser()?.email }}</p>
                 </div>
 
-                <!-- Admin gets a way into the panel; everyone else the membership row. -->
+                <!-- Admin gets a way into the panel. Membership is no longer sold, so
+                     nobody else is offered a plan — but anyone still subscribed from before
+                     keeps a way to manage or cancel it. -->
                 @if (firebase.isAdmin()) {
                   <div class="px-4 py-3 border-b border-stone-100 dark:border-stone-700 flex items-center justify-between gap-2">
                     <span class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold bg-capoeira-gold/15 px-2 py-0.5 rounded-full shrink-0">
@@ -95,24 +99,14 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
                       Abrir painel
                     </a>
                   </div>
-                } @else {
-                <div class="px-4 py-3 border-b border-stone-100 dark:border-stone-700 flex items-center justify-between gap-2">
-                  @if (firebase.membershipActive()) {
-                    <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full shrink-0">
-                      Membro ativo
-                    </span>
+                } @else if (firebase.membershipActive()) {
+                  <div class="px-4 py-3 border-b border-stone-100 dark:border-stone-700 flex items-center justify-between gap-2">
+                    <span class="text-xs text-stone-500 dark:text-stone-400">Assinatura antiga</span>
                     <button (click)="openPortal()" [disabled]="portalLoading()"
                       class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline disabled:opacity-50 transition-colors">
                       {{ portalLoading() ? 'Aguarde...' : 'Gerenciar assinatura' }}
                     </button>
-                  } @else {
-                    <span class="text-xs text-stone-400">Plano gratuito</span>
-                    <a routerLink="/membership" (click)="closeDropdown()"
-                      class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline transition-colors">
-                      Seja Membro
-                    </a>
-                  }
-                </div>
+                  </div>
                 }
 
                 <!-- Sign out -->
@@ -127,15 +121,32 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
             }
           }
           @if (!firebase.currentUser()) {
-            <a routerLink="/login"
-               class="text-sm font-semibold px-3 py-1.5 rounded-lg border border-capoeira-gold text-capoeira-gold hover:bg-capoeira-gold/10 transition-colors">
-              Entrar
-            </a>
+            <!-- Firebase loads a beat after the page. Until it has, someone who was
+                 signed in last visit sees a placeholder, not an "Entrar" that is about
+                 to turn into their avatar. -->
+            @if (firebase.pendingSignedIn()) {
+              <span aria-hidden="true" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-700 animate-pulse"></span>
+            } @else {
+              <a routerLink="/login" [queryParams]="loginParams()"
+                 class="text-sm font-semibold px-3 py-1.5 rounded-lg border border-capoeira-gold text-capoeira-gold hover:bg-capoeira-gold/10 transition-colors">
+                Entrar
+              </a>
+            }
           }
         </div>
 
+        <!-- Search on a phone. The header search is desktop-only, so from Home, a song or
+             Toques the only way to search used to be opening the menu. -->
+        <button type="button" (click)="toggleMobileSearch()"
+          class="md:hidden w-11 h-11 flex items-center justify-center rounded-md text-stone-500 hover:text-capoeira-brown dark:hover:text-capoeira-gold"
+          aria-label="Buscar" aria-controls="mobile-search" [attr.aria-expanded]="mobileSearchOpen()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="M21 21l-4-4"/>
+          </svg>
+        </button>
+
         <!-- Mobile menu button -->
-        <button (click)="mobileOpen.set(!mobileOpen())" class="md:hidden p-2 rounded-md text-stone-500"
+        <button (click)="mobileOpen.set(!mobileOpen())" class="md:hidden w-11 h-11 flex items-center justify-center rounded-md text-stone-500"
           aria-label="Menu" aria-controls="mobile-drawer" [attr.aria-expanded]="mobileOpen()">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -143,6 +154,11 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
         </button>
       </div>
 
+      @if (mobileSearchOpen()) {
+        <div id="mobile-search" class="md:hidden px-4 pb-3">
+          <app-search-bar />
+        </div>
+      }
     </header>
 
     <!-- Mobile drawer — always rendered so it can animate both ways; the inert attribute
@@ -212,25 +228,15 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
                   {{ firebase.isAdmin() ? 'Administrador' : (firebase.currentUser()?.displayName || firebase.currentUser()?.email) }}
                 </span>
               </div>
-              <!-- Membership row; admin already has its Admin link above. -->
-              @if (!firebase.isAdmin()) {
-              <div class="flex items-center justify-between px-3 py-1">
-                @if (firebase.membershipActive()) {
-                  <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
-                    Membro ativo
-                  </span>
+              <!-- Membership is no longer sold; an existing subscriber can still manage it. -->
+              @if (!firebase.isAdmin() && firebase.membershipActive()) {
+                <div class="flex items-center justify-between px-3 py-1">
+                  <span class="text-xs text-stone-500 dark:text-stone-400">Assinatura antiga</span>
                   <button (click)="openPortal(); mobileOpen.set(false)" [disabled]="portalLoading()"
                     class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline disabled:opacity-50">
                     {{ portalLoading() ? 'Aguarde...' : 'Gerenciar assinatura' }}
                   </button>
-                } @else {
-                  <span class="text-xs text-stone-400">Plano gratuito</span>
-                  <a routerLink="/membership" (click)="mobileOpen.set(false)"
-                    class="text-xs font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline">
-                    Seja Membro
-                  </a>
-                }
-              </div>
+                </div>
               }
               <!-- Sign out -->
               <button (click)="signOut(); mobileOpen.set(false)"
@@ -238,9 +244,9 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
                 Sair
               </button>
             }
-            @if (!firebase.currentUser()) {
-              <a routerLink="/login" (click)="mobileOpen.set(false)"
-                 class="px-3 py-2 rounded-md text-center text-capoeira-gold border border-capoeira-gold hover:bg-capoeira-gold/10 text-sm font-semibold">
+            @if (!firebase.currentUser() && !firebase.pendingSignedIn()) {
+              <a routerLink="/login" [queryParams]="loginParams()" (click)="mobileOpen.set(false)"
+                 class="px-3 py-3 rounded-md text-center text-capoeira-gold border border-capoeira-gold hover:bg-capoeira-gold/10 text-sm font-semibold">
                 Entrar
               </a>
             }
@@ -254,6 +260,23 @@ export class HeaderComponent {
   theme = inject(ThemeService);
   firebase = inject(FirebaseService);
   private el = inject(ElementRef);
+  private router = inject(Router);
+
+  readonly mobileSearchOpen = signal(false);
+
+  /** Brings you back to the page you were on after signing in. */
+  loginParams(): Record<string, string> {
+    const url = this.router.url;
+    return url.startsWith('/login') ? {} : { returnUrl: url };
+  }
+
+  toggleMobileSearch(): void {
+    this.mobileSearchOpen.update(open => !open);
+    if (this.mobileSearchOpen()) {
+      // Straight into typing: the row exists after this change detection pass.
+      setTimeout(() => (this.el.nativeElement as HTMLElement).querySelector<HTMLInputElement>('#mobile-search input')?.focus());
+    }
+  }
 
   mobileOpen = signal(false);
   dropdownOpen = signal(false);
@@ -286,6 +309,10 @@ export class HeaderComponent {
     effect(() => {
       document.body.style.overflow = this.mobileOpen() ? 'hidden' : '';
     });
+    // Picking a search result navigates; fold the phone search row away when it does.
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed())
+      .subscribe(() => this.mobileSearchOpen.set(false));
   }
 
   @HostListener('document:click', ['$event'])

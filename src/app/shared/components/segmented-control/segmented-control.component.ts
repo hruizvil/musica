@@ -19,7 +19,7 @@ export interface SegmentOption<T extends string = string> {
         <button type="button"
           [attr.aria-pressed]="value() === option.value"
           (click)="selected.emit(option.value)"
-          class="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+          class="min-h-[44px] sm:min-h-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
           [class]="value() === option.value
             ? 'bg-white dark:bg-stone-900 text-capoeira-brown dark:text-capoeira-gold shadow-sm'
             : 'text-stone-500 dark:text-stone-400 hover:text-capoeira-brown dark:hover:text-capoeira-gold'">

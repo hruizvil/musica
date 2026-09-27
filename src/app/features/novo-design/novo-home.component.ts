@@ -33,11 +33,11 @@ import { YoutubeEmbedComponent } from '../../shared/components/youtube-embed/you
         </div>
         @if (queue().length) {
           <a [routerLink]="['/novo/musicas', queue()[0].id]" [queryParams]="{ modo: 'praticar' }"
-             class="h-12 md:h-11 px-5 rounded-xl md:rounded-[10px] bg-[#2146d8] text-white text-base md:text-sm font-semibold inline-flex items-center justify-center gap-2 hover:bg-[#1733a8]">
+             class="shrink-0 whitespace-nowrap h-12 md:h-11 px-5 rounded-xl md:rounded-[10px] bg-[#2146d8] text-white text-base md:text-sm font-semibold inline-flex items-center justify-center gap-2 hover:bg-[#1733a8]">
             <app-novo-icon name="eye" [size]="18" /> Praticar a próxima
           </a>
         } @else if (!firebase.currentUser() && !firebase.pendingSignedIn()) {
-          <a routerLink="/novo/musicas" class="h-12 md:h-11 px-5 rounded-[10px] bg-[#2146d8] text-white font-semibold inline-flex items-center justify-center gap-2">Ver as cantigas</a>
+          <a routerLink="/novo/musicas" class="shrink-0 whitespace-nowrap h-12 md:h-11 px-5 rounded-[10px] bg-[#2146d8] text-white font-semibold inline-flex items-center justify-center gap-2">Ver as cantigas</a>
         }
       </div>
 

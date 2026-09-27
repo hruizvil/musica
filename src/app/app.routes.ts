@@ -15,6 +15,8 @@ export const routes: Routes = [
     loadComponent: () => import('./features/admin/admin.component').then(m => m.AdminComponent),
     canActivate: [authGuard],
   },
+  // New-design experiment, kept apart from the current site: its own shell and pages.
+  { path: 'novo', loadChildren: () => import('./features/novo-design/novo.routes').then(m => m.NOVO_ROUTES) },
   {
     path: '',
     component: ShellComponent,

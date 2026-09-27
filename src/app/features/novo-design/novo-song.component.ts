@@ -50,7 +50,7 @@ interface Line { words: Word[]; en: string }
         <div class="flex-1 min-w-0 w-full flex flex-col gap-5">
           <div class="flex flex-col gap-2">
             <div class="flex items-center gap-2 flex-wrap">
-              <a [routerLink]="['/novo/toques', s.toque[0]]" class="text-[13px] font-semibold text-[#2146d8] hover:underline">{{ toqueName() }}</a>
+              <a [routerLink]="['/novo/toques', s.toque[0]]" class="min-h-10 md:min-h-0 inline-flex items-center text-[13px] font-semibold text-[#2146d8] hover:underline">{{ toqueName() }}</a>
               <app-novo-tempo [toque]="toque()" />
               @if (learned() || inQueue()) { <app-novo-status [songId]="s.id" /> }
             </div>
@@ -166,7 +166,7 @@ interface Line { words: Word[]; en: string }
               @if (s.themes.length) {
                 <div class="flex flex-wrap gap-1.5">
                   @for (t of s.themes; track t) {
-                    <a routerLink="/novo/musicas" [queryParams]="{ q: t }" class="px-2 py-0.5 rounded-md bg-[#f6f7f9] border border-[#e3e6eb] text-xs text-[#434a5a] hover:border-[#2146d8]">{{ t }}</a>
+                    <a routerLink="/novo/musicas" [queryParams]="{ q: t }" class="min-h-9 md:min-h-0 inline-flex items-center px-2.5 md:px-2 py-0.5 rounded-md bg-[#f6f7f9] border border-[#e3e6eb] text-xs text-[#434a5a] hover:border-[#2146d8]">{{ t }}</a>
                   }
                 </div>
               }

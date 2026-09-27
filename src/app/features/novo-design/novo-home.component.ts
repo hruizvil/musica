@@ -82,7 +82,7 @@ import { YoutubeEmbedComponent } from '../../shared/components/youtube-embed/you
             <div class="h-full bg-[#0b7a55]" [style.width.%]="learnedPct()"></div>
           </div>
           @for (row of byToque(); track row.id) {
-            <a [routerLink]="['/novo/toques', row.id]" class="flex items-center justify-between text-sm text-[#434a5a] hover:text-[#2146d8]">
+            <a [routerLink]="['/novo/toques', row.id]" class="min-h-10 md:min-h-8 flex items-center justify-between gap-3 text-sm text-[#434a5a] hover:text-[#2146d8]">
               <span>{{ row.name }}</span><span class="n-mono text-[13px]">{{ row.learned }} / {{ row.total }}</span>
             </a>
           }
@@ -100,7 +100,7 @@ import { YoutubeEmbedComponent } from '../../shared/components/youtube-embed/you
               <div class="bg-white border border-[#e3e6eb] rounded-[14px] p-3 flex flex-col gap-3">
                 <app-youtube-embed [videoId]="v.youtubeId" [title]="v.title" [showControls]="false" />
                 <div class="flex items-center justify-between gap-2 px-1 pb-1">
-                  <a [routerLink]="['/novo/toques', v.toque]" class="text-[15px] font-semibold text-[#0f1115] hover:text-[#2146d8]">{{ v.title }}</a>
+                  <a [routerLink]="['/novo/toques', v.toque]" class="min-h-10 inline-flex items-center text-[15px] font-semibold text-[#0f1115] hover:text-[#2146d8]">{{ v.title }}</a>
                   <app-novo-tempo [toque]="data.toqueById().get(v.toque ?? '')" />
                 </div>
               </div>
@@ -120,7 +120,7 @@ import { YoutubeEmbedComponent } from '../../shared/components/youtube-embed/you
             <tbody>
               @for (song of recent(); track song.id) {
                 <tr class="border-t first:border-t-0 border-[#e3e6eb]">
-                  <td class="px-4 py-3"><a [routerLink]="['/novo/musicas', song.id]" class="text-sm font-semibold text-[#0f1115] hover:text-[#2146d8]">{{ song.title }}</a></td>
+                  <td class="px-4 py-1"><a [routerLink]="['/novo/musicas', song.id]" class="min-h-11 inline-flex items-center text-sm font-semibold text-[#0f1115] hover:text-[#2146d8]">{{ song.title }}</a></td>
                   <td class="px-4 py-3 text-sm text-[#434a5a] hidden sm:table-cell">{{ toqueName(song) }}</td>
                   <td class="px-4 py-3"><app-novo-status [songId]="song.id" /></td>
                   <td class="px-4 py-3 text-right n-mono text-xs text-[#5f6778] hidden sm:table-cell">{{ song.dateAdded }}</td>

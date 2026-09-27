@@ -34,10 +34,10 @@ type Lista = 'todas' | 'favoritas' | 'aprendidas' | 'pendentes';
                  class="flex-1 min-w-0 border-0 outline-none bg-transparent text-base md:text-sm text-[#0f1115]" />
         </label>
 
-        <div role="group" aria-label="Lista" class="flex gap-0.5 p-1 rounded-[10px] bg-[#eceef2] overflow-x-auto">
+        <div role="group" aria-label="Lista" class="grid grid-cols-2 sm:flex gap-0.5 p-1 rounded-[10px] bg-[#eceef2]">
           @for (opt of listas; track opt.id) {
             <button type="button" (click)="setParam('lista', opt.id === 'todas' ? '' : opt.id)" [attr.aria-pressed]="list() === opt.id"
-              class="shrink-0 h-9 md:h-8 px-3 rounded-lg text-[13px] font-semibold whitespace-nowrap"
+              class="h-10 sm:h-9 md:h-8 px-3 rounded-lg text-[13px] font-semibold whitespace-nowrap"
               [class]="list() === opt.id ? 'bg-white text-[#0f1115] shadow-[0_1px_2px_rgba(15,17,21,0.08)]' : 'text-[#5f6778]'">
               {{ opt.label }} <span class="n-mono font-normal">{{ counts()[opt.id] }}</span>
             </button>
@@ -66,8 +66,8 @@ type Lista = 'todas' | 'favoritas' | 'aprendidas' | 'pendentes';
           <a routerLink="/login" [queryParams]="{ returnUrl: '/novo/musicas?lista=' + list() }" class="h-10 px-4 rounded-[10px] bg-[#0f1115] text-white text-sm font-semibold inline-flex items-center justify-center">Entrar com Google</a>
         </div>
       } @else {
-        <!-- Desktop and tablet: the table. -->
-        <div class="hidden md:block bg-white border border-[#e3e6eb] rounded-[14px] overflow-hidden">
+        <!-- Wide screens: the table. -->
+        <div class="hidden lg:block bg-white border border-[#e3e6eb] rounded-[14px] overflow-hidden">
           <table class="w-full border-collapse">
             <caption class="sr-only">Cantigas</caption>
             <thead class="bg-[#fafbfc]">
@@ -113,8 +113,8 @@ type Lista = 'todas' | 'favoritas' | 'aprendidas' | 'pendentes';
           </table>
         </div>
 
-        <!-- Phone: the same rows as a list; the columns that matter stay. -->
-        <ul class="md:hidden m-0 p-0 list-none bg-white border border-[#e3e6eb] rounded-[14px] overflow-hidden">
+        <!-- Phones and tablets beside the sidebar: the same rows as a list; the columns that matter stay. -->
+        <ul class="lg:hidden m-0 p-0 list-none bg-white border border-[#e3e6eb] rounded-[14px] overflow-hidden">
           @for (song of rows(); track song.id) {
             <li class="relative flex items-center gap-2 pl-4 pr-1 py-2.5 border-t first:border-t-0 border-[#e3e6eb]">
               <a [routerLink]="['/novo/musicas', song.id]" class="flex-1 min-w-0 flex flex-col gap-1 after:absolute after:inset-0">

@@ -2,165 +2,161 @@ import { Component, DOCUMENT, ViewEncapsulation, computed, inject, signal } from
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
-import { DataService } from '../../core/services/data.service';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { FavoritesService } from '../../core/services/favorites.service';
 import { SigninPromptComponent } from '../../shared/components/signin-prompt/signin-prompt.component';
-import { NgTemplateOutlet } from '@angular/common';
+import { NovoThemeService } from './novo-theme.service';
+import { NovoPlayerService } from './novo-player.service';
+import { NovoPlayerComponent } from './novo-player.component';
 import { NovoIconComponent } from './novo-ui';
 
 const FONTS_ID = 'novo-design-fonts';
-const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap';
+const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Figtree:wght@400;500;600;700;800&display=swap';
 
 /**
- * The frame for the new-design experiment ("Estúdio") at /novo. It sits beside the
- * site's own shell, not inside it: nothing here changes the current site, and the current
- * header, theme and pages never appear in here. It reuses the site's data and account
- * services as they are, so favourites and "learned" are the same lists on both designs.
+ * The frame for the new design ("Abadá") at /novo. It sits beside the current site's shell,
+ * never inside it, and reuses the site's data and account services as they are, so
+ * Curtidas and Aprendidas are the same lists on both designs.
  *
- * Styles are unencapsulated but every rule is scoped under .novo, so they reach the pages
- * inside without leaking into the rest of the app.
+ * Colours are CSS variables set on the root for light or dark. Styles are unencapsulated
+ * but every rule is scoped under .novo, so nothing leaks into the current site.
  */
 @Component({
   selector: 'app-novo-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, SigninPromptComponent, NovoIconComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, SigninPromptComponent, NovoPlayerComponent, NovoIconComponent],
   encapsulation: ViewEncapsulation.None,
   styles: [`
-    .novo { font-family: 'Geist', system-ui, sans-serif; color: #0f1115; background: #f6f7f9; }
-    .novo .n-mono { font-family: 'Geist Mono', ui-monospace, monospace; }
-    .novo .n-label { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #5f6778; }
-    .novo a:focus-visible, .novo button:focus-visible, .novo input:focus-visible, .novo select:focus-visible, .novo [tabindex]:focus-visible {
-      outline: 2px solid #2146d8; outline-offset: 2px;
+    .novo {
+      --n-bg: #f6f5f1; --n-surf: #ffffff; --n-raise: #efede7; --n-line: #e2dfd6;
+      --n-tx: #15161a; --n-tx2: #50535c; --n-tx3: #6e717b; --n-acc: #ffc21a; --n-acc-tx: #8a6400;
+      font-family: 'Figtree', system-ui, sans-serif; color: var(--n-tx); background: var(--n-bg); color-scheme: light;
+    }
+    .novo.novo-dark {
+      --n-bg: #101114; --n-surf: #181a1f; --n-raise: #22252c; --n-line: #2d3038;
+      --n-tx: #f4f3ef; --n-tx2: #b4b6bd; --n-tx3: #8f929b; --n-acc: #ffc21a; --n-acc-tx: #ffc21a;
+      color-scheme: dark;
+    }
+    .novo .n-disp { font-family: 'Unbounded', system-ui, sans-serif; }
+    .novo a { color: inherit; }
+    .novo a:hover { text-decoration: underline; }
+    .novo a:focus-visible, .novo button:focus-visible, .novo input:focus-visible {
+      outline: 2px solid var(--n-acc); outline-offset: 2px;
     }
     @media print { .novo .no-print { display: none !important; } }
+    @media (prefers-reduced-motion: reduce) { .novo * { transition: none !important; } }
   `],
   template: `
-    <div class="novo min-h-screen md:flex">
+    <div class="novo min-h-screen flex flex-col" [class.novo-dark]="theme.dark()">
 
-      <!-- Desktop: the sidebar is the whole navigation. -->
-      <aside class="no-print hidden md:flex w-64 shrink-0 flex-col gap-1.5 px-3.5 py-5 bg-white border-r border-[#e3e6eb] sticky top-0 h-screen">
-        <a routerLink="/novo" class="flex items-center gap-2.5 px-2.5 pt-1 pb-4 text-[#0f1115]">
-          <span class="w-[30px] h-[30px] rounded-lg bg-[#0f1115] text-white flex items-center justify-center font-bold text-sm">A</span>
-          <span class="text-base font-bold tracking-tight">Abadá Música</span>
-        </a>
+      <header class="no-print sticky top-0 z-30 bg-[var(--n-surf)] border-b border-[var(--n-line)]">
+        <div class="max-w-[1440px] mx-auto h-[60px] md:h-[72px] flex items-center gap-4 md:gap-9 pl-[18px] pr-2 md:px-10">
+          <a routerLink="/novo" class="min-h-11 inline-flex items-center n-disp font-bold text-[17px] md:text-xl tracking-[-0.03em] hover:no-underline">abadá<span class="text-[var(--n-acc)]">.</span>música</a>
 
-        <a routerLink="/novo/musicas" [queryParams]="{ buscar: 1 }"
-           class="h-10 mb-3 px-3 rounded-[10px] border border-[#e3e6eb] bg-[#f6f7f9] flex items-center gap-2.5 text-sm text-[#5f6778] hover:border-[#c9ced8]">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-          Buscar
-        </a>
-
-        @for (item of mainNav; track item.link) {
-          <a [routerLink]="item.link" routerLinkActive="!bg-[#eef1fd] !text-[#2146d8] font-semibold" [routerLinkActiveOptions]="{ exact: item.exact }"
-             class="flex items-center gap-3 min-h-10 px-3 rounded-[10px] text-sm font-medium text-[#434a5a] hover:bg-[#f6f7f9]">
-            <app-novo-icon [name]="item.icon" />
-            {{ item.label }}
-            @if (item.count(); as n) {
-              <span class="ml-auto n-mono text-xs text-[#5f6778]">{{ n }}</span>
+          <nav aria-label="Principal" class="hidden md:flex gap-7 h-full">
+            @for (item of nav; track item.link) {
+              <a [routerLink]="item.link" routerLinkActive="!text-[var(--n-tx)] !border-[var(--n-acc)]" [routerLinkActiveOptions]="{ exact: item.exact }"
+                 class="h-full inline-flex items-center text-[15px] font-bold text-[var(--n-tx2)] border-b-[3px] border-transparent box-border hover:no-underline hover:text-[var(--n-tx)]">{{ item.label }}</a>
             }
-          </a>
-        }
+          </nav>
 
-        <p class="n-label px-3 pt-5 pb-1">Suas listas</p>
-        <a routerLink="/novo/musicas" [queryParams]="{ lista: 'favoritas' }"
-           class="flex items-center gap-3 min-h-10 px-3 rounded-[10px] text-sm font-medium text-[#434a5a] hover:bg-[#f6f7f9]">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
-          Fila de prática
-          <span class="ml-auto n-mono text-xs text-[#5f6778]">{{ firebase.favorites().size }}</span>
-        </a>
-        <a routerLink="/novo/musicas" [queryParams]="{ lista: 'aprendidas' }"
-           class="flex items-center gap-3 min-h-10 px-3 rounded-[10px] text-sm font-medium text-[#434a5a] hover:bg-[#f6f7f9]">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>
-          Aprendidas
-          <span class="ml-auto n-mono text-xs text-[#5f6778]">{{ firebase.learnedSongs().size }}</span>
-        </a>
+          <form role="search" (submit)="search($event, q.value)" class="hidden md:flex ml-auto">
+            <label class="w-[300px] h-[42px] px-3.5 rounded-[10px] bg-[var(--n-raise)] flex items-center gap-2.5 text-[var(--n-tx3)]">
+              <app-novo-icon name="search" [size]="17" />
+              <span class="sr-only">Buscar</span>
+              <input #q id="novo-search" type="search" placeholder="Cantiga, verso ou toque" class="flex-1 min-w-0 bg-transparent border-0 outline-none text-[15px] text-[var(--n-tx)] placeholder:text-[var(--n-tx3)]" />
+            </label>
+          </form>
 
-        <div class="mt-auto flex flex-col gap-3">
-          <a [href]="currentSiteUrl()" class="min-h-10 px-3 rounded-[10px] border border-dashed border-[#c9ced8] flex items-center justify-between text-sm font-medium text-[#434a5a] hover:border-[#2146d8] hover:text-[#2146d8]">
-            Ver no site atual <span aria-hidden="true">↗</span>
-          </a>
-          <div class="pt-3 border-t border-[#e3e6eb]">
-            <ng-container [ngTemplateOutlet]="account" />
+          <div class="hidden md:flex items-center gap-2 text-[13px] font-semibold text-[var(--n-tx2)]">
+            <span id="novo-theme-label">Escuro</span>
+            <button type="button" role="switch" (click)="theme.toggle()" [attr.aria-checked]="theme.dark()" aria-labelledby="novo-theme-label"
+              class="relative w-11 h-[26px] rounded-full transition-colors" [style.background]="theme.dark() ? 'var(--n-acc)' : 'var(--n-line)'">
+              <span class="absolute top-[3px] w-5 h-5 rounded-full transition-[left]" [style.left.px]="theme.dark() ? 21 : 3" [style.background]="theme.dark() ? '#1a1400' : '#ffffff'"></span>
+            </button>
+          </div>
+
+          <a [href]="currentSiteUrl()" class="hidden lg:inline-flex h-9 px-3 rounded-full border border-dashed border-[var(--n-line)] items-center text-[13px] font-semibold text-[var(--n-tx2)] whitespace-nowrap">Site atual ↗</a>
+
+          <div class="relative ml-auto md:ml-0 flex items-center gap-1">
+            <button type="button" (click)="theme.toggle()" class="md:hidden w-11 h-11 rounded-full flex items-center justify-center text-[var(--n-tx)]" [attr.aria-label]="theme.dark() ? 'Usar tema claro' : 'Usar tema escuro'">
+              <app-novo-icon [name]="theme.dark() ? 'sun' : 'moon'" [size]="20" />
+            </button>
+            <a routerLink="/novo/cantigas" [queryParams]="{ buscar: 1 }" class="md:hidden w-11 h-11 rounded-full flex items-center justify-center text-[var(--n-tx)]" aria-label="Buscar"><app-novo-icon name="search" [size]="21" /></a>
+            @if (firebase.currentUser(); as user) {
+              <button type="button" (click)="accountOpen.set(!accountOpen())" [attr.aria-expanded]="accountOpen()" [attr.aria-label]="'Conta: ' + (user.displayName || user.email)"
+                class="w-[38px] h-[38px] rounded-full bg-[var(--n-acc)] text-[#1a1400] font-extrabold flex items-center justify-center">{{ initial() }}</button>
+              @if (accountOpen()) {
+                <div class="absolute right-0 top-12 w-64 p-4 rounded-2xl bg-[var(--n-surf)] border border-[var(--n-line)] shadow-lg flex flex-col gap-3 z-50">
+                  <div class="min-w-0"><p class="m-0 font-bold truncate">{{ user.displayName || 'Sua conta' }}</p><p class="m-0 text-sm text-[var(--n-tx2)] truncate">{{ user.email }}</p></div>
+                  <a [href]="currentSiteUrl()" class="lg:hidden text-sm font-semibold">Ver no site atual ↗</a>
+                  <button type="button" (click)="signOut()" class="h-10 rounded-xl border border-[var(--n-line)] font-bold text-sm">Sair</button>
+                </div>
+              }
+            } @else if (firebase.pendingSignedIn()) {
+              <span aria-hidden="true" class="block w-[38px] h-[38px] rounded-full bg-[var(--n-raise)] animate-pulse"></span>
+            } @else {
+              <a routerLink="/login" [queryParams]="{ returnUrl: router.url }" class="h-10 px-4 rounded-xl bg-[var(--n-acc)] text-[#1a1400] text-sm font-extrabold inline-flex items-center hover:no-underline">Entrar</a>
+            }
           </div>
         </div>
-      </aside>
-
-      <!-- Phone: a slim top bar and a tab bar at the bottom, where thumbs are. -->
-      <header class="no-print md:hidden sticky top-0 z-40 h-[60px] flex items-center gap-2.5 pl-5 pr-2 bg-white border-b border-[#e3e6eb]">
-        <a routerLink="/novo" class="flex items-center gap-2.5 mr-auto text-[#0f1115]">
-          <span class="w-7 h-7 rounded-lg bg-[#0f1115] text-white flex items-center justify-center font-bold text-[13px]">A</span>
-          <span class="text-base font-bold">Abadá Música</span>
-        </a>
-        <a [href]="currentSiteUrl()" class="min-h-9 px-3 rounded-full border border-dashed border-[#c9ced8] flex items-center text-xs font-semibold text-[#434a5a]">Site atual ↗</a>
-        <a routerLink="/novo/musicas" [queryParams]="{ buscar: 1 }" aria-label="Buscar" class="w-11 h-11 flex items-center justify-center text-[#0f1115]">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-        </a>
       </header>
 
-      <main class="flex-1 min-w-0 pb-24 md:pb-0">
+      <main class="flex-1 min-w-0" [class]="player.current() ? 'pb-[180px] md:pb-28' : 'pb-24 md:pb-10'">
         <router-outlet />
       </main>
 
-      <nav aria-label="Principal" class="no-print md:hidden fixed inset-x-0 bottom-0 z-40 flex px-2 pt-1 pb-[max(env(safe-area-inset-bottom),12px)] bg-white border-t border-[#e3e6eb]">
-        @for (item of tabNav; track item.label) {
-          <a [routerLink]="item.link" [queryParams]="item.params" routerLinkActive="!text-[#2146d8]" [routerLinkActiveOptions]="{ exact: item.exact }"
-             class="flex-1 min-h-14 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-[#5f6778]">
-            <app-novo-icon [name]="item.icon" [size]="20" />
-            {{ item.label }}
+      <footer class="no-print hidden md:block border-t border-[var(--n-line)]" [class.md:mb-24]="!!player.current()">
+        <div class="max-w-[1440px] mx-auto px-10 py-6 flex items-center justify-between text-sm text-[var(--n-tx2)]">
+          <span><span class="n-disp font-bold text-[var(--n-tx)]">abadá.música</span> · novo design, em teste</span>
+          <a [href]="currentSiteUrl()" class="font-semibold text-[var(--n-acc-tx)]">Ver esta página no site atual</a>
+        </div>
+      </footer>
+
+      <nav aria-label="Principal" class="no-print md:hidden fixed inset-x-0 bottom-0 z-40 flex px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),14px)] bg-[var(--n-surf)] border-t border-[var(--n-line)]">
+        @for (item of tabs; track item.label) {
+          <a [routerLink]="item.link" routerLinkActive="!text-[var(--n-acc-tx)]" [routerLinkActiveOptions]="{ exact: item.exact }"
+             class="flex-1 min-h-[52px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold text-[var(--n-tx3)] hover:no-underline">
+            <app-novo-icon [name]="item.icon" [size]="22" />{{ item.label }}
           </a>
         }
       </nav>
 
-      <!-- The current site's own sign-in prompt: tapping a heart signed out opens it. -->
+      <app-novo-player />
+
+      <!-- The current site's sign-in prompt: tapping a heart signed out opens it. -->
       <app-signin-prompt />
 
       @if (favorites.toast(); as toast) {
-        <div role="status" class="no-print fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[75] flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-xl bg-[#0f1115] text-white shadow-lg whitespace-nowrap">
-          <span class="text-sm font-semibold">{{ toast.text === 'Salva nas favoritas' ? 'Na sua fila de prática' : (toast.text === 'Removida das favoritas' ? 'Fora da fila de prática' : toast.text) }}</span>
+        <div role="status" class="no-print fixed bottom-[190px] md:bottom-32 left-1/2 -translate-x-1/2 z-[75] flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-xl bg-[#15161a] text-white shadow-lg whitespace-nowrap">
+          <span class="text-sm font-semibold">{{ toastText(toast.text) }}</span>
           @if (toast.linkToLibrary) {
-            <a routerLink="/novo/musicas" [queryParams]="{ lista: 'favoritas' }" class="h-10 px-2 flex items-center text-sm font-bold text-[#9db1ff] hover:underline">Ver fila</a>
+            <a routerLink="/novo/curtidas" class="h-10 px-2 flex items-center text-sm font-bold text-[#ffc21a]">Ver curtidas</a>
           }
         </div>
       }
     </div>
-
-    <ng-template #account>
-      @if (firebase.currentUser(); as user) {
-        <div class="flex items-center gap-2.5 px-1">
-          <span class="w-8 h-8 shrink-0 rounded-full bg-[#eef1fd] text-[#2146d8] flex items-center justify-center font-bold text-[13px]">{{ initial() }}</span>
-          <span class="min-w-0 flex-1">
-            <span class="block text-sm font-semibold truncate">{{ user.displayName || user.email }}</span>
-            <button type="button" (click)="firebase.signOut()" class="text-xs text-[#5f6778] hover:text-[#0f1115] hover:underline">Sair</button>
-          </span>
-        </div>
-      } @else if (firebase.pendingSignedIn()) {
-        <span aria-hidden="true" class="block h-10 rounded-[10px] bg-[#eef0f3] animate-pulse"></span>
-      } @else {
-        <a routerLink="/login" [queryParams]="{ returnUrl: router.url }"
-           class="h-10 rounded-[10px] bg-[#2146d8] text-white text-sm font-semibold flex items-center justify-center">Entrar com Google</a>
-      }
-    </ng-template>
   `,
 })
 export class NovoShellComponent {
   readonly firebase = inject(FirebaseService);
   readonly favorites = inject(FavoritesService);
+  readonly theme = inject(NovoThemeService);
+  readonly player = inject(NovoPlayerService);
   readonly router = inject(Router);
-  private readonly data = inject(DataService);
   private readonly document = inject(DOCUMENT);
 
-  readonly mainNav = [
-    { label: 'Início', link: '/novo', exact: true, icon: 'home', count: () => 0 },
-    { label: 'Músicas', link: '/novo/musicas', exact: false, icon: 'list', count: () => this.data.songs().length },
-    { label: 'Toques', link: '/novo/toques', exact: false, icon: 'drum', count: () => this.data.toques().length },
+  readonly nav = [
+    { label: 'Início', link: '/novo', exact: true },
+    { label: 'Toques', link: '/novo/toques', exact: false },
+    { label: 'Cantigas', link: '/novo/cantigas', exact: false },
+    { label: 'Curtidas', link: '/novo/curtidas', exact: false },
   ];
-
-  readonly tabNav = [
-    { label: 'Início', link: '/novo', params: {}, exact: true, icon: 'home' },
-    { label: 'Músicas', link: '/novo/musicas', params: {}, exact: false, icon: 'list' },
-    { label: 'Toques', link: '/novo/toques', params: {}, exact: false, icon: 'drum' },
-    { label: 'Fila', link: '/novo/musicas', params: { lista: 'favoritas' }, exact: false, icon: 'heart' },
+  readonly tabs = [
+    { label: 'Início', link: '/novo', exact: true, icon: 'home' },
+    { label: 'Toques', link: '/novo/toques', exact: false, icon: 'drum' },
+    { label: 'Cantigas', link: '/novo/cantigas', exact: false, icon: 'note' },
+    { label: 'Curtidas', link: '/novo/curtidas', exact: false, icon: 'heart' },
   ];
 
   readonly accountOpen = signal(false);
@@ -170,8 +166,11 @@ export class NovoShellComponent {
     { initialValue: this.router.url },
   );
 
-  /** The same page on the current site, for comparing the two designs side by side. */
-  readonly currentSiteUrl = computed(() => this.url().split(/[?#]/)[0].replace(/^\/novo/, '') || '/');
+  /** The same page on the current site, for comparing the two designs. */
+  readonly currentSiteUrl = computed(() => {
+    const path = this.url().split(/[?#]/)[0].replace(/^\/novo/, '');
+    return path.replace(/^\/cantigas/, '/musicas').replace(/^\/curtidas/, '/minhas') || '/';
+  });
 
   readonly initial = computed(() => {
     const u = this.firebase.currentUser();
@@ -182,12 +181,28 @@ export class NovoShellComponent {
     // Loaded here rather than in index.html, so the current site never downloads them.
     if (!this.document.getElementById(FONTS_ID)) {
       const link = this.document.createElement('link');
-      link.id = FONTS_ID;
-      link.rel = 'stylesheet';
-      link.href = FONTS_HREF;
+      link.id = FONTS_ID; link.rel = 'stylesheet'; link.href = FONTS_HREF;
       this.document.head.appendChild(link);
     }
     this.router.events.pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed())
       .subscribe(() => this.accountOpen.set(false));
+  }
+
+  /** The shared favourites service speaks of "favoritas"; this design calls them curtidas. */
+  toastText(text: string): string {
+    if (text === 'Salva nas favoritas') return 'Salva nas curtidas';
+    if (text === 'Removida das favoritas') return 'Removida das curtidas';
+    return text;
+  }
+
+  search(event: Event, value: string): void {
+    event.preventDefault();
+    const q = value.trim();
+    void this.router.navigate(['/novo/cantigas'], { queryParams: q ? { q } : {} });
+  }
+
+  async signOut(): Promise<void> {
+    await this.firebase.signOut();
+    this.accountOpen.set(false);
   }
 }

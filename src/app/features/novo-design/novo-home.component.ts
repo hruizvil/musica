@@ -3,132 +3,84 @@ import { RouterLink } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { Song } from '../../core/models/song.model';
-import { NovoIconComponent, NovoStatusComponent, NovoTempoComponent } from './novo-ui';
-import { YoutubeEmbedComponent } from '../../shared/components/youtube-embed/youtube-embed.component';
+import { NovoPlayerService } from './novo-player.service';
+import { NovoCoverComponent, NovoIconComponent } from './novo-ui';
+import { NovoSongRowComponent, NovoToqueCardComponent } from './novo-parts';
+import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, seedOf, songColor } from './novo-data';
 
-/** Estúdio home: what to practise next, how far along you are, and the toques to hear. */
+/** Início: pick up where you were, your two lists, the toques by their pattern, what's new. */
 @Component({
   selector: 'app-novo-home',
   standalone: true,
-  imports: [RouterLink, NovoIconComponent, NovoStatusComponent, NovoTempoComponent, YoutubeEmbedComponent],
+  imports: [RouterLink, NovoCoverComponent, NovoIconComponent, NovoSongRowComponent, NovoToqueCardComponent],
   template: `
-    <div class="max-w-[1180px] mx-auto px-4 md:px-8 py-6 md:py-8 flex flex-col gap-6 md:gap-8">
+    <div class="max-w-[1360px] mx-auto px-4 md:px-10 py-5 md:py-8 flex flex-col gap-7 md:gap-9">
 
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div class="flex flex-col gap-1.5">
-          <p class="n-label hidden md:block">Início</p>
-          @if (firebase.currentUser()) {
-            <h1 class="m-0 text-3xl md:text-4xl font-semibold tracking-[-0.03em]">{{ greeting() }}, {{ firstName() }}.</h1>
-            <p class="m-0 text-[15px] text-[#5f6778]">
-              @if (queue().length) {
-                {{ queue().length === 1 ? 'Uma cantiga' : queue().length + ' cantigas' }} na sua fila de prática.
-              } @else {
-                Sua fila de prática está vazia. Toque no coração de uma cantiga para começar.
+      <div class="grid lg:grid-cols-[1.6fr_1fr_1fr] gap-3.5 md:gap-4">
+        @if (feature(); as f) {
+          <div class="grid grid-cols-[96px_minmax(0,1fr)] md:grid-cols-[168px_minmax(0,1fr)] gap-4 md:gap-6 p-3.5 md:p-5 rounded-[20px] bg-[var(--n-surf)] border border-[var(--n-line)]">
+            <app-novo-cover [color]="color(f.song)" [size]="96" [radius]="14" [seed]="seed(f.song)" class="md:hidden" />
+            <app-novo-cover [color]="color(f.song)" [title]="f.song.title" [label]="toqueName(f.song)" [size]="168" [radius]="14" [seed]="seed(f.song)" class="hidden md:block" />
+            <div class="min-w-0 flex flex-col gap-1.5 md:gap-2.5 justify-center">
+              <span class="text-[11px] md:text-xs font-extrabold tracking-[0.1em] uppercase text-[var(--n-acc-tx)]">{{ f.resume ? 'Continue de onde parou' : 'Comece por aqui' }}</span>
+              <a [routerLink]="['/novo/cantigas', f.song.id]" class="min-h-10 inline-flex items-center n-disp text-lg md:text-[28px] font-bold tracking-[-0.03em] leading-tight">{{ f.song.title }}</a>
+              @if (f.line; as line) {
+                <span class="text-sm md:text-[17px] text-[var(--n-tx)] truncate">“{{ line.pt }}”</span>
+                @if (line.en) { <span class="hidden md:block text-[15px] text-[var(--n-tx2)] truncate">{{ line.en }}</span> }
               }
-            </p>
-          } @else {
-            <h1 class="m-0 text-3xl md:text-4xl font-semibold tracking-[-0.03em]">Aprenda as cantigas da roda.</h1>
-            <p class="m-0 max-w-xl text-[15px] text-[#5f6778]">{{ data.songs().length }} cantigas com letra e tradução, {{ data.toques().length }} toques e um modo de prática para decorar a letra.</p>
-          }
-        </div>
-        @if (queue().length) {
-          <a [routerLink]="['/novo/musicas', queue()[0].id]" [queryParams]="{ modo: 'praticar' }"
-             class="shrink-0 whitespace-nowrap h-12 md:h-11 px-5 rounded-xl md:rounded-[10px] bg-[#2146d8] text-white text-base md:text-sm font-semibold inline-flex items-center justify-center gap-2 hover:bg-[#1733a8]">
-            <app-novo-icon name="eye" [size]="18" /> Praticar a próxima
-          </a>
-        } @else if (!firebase.currentUser() && !firebase.pendingSignedIn()) {
-          <a routerLink="/novo/musicas" class="shrink-0 whitespace-nowrap h-12 md:h-11 px-5 rounded-[10px] bg-[#2146d8] text-white font-semibold inline-flex items-center justify-center gap-2">Ver as cantigas</a>
+              <button type="button" (click)="playFeature(f.song)" class="self-start mt-1 h-10 md:h-11 px-4 md:px-[18px] rounded-xl bg-[var(--n-acc)] text-[#1a1400] inline-flex items-center gap-2 text-sm md:text-[15px] font-extrabold">
+                <app-novo-icon name="play" [size]="15" />{{ f.resume ? 'Continuar' : 'Tocar' }}
+              </button>
+            </div>
+          </div>
+        }
+
+        @for (list of lists(); track list.key) {
+          <div class="p-4 md:p-5 rounded-[20px] bg-[var(--n-surf)] border border-[var(--n-line)] flex flex-col gap-2.5">
+            <div class="flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-lg flex items-center justify-center text-white" [style.background]="list.color"><app-novo-icon [name]="list.icon" [size]="16" [filled]="list.icon === 'heart'" /></span>
+              <a routerLink="/novo/curtidas" [queryParams]="list.params" class="min-h-10 inline-flex items-center text-[17px] font-extrabold">{{ list.title }}</a>
+              <span class="ml-auto text-sm text-[var(--n-tx3)] tabular-nums">{{ list.songs.length }}</span>
+            </div>
+            @if (!firebase.currentUser() && !firebase.pendingSignedIn()) {
+              <p class="m-0 text-sm text-[var(--n-tx2)] leading-relaxed">{{ list.empty }}</p>
+              <a routerLink="/login" [queryParams]="{ returnUrl: '/novo' }" class="self-start h-10 px-4 rounded-xl border border-[var(--n-line)] inline-flex items-center text-sm font-bold hover:no-underline">Entrar com Google</a>
+            } @else if (list.songs.length) {
+              @for (s of list.songs.slice(0, 3); track s.id) {
+                <a [routerLink]="['/novo/cantigas', s.id]" class="flex items-center gap-3 py-1.5 border-t border-[var(--n-line)] hover:no-underline">
+                  <app-novo-cover [color]="color(s)" [size]="40" [radius]="8" [seed]="seed(s)" />
+                  <span class="flex-1 min-w-0 text-[15px] font-bold truncate">{{ s.title }}</span>
+                </a>
+              }
+              <button type="button" (click)="playAll(list.songs)" class="self-start mt-1 h-10 px-3.5 rounded-xl border border-[var(--n-line)] inline-flex items-center gap-2 text-sm font-bold">
+                <app-novo-icon name="play" [size]="13" />Tocar tudo
+              </button>
+            } @else {
+              <p class="m-0 text-sm text-[var(--n-tx2)] leading-relaxed">{{ list.none }}</p>
+            }
+          </div>
         }
       </div>
 
-      <div class="grid md:grid-cols-[2fr_1fr] gap-5 items-start">
-        <section class="flex flex-col gap-3" aria-labelledby="fila">
-          <div class="flex items-center justify-between">
-            <h2 id="fila" class="m-0 text-base font-semibold">Fila de prática</h2>
-            <a routerLink="/novo/musicas" [queryParams]="{ lista: 'favoritas' }" class="min-h-9 inline-flex items-center text-sm font-semibold text-[#2146d8]">Ver fila</a>
-          </div>
-          @if (queue().length) {
-            <div class="grid sm:grid-cols-3 gap-3">
-              @for (song of queue().slice(0, 3); track song.id; let i = $index) {
-                <div class="bg-white border border-[#e3e6eb] rounded-[14px] p-4 md:p-5 flex flex-col gap-3.5">
-                  <div class="flex items-center justify-between"><span class="n-mono text-xs text-[#5f6778]">#{{ i + 1 }} na fila</span><app-novo-status [songId]="song.id" /></div>
-                  <a [routerLink]="['/novo/musicas', song.id]" class="text-lg md:text-xl font-semibold tracking-[-0.01em] text-[#0f1115] hover:text-[#2146d8]">{{ song.title }}</a>
-                  <div class="flex items-center gap-2 flex-wrap"><span class="text-[13px] text-[#5f6778]">{{ toqueName(song) }}</span><app-novo-tempo [toque]="toqueOf(song)" /></div>
-                  <div class="flex gap-2 mt-auto">
-                    <a [routerLink]="['/novo/musicas', song.id]" [queryParams]="{ modo: 'praticar' }" class="h-10 md:h-9 px-3.5 rounded-[10px] bg-[#2146d8] text-white text-sm font-semibold inline-flex items-center gap-2"><app-novo-icon name="eye" [size]="16" />Praticar</a>
-                    <a [routerLink]="['/novo/musicas', song.id]" class="h-10 md:h-9 px-3.5 rounded-[10px] border border-[#e3e6eb] text-sm font-semibold inline-flex items-center text-[#0f1115]">Letra</a>
-                  </div>
-                </div>
-              }
-            </div>
-          } @else if (firebase.pendingSignedIn()) {
-            <div aria-hidden="true" class="h-44 rounded-[14px] bg-[#eef0f3] animate-pulse"></div>
-          } @else {
-            <div class="bg-white border border-dashed border-[#c9ced8] rounded-[14px] p-6 flex flex-col gap-3 items-start">
-              <p class="m-0 text-[15px] text-[#434a5a]">A fila é feita das cantigas que você marca com o coração. Elas aparecem aqui, na ordem em que você marcou.</p>
-              @if (!firebase.currentUser()) {
-                <a routerLink="/login" [queryParams]="{ returnUrl: '/novo' }" class="h-10 px-4 rounded-[10px] bg-[#0f1115] text-white text-sm font-semibold inline-flex items-center">Entrar com Google</a>
-              } @else {
-                <a routerLink="/novo/musicas" class="h-10 px-4 rounded-[10px] bg-[#0f1115] text-white text-sm font-semibold inline-flex items-center">Escolher cantigas</a>
-              }
-            </div>
-          }
-        </section>
-
-        <section class="bg-white border border-[#e3e6eb] rounded-[14px] p-5 flex flex-col gap-4" aria-labelledby="progresso">
-          <h2 id="progresso" class="n-label m-0 font-normal">Seu progresso</h2>
-          <p class="m-0 text-4xl font-semibold tracking-[-0.02em]">{{ learnedCount() }}<span class="text-lg text-[#5f6778] font-medium"> de {{ data.songs().length }} aprendidas</span></p>
-          <div class="h-2 rounded-full bg-[#f6f7f9] overflow-hidden" role="progressbar" [attr.aria-valuenow]="learnedCount()" aria-valuemin="0" [attr.aria-valuemax]="data.songs().length" aria-label="Cantigas aprendidas">
-            <div class="h-full bg-[#0b7a55]" [style.width.%]="learnedPct()"></div>
-          </div>
-          @for (row of byToque(); track row.id) {
-            <a [routerLink]="['/novo/toques', row.id]" class="min-h-10 md:min-h-8 flex items-center justify-between gap-3 text-sm text-[#434a5a] hover:text-[#2146d8]">
-              <span>{{ row.name }}</span><span class="n-mono text-[13px]">{{ row.learned }} / {{ row.total }}</span>
-            </a>
-          }
-          @if (!firebase.currentUser()) {
-            <p class="m-0 text-[13px] text-[#5f6778]">Entre para marcar as cantigas que já sabe.</p>
-          }
-        </section>
-      </div>
-
-      @if (videos().length) {
-        <section class="flex flex-col gap-3" aria-labelledby="toques-video">
-          <h2 id="toques-video" class="m-0 text-base font-semibold">Ouça os toques</h2>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            @for (v of videos(); track v.id) {
-              <div class="bg-white border border-[#e3e6eb] rounded-[14px] p-3 flex flex-col gap-3">
-                <app-youtube-embed [videoId]="v.youtubeId" [title]="v.title" [showControls]="false" />
-                <div class="flex items-center justify-between gap-2 px-1 pb-1">
-                  <a [routerLink]="['/novo/toques', v.toque]" class="min-h-10 inline-flex items-center text-[15px] font-semibold text-[#0f1115] hover:text-[#2146d8]">{{ v.title }}</a>
-                  <app-novo-tempo [toque]="data.toqueById().get(v.toque ?? '')" />
-                </div>
-              </div>
-            }
-          </div>
-        </section>
-      }
-
-      <section class="flex flex-col gap-3" aria-labelledby="recentes">
-        <div class="flex items-center justify-between">
-          <h2 id="recentes" class="m-0 text-base font-semibold">Adicionadas recentemente</h2>
-          <a routerLink="/novo/musicas" class="min-h-9 inline-flex items-center text-sm font-semibold text-[#2146d8]">Ver todas</a>
+      <section class="flex flex-col gap-4" aria-labelledby="toques-h">
+        <div class="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+          <h2 id="toques-h" class="m-0 n-disp text-2xl md:text-[28px] font-bold tracking-[-0.03em]">Toques</h2>
+          <span class="hidden sm:inline-flex gap-4 text-[13px] text-[var(--n-tx2)]"><span><b class="text-[var(--n-tx)]">dim</b> agudo</span><span><b class="text-[var(--n-tx)]">tch</b> chiado</span><span><b class="text-[var(--n-tx)]">dom</b> grave</span></span>
+          <a routerLink="/novo/toques" class="ml-auto min-h-10 inline-flex items-center text-[15px] font-bold text-[var(--n-acc-tx)]">Todos os {{ data.toques().length }} toques</a>
         </div>
-        <div class="bg-white border border-[#e3e6eb] rounded-[14px] overflow-hidden">
-          <table class="w-full border-collapse">
-            <caption class="sr-only">Cantigas adicionadas recentemente</caption>
-            <tbody>
-              @for (song of recent(); track song.id) {
-                <tr class="border-t first:border-t-0 border-[#e3e6eb]">
-                  <td class="px-4 py-1"><a [routerLink]="['/novo/musicas', song.id]" class="min-h-11 inline-flex items-center text-sm font-semibold text-[#0f1115] hover:text-[#2146d8]">{{ song.title }}</a></td>
-                  <td class="px-4 py-3 text-sm text-[#434a5a] hidden sm:table-cell">{{ toqueName(song) }}</td>
-                  <td class="px-4 py-3"><app-novo-status [songId]="song.id" /></td>
-                  <td class="px-4 py-3 text-right n-mono text-xs text-[#5f6778] hidden sm:table-cell">{{ song.dateAdded }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          @for (t of featuredToques(); track t.id) { <app-novo-toque-card [toque]="t" /> }
         </div>
+      </section>
+
+      <section class="flex flex-col gap-2" aria-labelledby="recent-h">
+        <div class="flex items-baseline justify-between mb-1.5">
+          <h2 id="recent-h" class="m-0 n-disp text-2xl md:text-[28px] font-bold tracking-[-0.03em]">Adicionadas recentemente</h2>
+          <a routerLink="/novo/cantigas" class="min-h-10 inline-flex items-center text-[15px] font-bold text-[var(--n-acc-tx)]">Todas</a>
+        </div>
+        @for (s of recent(); track s.id; let i = $index) {
+          <app-novo-song-row [song]="s" [n]="i + 1" [queue]="recentIds()" />
+        }
       </section>
     </div>
   `,
@@ -136,44 +88,53 @@ import { YoutubeEmbedComponent } from '../../shared/components/youtube-embed/you
 export class NovoHomeComponent {
   readonly data = inject(DataService);
   readonly firebase = inject(FirebaseService);
+  private player = inject(NovoPlayerService);
 
-  /** The practice queue is the favourites, in the order they were starred. */
-  readonly queue = computed<Song[]>(() => {
+  private songsFrom(ids: Set<string>): Song[] {
     const byId = this.data.songById();
-    return [...this.firebase.favorites()].map(id => byId.get(id)).filter((s): s is Song => !!s);
+    return [...ids].map(id => byId.get(id)).filter((s): s is Song => !!s);
+  }
+
+  readonly liked = computed(() => this.songsFrom(this.firebase.favorites()));
+  readonly learned = computed(() => this.songsFrom(this.firebase.learnedSongs()));
+
+  readonly lists = computed(() => [
+    { key: 'c', title: 'Curtidas', icon: 'heart', color: LIKED_COLOR, songs: this.liked(), params: {},
+      empty: 'Entre para guardar as cantigas que você curte e tocar todas em sequência.', none: 'Toque no coração de uma cantiga para guardá-la aqui.' },
+    { key: 'a', title: 'Aprendidas', icon: 'check', color: LEARNED_COLOR, songs: this.learned(), params: { lista: 'aprendidas' },
+      empty: 'Entre para marcar as cantigas que você já sabe cantar.', none: 'Abra uma cantiga e marque como aprendida quando souber.' },
+  ]);
+
+  /** What is playing, else the first curtida, else the newest song. Only the first is a real "resume". */
+  readonly feature = computed(() => {
+    const playing = this.player.currentSong();
+    if (playing) return { song: playing, resume: true, line: this.player.currentLine() };
+    const song = this.liked()[0] ?? this.recent()[0];
+    return song ? { song, resume: false, line: lyricLines(song)[0] ?? null } : null;
   });
 
-  readonly learnedCount = computed(() => {
-    const byId = this.data.songById();
-    return [...this.firebase.learnedSongs()].filter(id => byId.has(id)).length;
-  });
-  readonly learnedPct = computed(() => (this.data.songs().length ? (this.learnedCount() / this.data.songs().length) * 100 : 0));
-
-  /** Progress for the three toques with the most songs. */
-  readonly byToque = computed(() => {
-    const learned = this.firebase.learnedSongs();
-    return [...this.data.songsByToque().entries()]
-      .sort((a, b) => b[1].length - a[1].length)
-      .slice(0, 3)
-      .map(([id, songs]) => ({
-        id, name: this.data.toqueById().get(id)?.name ?? id,
-        total: songs.length, learned: songs.filter(s => learned.has(s.id)).length,
-      }));
+  /** Toques with a confirmed pattern first, then the ones with the most songs. */
+  readonly featuredToques = computed(() => {
+    const count = (id: string) => this.data.songsByToque().get(id)?.length ?? 0;
+    return [...this.data.toques()]
+      .sort((a, b) => (PATTERNS[b.id] ? 1 : 0) - (PATTERNS[a.id] ? 1 : 0) || count(b.id) - count(a.id))
+      .slice(0, 6);
   });
 
-  readonly videos = computed(() => this.data.videos().filter(v => !!v.toque));
   readonly recent = computed(() => [...this.data.songs()].sort((a, b) => b.dateAdded.localeCompare(a.dateAdded)).slice(0, 5));
+  readonly recentIds = computed(() => this.recent().map(s => s.id));
 
-  readonly firstName = computed(() => {
-    const u = this.firebase.currentUser();
-    return (u?.displayName || u?.email?.split('@')[0] || '').split(' ')[0];
-  });
+  color(s: Song): string { return songColor(s); }
+  seed(s: Song): number { return seedOf('song:' + s.id); }
+  toqueName(s: Song): string { return this.data.toqueById().get(s.toque[0])?.name ?? ''; }
 
-  readonly greeting = computed(() => {
-    const h = new Date().getHours();
-    return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
-  });
+  playFeature(song: Song): void {
+    if (this.player.isCurrentSong(song.id)) { this.player.toggle(); return; }
+    const inLiked = this.liked().some(s => s.id === song.id);
+    this.player.playSongs(inLiked ? this.liked().map(s => s.id) : [song.id], song.id);
+  }
 
-  toqueOf(song: Song) { return this.data.toqueById().get(song.toque[0]); }
-  toqueName(song: Song): string { return this.toqueOf(song)?.name ?? ''; }
+  playAll(songs: Song[]): void {
+    this.player.playSongs(songs.map(s => s.id));
+  }
 }

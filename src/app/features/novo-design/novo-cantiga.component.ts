@@ -7,7 +7,7 @@ import { FavoritesService } from '../../core/services/favorites.service';
 import { Song } from '../../core/models/song.model';
 import { NovoPlayerService } from './novo-player.service';
 import { NovoCoverComponent, NovoIconComponent } from './novo-ui';
-import { byTitle, lyricLines, seedOf, songColor } from './novo-data';
+import { TextRun, byTitle, emphasis, lyricLines, seedOf, songColor } from './novo-data';
 
 /**
  * A song. The lyrics are the page: each line with its translation beneath, and tapping a
@@ -19,7 +19,7 @@ import { byTitle, lyricLines, seedOf, songColor } from './novo-data';
   imports: [RouterLink, NovoCoverComponent, NovoIconComponent],
   template: `
     @if (song(); as s) {
-      <div class="max-w-[1360px] mx-auto px-4 md:px-10 py-5 md:py-9 grid lg:grid-cols-[300px_minmax(0,1fr)_320px] gap-6 lg:gap-12 items-start">
+      <div class="max-w-[1360px] mx-auto px-4 md:px-10 py-5 md:py-9 grid lg:grid-cols-[300px_minmax(0,1fr)] gap-6 lg:gap-x-12 lg:gap-y-6 items-start">
 
         <aside class="flex flex-col gap-4 min-w-0">
           <div class="flex lg:flex-col gap-4 items-center lg:items-stretch">
@@ -54,7 +54,7 @@ import { byTitle, lyricLines, seedOf, songColor } from './novo-data';
           </div>
         </aside>
 
-        <section class="min-w-0 flex flex-col gap-3" aria-labelledby="letra-h">
+        <section class="min-w-0 flex flex-col gap-3 lg:row-span-2" aria-labelledby="letra-h">
           <div class="flex items-center justify-between gap-3">
             <h2 id="letra-h" class="m-0 text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">Letra</h2>
             @if (s.translation) {
@@ -68,24 +68,28 @@ import { byTitle, lyricLines, seedOf, songColor } from './novo-data';
             }
           </div>
           @if (s.refrao) {
-            <div class="p-4 rounded-2xl bg-[var(--n-raise)] flex flex-col gap-1">
+            <div class="p-4 rounded-2xl bg-[var(--n-raise)] flex flex-col gap-2">
               <span class="text-xs font-extrabold tracking-[0.1em] uppercase text-[var(--n-acc-tx)]">Coro</span>
-              <p class="m-0 n-disp text-lg font-semibold whitespace-pre-line">{{ s.refrao }}</p>
-              @if (showEn() && s.refraoTranslation) { <p class="m-0 text-[15px] whitespace-pre-line text-[var(--n-tx2)]">{{ s.refraoTranslation }}</p> }
+              <div class="grid gap-x-8 gap-y-1" [class.md:grid-cols-2]="showEn() && !!s.refraoTranslation">
+                <p class="m-0 text-lg md:text-[19px] font-bold leading-snug whitespace-pre-line">{{ s.refrao }}</p>
+                @if (showEn() && s.refraoTranslation) {
+                  <p class="m-0 text-[15px] md:text-base leading-snug whitespace-pre-line text-[var(--n-tx2)]">@for (r of runs(s.refraoTranslation); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</p>
+                }
+              </div>
             </div>
           }
           <p class="m-0 text-[13px] text-[var(--n-tx3)]">Toque numa linha para acompanhar: ela aparece no player enquanto a música toca.</p>
           <ol class="m-0 p-0 list-none flex flex-col">
             @for (line of lines(); track $index; let i = $index) {
-              <li [class.mt-5]="line.stanzaStart">
+              <li [class.mt-4]="line.stanzaStart">
                 <button type="button" (click)="pick(i)" [attr.aria-current]="current() === i ? 'true' : null"
-                  class="w-full text-left py-2 px-3 md:px-4 -mx-3 md:-mx-4 rounded-xl transition-colors hover:bg-[var(--n-raise)]"
-                  [style.background]="current() === i ? 'var(--n-raise)' : ''">
-                  <span class="block n-disp tracking-[-0.03em] leading-[1.2]"
-                    [class]="current() === i ? 'text-[22px] md:text-[30px] font-bold' : 'text-xl md:text-[26px] font-semibold'"
-                    [style.color]="current() === null || i <= current()! ? 'var(--n-tx)' : 'var(--n-tx3)'">{{ line.pt }}</span>
+                  class="w-full text-left py-1.5 px-3 -mx-3 rounded-lg transition-colors hover:bg-[var(--n-raise)] grid gap-x-8 gap-y-0.5 items-baseline"
+                  [class.md:grid-cols-2]="showEn() && !!line.en"
+                  [style.background]="current() === i ? 'var(--n-raise)' : ''"
+                  [style.box-shadow]="current() === i ? 'inset 3px 0 0 var(--n-acc)' : ''">
+                  <span class="block text-[17px] md:text-[19px] font-bold leading-snug text-[var(--n-tx)]">{{ line.pt }}</span>
                   @if (showEn() && line.en) {
-                    <span class="block mt-1 text-[15px] md:text-[17px] font-semibold" [style.color]="current() === i ? 'var(--n-acc-tx)' : 'var(--n-tx3)'">{{ line.en }}</span>
+                    <span class="block text-[15px] md:text-[17px] leading-snug" [style.color]="current() === i ? 'var(--n-acc-tx)' : 'var(--n-tx2)'">@for (r of runs(line.en); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</span>
                   }
                 </button>
               </li>
@@ -93,7 +97,7 @@ import { byTitle, lyricLines, seedOf, songColor } from './novo-data';
           </ol>
         </section>
 
-        <aside class="flex flex-col gap-3.5 min-w-0">
+        <aside class="flex flex-col gap-3.5 min-w-0 lg:col-start-1 lg:row-start-2">
           @if (s.notes || s.themes.length) {
             <div class="p-5 rounded-[18px] bg-[var(--n-surf)] border border-[var(--n-line)] flex flex-col gap-2.5">
               <span class="text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">Sobre a cantiga</span>
@@ -171,6 +175,7 @@ export class NovoCantigaComponent implements OnDestroy {
 
   ngOnDestroy(): void { clearTimeout(this.shareTimer); }
 
+  runs(text: string): TextRun[] { return emphasis(text); }
   colorOf(s: Song): string { return songColor(s); }
   seedOf(s: Song): number { return seedOf('song:' + s.id); }
 

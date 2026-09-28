@@ -6,7 +6,7 @@ import { Song } from '../../core/models/song.model';
 import { NovoPlayerService } from './novo-player.service';
 import { NovoCoverComponent, NovoIconComponent } from './novo-ui';
 import { NovoSongRowComponent, NovoToqueCardComponent } from './novo-parts';
-import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, seedOf, songColor } from './novo-data';
+import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, plainText, seedOf, songColor } from './novo-data';
 
 /** Início: pick up where you were, your two lists, the toques by their pattern, what's new. */
 @Component({
@@ -26,7 +26,7 @@ import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, seedOf, songColor } f
               <a [routerLink]="['/novo/cantigas', f.song.id]" class="min-h-10 inline-flex items-center n-disp text-lg md:text-[28px] font-bold tracking-[-0.03em] leading-tight">{{ f.song.title }}</a>
               @if (f.line; as line) {
                 <span class="text-sm md:text-[17px] text-[var(--n-tx)] truncate">“{{ line.pt }}”</span>
-                @if (line.en) { <span class="hidden md:block text-[15px] text-[var(--n-tx2)] truncate">{{ line.en }}</span> }
+                @if (line.en) { <span class="hidden md:block text-[15px] text-[var(--n-tx2)] truncate">{{ plain(line.en) }}</span> }
               }
               <button type="button" (click)="playFeature(f.song)" class="self-start mt-1 h-10 md:h-11 px-4 md:px-[18px] rounded-xl bg-[var(--n-acc)] text-[#1a1400] inline-flex items-center gap-2 text-sm md:text-[15px] font-extrabold">
                 <app-novo-icon name="play" [size]="15" />{{ f.resume ? 'Continuar' : 'Tocar' }}
@@ -124,6 +124,7 @@ export class NovoHomeComponent {
   readonly recent = computed(() => [...this.data.songs()].sort((a, b) => b.dateAdded.localeCompare(a.dateAdded)).slice(0, 5));
   readonly recentIds = computed(() => this.recent().map(s => s.id));
 
+  plain(text: string): string { return plainText(text); }
   color(s: Song): string { return songColor(s); }
   seed(s: Song): number { return seedOf('song:' + s.id); }
   toqueName(s: Song): string { return this.data.toqueById().get(s.toque[0])?.name ?? ''; }

@@ -78,3 +78,17 @@ export function youTubeId(input: string | null | undefined): string | null {
   const m = s.match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([a-zA-Z0-9_-]{11})/);
   return m ? m[1] : null;
 }
+
+/**
+ * Translations mark Portuguese words kept as-is with asterisks (*roda*). Split a line into
+ * runs so those words render in italics instead of showing the asterisks.
+ */
+export interface TextRun { text: string; em: boolean; }
+export function emphasis(text: string): TextRun[] {
+  return text.split(/(\*[^*]+\*)/).filter(Boolean).map(part =>
+    part.length > 2 && part.startsWith('*') && part.endsWith('*') ? { text: part.slice(1, -1), em: true } : { text: part, em: false });
+}
+/** The same line with the asterisks dropped, for places that show plain text. */
+export function plainText(text: string): string {
+  return text.replace(/\*([^*]+)\*/g, '$1');
+}

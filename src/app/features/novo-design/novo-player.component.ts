@@ -4,7 +4,7 @@ import { FirebaseService } from '../../core/services/firebase.service';
 import { FavoritesService } from '../../core/services/favorites.service';
 import { NovoPlayerService } from './novo-player.service';
 import { NovoCoverComponent, NovoIconComponent } from './novo-ui';
-import { seedOf } from './novo-data';
+import { plainText, seedOf } from './novo-data';
 
 /**
  * The player that stays on screen: a strip along the bottom showing the line being sung
@@ -56,7 +56,7 @@ import { seedOf } from './novo-data';
             <a [routerLink]="['/novo/cantigas', item.songId]" class="min-w-0 flex flex-col gap-0.5 hover:no-underline">
               <span class="text-[13px] text-[var(--n-tx3)] truncate">{{ player.previousLine()?.pt || ' ' }}</span>
               <span class="n-disp text-xl font-semibold tracking-[-0.02em] text-[var(--n-tx)] truncate">{{ line.pt }}</span>
-              @if (line.en) { <span class="text-sm text-[var(--n-acc-tx)] truncate">{{ line.en }}</span> }
+              @if (line.en) { <span class="text-sm text-[var(--n-acc-tx)] truncate">{{ plain(line.en) }}</span> }
             </a>
           } @else {
             <span class="text-sm text-[var(--n-tx2)] truncate">{{ item.subtitle }}</span>
@@ -88,7 +88,7 @@ import { seedOf } from './novo-data';
             <span class="text-xs font-bold text-[var(--n-tx3)] truncate">{{ item.title }}</span>
             @if (player.currentLine(); as line) {
               <span class="n-disp text-[15px] font-semibold tracking-[-0.02em] text-[var(--n-tx)] truncate">{{ line.pt }}</span>
-              @if (line.en) { <span class="text-[13px] text-[var(--n-acc-tx)] truncate">{{ line.en }}</span> }
+              @if (line.en) { <span class="text-[13px] text-[var(--n-acc-tx)] truncate">{{ plain(line.en) }}</span> }
             } @else {
               <span class="text-[13px] text-[var(--n-tx2)] truncate">{{ item.videoId ? item.subtitle : 'Sem gravação ainda' }}</span>
             }
@@ -138,4 +138,5 @@ export class NovoPlayerComponent implements OnDestroy {
   }
 
   seed(key: string): number { return seedOf(key); }
+  plain(text: string): string { return plainText(text); }
 }

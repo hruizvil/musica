@@ -1,4 +1,4 @@
-import { Component, OnDestroy, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, OnDestroy, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
@@ -131,6 +131,8 @@ export class NovoToqueComponent implements OnDestroy {
     });
     // Moving to another toque stops the pattern that was playing.
     effect(() => { this.id(); this.stopPattern(); });
+    // One sound at a time: when the video starts, the synthesised pattern stops.
+    effect(() => { if (this.player.playing()) untracked(() => this.stopPattern()); });
   }
 
   ngOnDestroy(): void {

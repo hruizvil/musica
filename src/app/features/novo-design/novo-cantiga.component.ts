@@ -7,7 +7,7 @@ import { FavoritesService } from '../../core/services/favorites.service';
 import { Song } from '../../core/models/song.model';
 import { NovoPlayerService } from './novo-player.service';
 import { NovoCoverComponent, NovoIconComponent } from './novo-ui';
-import { TextRun, byTitle, emphasis, lyricLines, seedOf, songColor } from './novo-data';
+import { TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, seedOf, songColor } from './novo-data';
 
 /**
  * A song. The lyrics are the page: each line with its translation beneath, and tapping a
@@ -57,7 +57,7 @@ import { TextRun, byTitle, emphasis, lyricLines, seedOf, songColor } from './nov
         <section class="min-w-0 flex flex-col gap-3 lg:row-span-2" aria-labelledby="letra-h">
           <div class="flex items-center justify-between gap-3">
             <h2 id="letra-h" class="m-0 text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">Letra</h2>
-            @if (s.translation) {
+            @if (translated()) {
               <div class="flex items-center gap-2.5 text-sm font-bold">
                 <span id="trad-label">Tradução</span>
                 <button type="button" role="switch" (click)="showEn.set(!showEn())" [attr.aria-checked]="showEn()" aria-labelledby="trad-label"
@@ -67,7 +67,7 @@ import { TextRun, byTitle, emphasis, lyricLines, seedOf, songColor } from './nov
               </div>
             }
           </div>
-          @if (s.refrao) {
+          @if (s.refrao && !coroOnly()) {
             <div class="p-4 rounded-2xl bg-[var(--n-raise)] flex flex-col gap-2">
               <span class="text-xs font-extrabold tracking-[0.1em] uppercase text-[var(--n-acc-tx)]">Coro</span>
               <div class="grid gap-x-8 gap-y-1" [class.md:grid-cols-2]="showEn() && !!s.refraoTranslation">
@@ -78,7 +78,9 @@ import { TextRun, byTitle, emphasis, lyricLines, seedOf, songColor } from './nov
               </div>
             </div>
           }
-          <p class="m-0 text-[13px] text-[var(--n-tx3)]">Toque numa linha para acompanhar: ela aparece no player enquanto a música toca.</p>
+          @if (lines().length) {
+            <p class="m-0 text-[13px] text-[var(--n-tx3)]">{{ coroOnly() ? 'Esta cantiga tem só o coro. ' : '' }}Toque numa linha para acompanhar: ela aparece no player enquanto a música toca.</p>
+          }
           <ol class="m-0 p-0 list-none flex flex-col">
             @for (line of lines(); track $index; let i = $index) {
               <li [class.mt-4]="line.stanzaStart">
@@ -144,6 +146,8 @@ export class NovoCantigaComponent implements OnDestroy {
 
   readonly song = computed(() => this.data.songById().get(this.id()));
   readonly lines = computed(() => (this.song() ? lyricLines(this.song()!) : []));
+  readonly coroOnly = computed(() => !!this.song() && coroIsLyrics(this.song()!));
+  readonly translated = computed(() => !!this.song() && hasTranslation(this.song()!));
   readonly color = computed(() => (this.song() ? songColor(this.song()!) : '#374151'));
   readonly seed = computed(() => seedOf('song:' + this.id()));
   readonly toqueName = computed(() => this.data.toqueById().get(this.song()?.toque[0] ?? '')?.name ?? '');

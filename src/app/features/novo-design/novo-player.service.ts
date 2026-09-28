@@ -57,6 +57,8 @@ export class NovoPlayerService {
     return id ? this.data.songById().get(id) ?? null : null;
   });
   readonly lines = computed<LyricLine[]>(() => (this.currentSong() ? lyricLines(this.currentSong()!) : []));
+  /** Whether the video card is on screen: something with a video is loaded and not minimised. */
+  readonly videoShown = computed(() => !!this.current()?.videoId && !this.minimized());
   readonly currentLine = computed<LyricLine | null>(() => this.lines()[this.line()] ?? null);
   readonly previousLine = computed<LyricLine | null>(() => this.lines()[this.line() - 1] ?? null);
   readonly hasPrev = computed(() => this.index() > 0);
@@ -66,6 +68,8 @@ export class NovoPlayerService {
   private host: HTMLElement | null = null;
   private loadedId: string | null = null;
   private wantPlay = false;
+  /** Set when a new item starts, so the same video (a toque demo shared by two songs) plays again from the top. */
+  private restart = false;
   private ticker?: ReturnType<typeof setInterval>;
 
   // ── Starting playback ──
@@ -169,6 +173,7 @@ export class NovoPlayerService {
     this.line.set(0);
     this.minimized.set(false);
     this.wantPlay = true;
+    this.restart = true;
     this.sync();
   }
 
@@ -186,10 +191,16 @@ export class NovoPlayerService {
         this.loadedId = id;
         if (this.wantPlay) this.player.loadVideoById({ videoId: id });
         else this.player.cueVideoById({ videoId: id });
+      } else if (this.restart) {
+        // Same video as before: loading it again would do nothing, so start it by hand.
+        this.player.seekTo(0, true);
+        if (this.wantPlay) this.player.playVideo();
       }
+      this.restart = false;
       return;
     }
     const host = this.host;
+    this.restart = false;
     loadYouTubeApi().then(YT => {
       if (this.player || host !== this.host || !host.isConnected) return;
       this.loadedId = id;

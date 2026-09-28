@@ -55,12 +55,25 @@ export function stanzas(text: string | null | undefined): string[][] {
 /** Lyrics as a flat list of lines, each with its translation and where its stanza starts. */
 export interface LyricLine { pt: string; en: string; stanzaStart: boolean; }
 export function lyricLines(song: Song): LyricLine[] {
-  const pt = stanzas(song.lyrics); const en = stanzas(song.translation);
+  // A song entered with only its coro has no verses: the coro is then its whole lyrics.
+  const onlyCoro = coroIsLyrics(song);
+  const pt = stanzas(onlyCoro ? song.refrao : song.lyrics);
+  const en = stanzas(onlyCoro ? song.refraoTranslation : song.translation);
   return pt.flatMap((stanza, si) => stanza.map((line, li) => ({ pt: line, en: en[si]?.[li] ?? '', stanzaStart: li === 0 && si > 0 })));
 }
 
+/** True when the coro stands in for the lyrics, so pages don't show it twice. */
+export function coroIsLyrics(song: Song): boolean {
+  return !song.lyrics.trim() && !!song.refrao?.trim();
+}
+
+/** Whether any part of the song has a translation (verses or coro). */
+export function hasTranslation(song: Song): boolean {
+  return !!song.translation?.trim() || !!song.refraoTranslation?.trim();
+}
+
 export function firstLine(song: Song): string {
-  return song.lyrics.split('\n').map(l => l.trim()).find(Boolean) ?? '';
+  return lyricLines(song)[0]?.pt ?? '';
 }
 
 /** A stable small number from an id, for varying the generated covers. */

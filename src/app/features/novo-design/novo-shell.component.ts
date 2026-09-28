@@ -4,7 +4,6 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { filter, map } from 'rxjs';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { FavoritesService } from '../../core/services/favorites.service';
-import { SigninPromptComponent } from '../../shared/components/signin-prompt/signin-prompt.component';
 import { NovoThemeService } from './novo-theme.service';
 import { NovoPlayerService } from './novo-player.service';
 import { NovoPlayerComponent } from './novo-player.component';
@@ -24,7 +23,8 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
 @Component({
   selector: 'app-novo-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SigninPromptComponent, NovoPlayerComponent, NovoIconComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NovoPlayerComponent, NovoIconComponent],
+  host: { '(document:keydown)': 'onKey($event)' },
   encapsulation: ViewEncapsulation.None,
   styles: [`
     .novo {
@@ -102,7 +102,7 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
         </div>
       </header>
 
-      <main class="flex-1 min-w-0" [class]="player.current() ? 'pb-[180px] md:pb-28' : 'pb-24 md:pb-10'">
+      <main class="flex-1 min-w-0" [class]="bottomRoom()">
         <router-outlet />
       </main>
 
@@ -124,8 +124,24 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
 
       <app-novo-player />
 
-      <!-- The current site's sign-in prompt: tapping a heart signed out opens it. -->
-      <app-signin-prompt />
+      <!-- Tapping a heart while signed out: the shared favourites action opens this. -->
+      @if (favorites.promptOpen()) {
+        <div class="fixed inset-0 z-[80] flex items-end sm:items-center justify-center">
+          <button type="button" aria-label="Fechar" (click)="favorites.closePrompt()" class="absolute inset-0 bg-black/55 cursor-default"></button>
+          <section role="dialog" aria-modal="true" aria-labelledby="novo-signin-title" tabindex="-1" (keydown.escape)="favorites.closePrompt()"
+            class="relative w-full sm:max-w-sm bg-[var(--n-surf)] text-[var(--n-tx)] rounded-t-3xl sm:rounded-3xl px-6 pt-3 pb-[max(env(safe-area-inset-bottom),28px)] sm:pt-7 shadow-2xl flex flex-col items-center gap-4 text-center">
+            <span aria-hidden="true" class="sm:hidden w-10 h-1.5 rounded-full bg-[var(--n-line)]"></span>
+            <span aria-hidden="true" class="mt-2 sm:mt-0 w-14 h-14 rounded-2xl bg-[#4338ca] text-white flex items-center justify-center"><app-novo-icon name="heart" [size]="26" [filled]="true" /></span>
+            <h2 id="novo-signin-title" class="m-0 n-disp text-[22px] font-bold tracking-[-0.03em]">Guarde suas curtidas</h2>
+            <p class="m-0 text-[15px] leading-relaxed text-[var(--n-tx2)]">Entre com o Google para guardar as cantigas que você curte em qualquer aparelho e tocar todas em sequência.</p>
+            <div class="self-stretch flex flex-col gap-2 mt-1">
+              <a routerLink="/login" [queryParams]="{ returnUrl: router.url }" (click)="favorites.closePrompt()"
+                class="h-12 rounded-xl bg-[var(--n-acc)] text-[#1a1400] font-extrabold flex items-center justify-center hover:no-underline">Entrar com Google</a>
+              <button type="button" (click)="favorites.closePrompt()" class="h-12 rounded-xl font-bold text-[var(--n-tx2)] hover:bg-[var(--n-raise)]">Agora não</button>
+            </div>
+          </section>
+        </div>
+      }
 
       @if (favorites.toast(); as toast) {
         <div role="status" class="no-print fixed bottom-[190px] md:bottom-32 left-1/2 -translate-x-1/2 z-[75] flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-xl bg-[#15161a] text-white shadow-lg whitespace-nowrap">
@@ -186,6 +202,22 @@ export class NovoShellComponent {
     }
     this.router.events.pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed())
       .subscribe(() => this.accountOpen.set(false));
+  }
+
+  /** Space for the player at the bottom of every page, so the end of a page can scroll clear of it. */
+  readonly bottomRoom = computed(() => {
+    if (!this.player.current()) return 'pb-24 md:pb-10';
+    return this.player.videoShown() ? 'pb-[370px] md:pb-[330px]' : 'pb-[180px] md:pb-28';
+  });
+
+  /** Space bar plays and pauses, as in music apps, unless the visitor is typing or on a control. */
+  onKey(e: KeyboardEvent): void {
+    if (e.key !== ' ' || e.repeat || e.ctrlKey || e.metaKey || e.altKey || !this.player.current()?.videoId) return;
+    const el = e.target as HTMLElement | null;
+    if (el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(el.tagName))) return;
+    if (this.favorites.promptOpen()) return;
+    e.preventDefault();
+    this.player.toggle();
   }
 
   /** The shared favourites service speaks of "favoritas"; this design calls them curtidas. */

@@ -30,7 +30,7 @@ import { plainText, seedOf } from './novo-data';
   template: `
     <!-- The YouTube frame. Always mounted so playback survives navigation; moved off screen
          (never shrunk) when there is nothing to show, and paused whenever it is off screen. -->
-    <section #card [attr.aria-label]="L.s().playerAndVideo" class="no-print fixed z-40 overflow-hidden rounded-2xl bg-[var(--n-raise)] border border-[var(--n-line)] shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
+    <section #card [attr.aria-label]="L.s().playerAndVideo" class="no-print fixed z-40 overflow-hidden rounded-t-2xl rounded-b-2xl md:rounded-b-none bg-[var(--n-raise)] border border-[var(--n-line)] shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
       [class]="cardClass()" [style.left.px]="player.videoShown() && pos() ? pos()!.x : null" [style.top.px]="player.videoShown() && pos() ? pos()!.y : null"
       [attr.aria-hidden]="!player.videoShown()">
       <!-- Grip: drag the video anywhere on screen, like a floating player. Double-tap (or Enter) puts it back. -->
@@ -49,6 +49,18 @@ import { plainText, seedOf } from './novo-data';
         </div>
       }
     </section>
+
+    <!-- Tucked against an edge: a small tab that brings the player back (and resumes). -->
+    @if (player.tucked(); as t) {
+      @if (player.current(); as item) {
+        <button type="button" (click)="player.untuck()" [attr.aria-label]="L.s().showPlayer" [attr.title]="L.s().showPlayer"
+          class="no-print fixed z-40 w-12 h-[76px] flex flex-col items-center justify-center gap-1.5 bg-[var(--n-surf)] border border-[var(--n-line)] shadow-[0_10px_30px_rgba(0,0,0,0.22)]"
+          [class]="t.side === 'left' ? 'left-0 rounded-r-2xl border-l-0' : 'right-0 rounded-l-2xl border-r-0'" [style.top.px]="t.y">
+          <app-novo-cover [color]="item.color" [size]="30" [radius]="8" [seed]="seed(item.key)" />
+          <span class="text-[var(--n-tx2)]"><app-novo-icon [name]="t.side === 'left' ? 'next' : 'back'" [size]="14" /></span>
+        </button>
+      }
+    }
 
     @if (player.current(); as item) {
       <!-- Desktop strip -->
@@ -102,7 +114,7 @@ import { plainText, seedOf } from './novo-data';
       </footer>
 
       <!-- Phone card without a video (hidden, or nothing to show): the same controls on their own. -->
-      @if (!player.videoShown()) {
+      @if (!player.videoShown() && !player.tucked()) {
         <section [attr.aria-label]="L.s().player" class="no-print md:hidden fixed inset-x-2.5 bottom-[84px] z-40 rounded-2xl bg-[var(--n-raise)] border border-[var(--n-line)] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
           <ng-container [ngTemplateOutlet]="phoneControls" [ngTemplateOutletContext]="{ $implicit: item }" />
         </section>
@@ -136,7 +148,7 @@ import { plainText, seedOf } from './novo-data';
           @if (item.videoId && player.minimized()) {
             <button type="button" (click)="player.restore()" [attr.aria-label]="L.s().showVideo" class="w-11 h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="video" [size]="20" /></button>
           } @else if (item.videoId) {
-            <button type="button" (click)="player.minimize()" [attr.aria-label]="L.s().hideVideo" class="w-11 h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="min" [size]="20" /></button>
+            <button type="button" (click)="tuckAside()" [attr.aria-label]="L.s().tuckVideo" class="w-11 h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="min" [size]="20" /></button>
           }
           <button type="button" (click)="player.close()" [attr.aria-label]="L.s().closePlayer" class="w-11 h-11 rounded-full flex items-center justify-center text-[var(--n-tx3)]"><app-novo-icon name="close" [size]="18" /></button>
         </div>
@@ -155,7 +167,7 @@ export class NovoPlayerComponent implements OnDestroy {
   // ── Moving the video around ──
   /** Where the video card was dragged to; null keeps it in its usual spot. Remembered per screen size. */
   readonly pos = signal<{ x: number; y: number } | null>(null);
-  private drag: { dx: number; dy: number; id: number; moved: boolean } | null = null;
+  private drag: { dx: number; dy: number; id: number; moved: boolean; startLeft: number; width: number } | null = null;
 
   readonly cardClass = computed(() => {
     if (!this.player.videoShown()) return '-left-[9999px] bottom-0 w-[356px] opacity-0 pointer-events-none';
@@ -182,7 +194,7 @@ export class NovoPlayerComponent implements OnDestroy {
 
   dragStart(e: PointerEvent): void {
     const r = this.card().nativeElement.getBoundingClientRect();
-    this.drag = { dx: e.clientX - r.left, dy: e.clientY - r.top, id: e.pointerId, moved: false };
+    this.drag = { dx: e.clientX - r.left, dy: e.clientY - r.top, id: e.pointerId, moved: false, startLeft: r.left, width: r.width };
     // Keeps the drag going when the finger slides over the video frame, which would otherwise swallow the events.
     try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
   }
@@ -190,12 +202,27 @@ export class NovoPlayerComponent implements OnDestroy {
   dragMove(e: PointerEvent): void {
     if (!this.drag || e.pointerId !== this.drag.id) return;
     this.drag.moved = true;
-    this.pos.set(this.clamp(e.clientX - this.drag.dx, e.clientY - this.drag.dy));
+    // Up and down stay on screen; sideways follows the finger freely, so the card can be swiped off to an edge.
+    const y = this.clamp(0, e.clientY - this.drag.dy).y;
+    this.pos.set({ x: Math.round(e.clientX - this.drag.dx), y });
   }
 
   dragEnd(e: PointerEvent): void {
     if (!this.drag || e.pointerId !== this.drag.id) return;
-    if (this.drag.moved) this.savePos();
+    if (this.drag.moved) {
+      const p = this.pos()!;
+      const shift = p.x - this.drag.startLeft;
+      // Swiped more than a third of its width sideways: tuck it against that edge.
+      if (Math.abs(shift) > this.drag.width * 0.35) {
+        const home = this.clamp(this.drag.startLeft, p.y);
+        this.pos.set(home);
+        this.savePos();
+        this.player.tuck(shift < 0 ? 'left' : 'right', this.tabY(home.y));
+      } else {
+        this.pos.set(this.clamp(p.x, p.y));
+        this.savePos();
+      }
+    }
     this.drag = null;
   }
 
@@ -210,6 +237,17 @@ export class NovoPlayerComponent implements OnDestroy {
     e.preventDefault();
     this.pos.set(this.clamp(at.x + m[0], at.y + m[1]));
     this.savePos();
+  }
+
+  /** The phone's hide button: tuck to the right edge at the card's current height. */
+  tuckAside(): void {
+    const r = this.card().nativeElement.getBoundingClientRect();
+    this.player.tuck('right', this.tabY(r.top));
+  }
+
+  /** Where the edge tab sits: level with the card's video, kept on screen. */
+  private tabY(cardTop: number): number {
+    return Math.round(Math.min(Math.max(72, cardTop + 60), window.innerHeight - 170));
   }
 
   resetPos(): void {

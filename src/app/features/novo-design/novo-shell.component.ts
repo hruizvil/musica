@@ -1,4 +1,4 @@
-import { Component, DOCUMENT, ViewEncapsulation, computed, inject, signal } from '@angular/core';
+import { Component, DOCUMENT, ViewEncapsulation, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
@@ -162,7 +162,8 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
       }
 
       @if (favorites.toast(); as toast) {
-        <div role="status" class="no-print fixed bottom-[190px] md:bottom-32 left-1/2 -translate-x-1/2 z-[75] flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-xl bg-[#15161a] text-white shadow-lg whitespace-nowrap">
+        <div role="status" class="no-print fixed left-1/2 -translate-x-1/2 z-[75] flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-xl bg-[#15161a] text-white shadow-lg whitespace-nowrap"
+          [class]="player.videoShown() ? 'top-[76px] md:top-[88px]' : 'bottom-[190px] md:bottom-32'">
           <span class="text-sm font-semibold">{{ toastText(toast.text) }}</span>
           @if (toast.linkToLibrary) {
             <a [routerLink]="L.to('/curtidas')" class="h-10 px-2 flex items-center text-sm font-bold text-[#ffc21a]">{{ L.s().seeLiked }}</a>
@@ -217,11 +218,17 @@ export class NovoShellComponent {
     }
     this.router.events.pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed())
       .subscribe(() => this.accountOpen.set(false));
+    // YouTube's embed rules forbid covering a playing video; the sign-in sheet covers
+    // everything, so the video pauses while it is open.
+    effect(() => {
+      if (this.favorites.promptOpen() && untracked(() => this.player.playing())) untracked(() => this.player.toggle());
+    });
   }
 
   /** Space for the player at the bottom of every page, so the end of a page can scroll clear of it. */
   readonly bottomRoom = computed(() => {
     if (!this.player.current()) return 'pb-24 md:pb-10';
+    if (this.player.tucked()) return 'pb-24 md:pb-28';
     return this.player.videoShown() ? 'pb-[370px] md:pb-[330px]' : 'pb-[180px] md:pb-28';
   });
 

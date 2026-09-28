@@ -81,7 +81,7 @@ const EN = {
   // Player
   player: 'Player', playerAndVideo: 'Player and video', previous: 'Previous', next: 'Next', repeat: 'Repeat', speed: 'Speed',
   prevLine: 'Previous line', nextLine: 'Next line', showVideo: 'Show video', hideVideo: 'Hide video (pauses)', closePlayer: 'Close player',
-  moreControls: 'More controls', playPauseHint: 'Play / pause (space bar)', moveVideo: 'Move the video (drag; double-tap to put it back)',
+  moreControls: 'More controls', playPauseHint: 'Play / pause (space bar)', moveVideo: 'Move the video (drag; swipe sideways to tuck it away; double-tap to put it back)', showPlayer: 'Show the player', tuckVideo: 'Tuck the video to the side (pauses)',
   noRecordingShort: 'No recording yet', toqueVideoFor: (t: string) => `No recording: ${t} toque video`, toqueDemo: 'Toque demonstration',
   likeSong: 'Like', unlikeSong: (t: string) => `Remove from liked: ${t}`, likeNamed: (t: string) => `Like: ${t}`, playNamed: (t: string) => `Play ${t}`,
   learning: 'Learning', learnedStatus: 'Learned', coverOf: (t: string) => `Cover: ${t}`,
@@ -175,7 +175,7 @@ const PT: Dict = {
 
   player: 'Player', playerAndVideo: 'Player e vídeo', previous: 'Anterior', next: 'Próxima', repeat: 'Repetir', speed: 'Velocidade',
   prevLine: 'Linha anterior', nextLine: 'Próxima linha', showVideo: 'Mostrar vídeo', hideVideo: 'Esconder vídeo (pausa)', closePlayer: 'Fechar player',
-  moreControls: 'Mais controles', playPauseHint: 'Tocar / pausar (barra de espaço)', moveVideo: 'Mover o vídeo (arraste; toque duas vezes para voltar)',
+  moreControls: 'Mais controles', playPauseHint: 'Tocar / pausar (barra de espaço)', moveVideo: 'Mover o vídeo (arraste; deslize para o lado para guardar; toque duas vezes para voltar)', showPlayer: 'Mostrar o player', tuckVideo: 'Guardar o vídeo ao lado (pausa)',
   noRecordingShort: 'Sem gravação ainda', toqueVideoFor: (t: string) => `Sem gravação: vídeo do toque ${t}`, toqueDemo: 'Demonstração do toque',
   likeSong: 'Curtir', unlikeSong: (t: string) => `Tirar das curtidas: ${t}`, likeNamed: (t: string) => `Curtir: ${t}`, playNamed: (t: string) => `Tocar ${t}`,
   learning: 'Aprendendo', learnedStatus: 'Aprendida', coverOf: (t: string) => `Capa: ${t}`,

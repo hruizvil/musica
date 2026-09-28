@@ -49,6 +49,8 @@ export class NovoPlayerService {
   readonly rate = signal<number>(this.storedRate());
   readonly line = signal(0);
   readonly minimized = signal(false);
+  /** Tucked against a screen edge (a small tab stays). Tucked means hidden, so it pauses; "resume" says whether to play again on return. */
+  readonly tucked = signal<{ side: 'left' | 'right'; y: number; resume: boolean } | null>(null);
   readonly apiFailed = signal(false);
   /** How far through the current video, 0 to 1. Read from the player while it plays. */
   readonly progress = signal(0);
@@ -137,7 +139,22 @@ export class NovoPlayerService {
     this.wantPlay = false;
     this.minimized.set(true);
   }
-  restore(): void { this.minimized.set(false); }
+  restore(): void { this.minimized.set(false); this.tucked.set(null); }
+
+  /** Slides the video to a screen edge. YouTube may not play while hidden, so it pauses and remembers whether to resume. */
+  tuck(side: 'left' | 'right', y: number): void {
+    const resume = this.playing();
+    this.minimize();
+    this.tucked.set({ side, y, resume });
+  }
+
+  /** Brings a tucked video back and, if it was playing, carries on. */
+  untuck(): void {
+    const t = this.tucked();
+    this.tucked.set(null);
+    this.minimized.set(false);
+    if (t?.resume) { this.wantPlay = true; this.sync(); this.player?.playVideo(); }
+  }
 
   close(): void {
     this.player?.pauseVideo();
@@ -145,6 +162,7 @@ export class NovoPlayerService {
     this.queue.set([]);
     this.index.set(0);
     this.playing.set(false);
+    this.tucked.set(null);
   }
 
   // ── The YouTube player (owned by the shell's dock) ──
@@ -172,6 +190,7 @@ export class NovoPlayerService {
   private go(index: number): void {
     this.index.set(index);
     this.progress.set(0);
+    this.tucked.set(null);
     this.line.set(0);
     this.minimized.set(false);
     this.wantPlay = true;

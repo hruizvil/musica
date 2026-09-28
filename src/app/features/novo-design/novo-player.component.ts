@@ -211,13 +211,17 @@ export class NovoPlayerComponent implements OnDestroy {
     if (!this.drag || e.pointerId !== this.drag.id) return;
     if (this.drag.moved) {
       const p = this.pos()!;
-      const shift = p.x - this.drag.startLeft;
-      // Swiped more than a third of its width sideways: tuck it against that edge.
-      if (Math.abs(shift) > this.drag.width * 0.35) {
+      // Tuck only when pushed past a screen edge (a third of the card off-screen). Anywhere
+      // inside the screen it stays where it was dropped; measuring the distance dragged
+      // instead tucked the small desktop card whenever it moved toward the middle.
+      const offLeft = -p.x;
+      const offRight = p.x + this.drag.width - window.innerWidth;
+      const edge = offLeft > this.drag.width * 0.33 ? 'left' : offRight > this.drag.width * 0.33 ? 'right' : null;
+      if (edge) {
         const home = this.clamp(this.drag.startLeft, p.y);
         this.pos.set(home);
         this.savePos();
-        this.player.tuck(shift < 0 ? 'left' : 'right', this.tabY(home.y));
+        this.player.tuck(edge, this.tabY(home.y));
       } else {
         this.pos.set(this.clamp(p.x, p.y));
         this.savePos();

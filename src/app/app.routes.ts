@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { ShellComponent } from './layout/shell/shell.component';
 import { authGuard } from './core/guards/auth.guard';
 import { NOVO_ROUTES } from './features/novo-design/novo.routes';
 
@@ -16,7 +15,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/login',
-    component: ShellComponent,
+    loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
     children: [
       { path: '', title: `Admin · ${SITE}`, loadComponent: () => import('./features/admin/admin-login.component').then(m => m.AdminLoginComponent) },
     ],
@@ -25,7 +24,7 @@ export const routes: Routes = [
   // The classic design, kept at /classico during the move to the new design.
   {
     path: 'classico',
-    component: ShellComponent,
+    loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
     children: [
       { path: '', title: `${SITE} — Biblioteca musical da capoeira`, loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent) },
       { path: 'musicas', title: `Músicas · ${SITE}`, loadComponent: () => import('./features/songs/song-list/song-list.component').then(m => m.SongListComponent) },

@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, inject, computed, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, TransferState, inject, computed, signal } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -7,7 +7,7 @@ import { Song } from '../models/song.model';
 import { Toque } from '../models/toque.model';
 import { Video } from '../models/video.model';
 import { FirebaseService, SongOverride } from './firebase.service';
-import { snapshotCollections } from './songs-remote';
+import { SONG_SNAPSHOT, SONG_SNAPSHOT_STATE, SONG_SNAPSHOT_URL, SongCollections, SongSnapshot, fromSnapshot } from './songs-remote';
 
 // Last server state, kept in localStorage so a refresh can hide deleted songs on
 // the very first paint instead of showing them until Firestore answers.
@@ -132,15 +132,38 @@ export class DataService {
 
   private readonly onServer = isPlatformServer(inject(PLATFORM_ID));
 
+  /** Set once Firestore has answered; a late snapshot fallback must not overwrite it. */
+  private live = false;
+
   constructor() {
-    // Start from the snapshot saved at build time. The prerendered pages are built from it,
-    // and in the browser it covers a first visit before (or without) Firestore.
-    const { overrides, extra } = snapshotCollections();
+    const state = inject(TransferState);
+    if (this.onServer) {
+      // Prerendering: build from the snapshot and hand it to the page, so the browser
+      // starts from exactly the data the HTML was built with.
+      const snapshot = inject(SONG_SNAPSHOT, { optional: true });
+      if (snapshot) {
+        this.apply(fromSnapshot(snapshot));
+        state.set(SONG_SNAPSHOT_STATE, snapshot);
+      }
+      return;
+    }
+    const carried = state.get(SONG_SNAPSHOT_STATE, null);
+    if (carried) {
+      this.apply(fromSnapshot(carried));
+    } else if (!this.seedFromCache()) {
+      // A page rendered in the browser on a first visit: nothing cached yet, so fetch
+      // the build snapshot in case Firestore is slow or unreachable.
+      this.http.get<SongSnapshot>(SONG_SNAPSHOT_URL).subscribe({
+        next: s => { if (!this.live) this.apply(fromSnapshot(s)); },
+        error: () => { /* Firestore or the bundled songs cover it */ },
+      });
+    }
+    this.refreshOverrides();
+  }
+
+  private apply({ overrides, extra }: SongCollections): void {
     this.overrides.set(overrides);
     this.extraSongs.set(extra);
-    if (this.onServer) return;
-    this.seedFromCache();
-    this.refreshOverrides();
   }
 
   async refreshOverrides(): Promise<void> {
@@ -149,8 +172,8 @@ export class DataService {
         this.fb.getSongOverrides(),
         this.fb.getExtraSongs(),
       ]);
-      this.overrides.set(overridesMap);
-      this.extraSongs.set(extra);
+      this.live = true;
+      this.apply({ overrides: overridesMap, extra });
       this.writeCache(overridesMap, extra);
     } catch {
       // Firebase not configured — app works with JSON-only data
@@ -159,19 +182,23 @@ export class DataService {
 
   /** Prime the signals from the last cached server state so the first render is
    *  already correct. Firestore then reconciles a moment later. */
-  private seedFromCache(): void {
+  private seedFromCache(): boolean {
+    let seeded = false;
     try {
       const rawOverrides = localStorage.getItem(OVERRIDES_CACHE_KEY);
       if (rawOverrides) {
         this.overrides.set(new Map(JSON.parse(rawOverrides) as [string, SongOverride][]));
+        seeded = true;
       }
       const rawExtra = localStorage.getItem(EXTRA_CACHE_KEY);
       if (rawExtra) {
         this.extraSongs.set(JSON.parse(rawExtra) as Song[]);
+        seeded = true;
       }
     } catch {
       // no cache, corrupt cache, or storage unavailable — the refresh fills it in
     }
+    return seeded;
   }
 
   private writeCache(overrides: Map<string, SongOverride>, extra: Song[]): void {

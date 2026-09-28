@@ -1,22 +1,27 @@
+import { InjectionToken, makeStateKey } from '@angular/core';
 import { Song } from '../models/song.model';
 import { SongOverride } from './firebase.service';
-import snapshot from '../../../assets/data/songs-remote.json';
 
 /**
  * The admin's song data (edits, deletions, added songs) as saved by scripts/songs-snapshot.mjs
- * right before the build.
+ * right before the build, in src/assets/data/songs-remote.json.
  *
- * The prerendered pages are built from it without touching Firestore, and the browser starts
- * from it too, so a first visit shows the right list even if Firestore is unreachable. Live
- * Firestore data replaces it a moment later in the browser.
+ * The file is kept out of the browser bundle. The server reads it (SONG_SNAPSHOT, provided in
+ * app.config.server.ts) and every prerendered page carries it in its transfer state, so the
+ * page starts from the same data it was built with. Pages rendered in the browser fetch the
+ * file instead, as a fallback until Firestore answers.
  */
+export interface SongSnapshot {
+  fetchedAt: string;
+  overrides: Record<string, SongOverride>;
+  extra: Song[];
+}
 export interface SongCollections { overrides: Map<string, SongOverride>; extra: Song[]; }
 
-export const SNAPSHOT_TIME = snapshot.fetchedAt;
+export const SONG_SNAPSHOT = new InjectionToken<SongSnapshot>('SONG_SNAPSHOT');
+export const SONG_SNAPSHOT_STATE = makeStateKey<SongSnapshot>('song-snapshot');
+export const SONG_SNAPSHOT_URL = 'assets/data/songs-remote.json';
 
-export function snapshotCollections(): SongCollections {
-  return {
-    overrides: new Map(Object.entries(snapshot.overrides as Record<string, SongOverride>)),
-    extra: snapshot.extra as unknown as Song[],
-  };
+export function fromSnapshot(s: SongSnapshot): SongCollections {
+  return { overrides: new Map(Object.entries(s.overrides)), extra: s.extra };
 }

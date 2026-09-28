@@ -1,7 +1,8 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 import songsData from '../assets/data/songs.json';
 import toquesData from '../assets/data/toques.json';
-import { snapshotCollections } from './core/services/songs-remote';
+import snapshot from '../assets/data/songs-remote.json';
+import { fromSnapshot, SongSnapshot } from './core/services/songs-remote';
 
 /**
  * Which pages are generated as real HTML at build time.
@@ -17,7 +18,7 @@ import { snapshotCollections } from './core/services/songs-remote';
  */
 /** Song ids: bundled songs plus the admin's, minus the ones the admin deleted. */
 function songIds(): string[] {
-  const { overrides, extra } = snapshotCollections();
+  const { overrides, extra } = fromSnapshot(snapshot as unknown as SongSnapshot);
   const deleted = new Set([...overrides].filter(([, o]) => o.deleted).map(([id]) => id));
   const bundled = songsData.songs.map(s => s.id);
   return [...new Set([...bundled, ...extra.map(e => e.id)])].filter(id => !deleted.has(id));

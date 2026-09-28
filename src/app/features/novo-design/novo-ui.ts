@@ -62,7 +62,7 @@ export class NovoIconComponent {
       } @else if (size() >= 110 && title()) {
         <span class="absolute inset-0 flex flex-col justify-between text-white box-border" [style.padding.px]="size() * 0.09">
           <span class="font-bold uppercase tracking-[0.12em] opacity-85" [style.font-size.px]="labelSize()">{{ label() }}</span>
-          <span class="n-disp font-bold leading-[1.02] tracking-[-0.03em]" [style.font-size.px]="titleSize()">{{ title() }}</span>
+          <span class="font-extrabold leading-[1.05] tracking-[-0.02em]" [style.font-size.px]="titleSize()">{{ title() }}</span>
         </span>
       }
     </span>

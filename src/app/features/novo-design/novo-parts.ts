@@ -59,7 +59,7 @@ export class NovoSongRowComponent {
   readonly side = computed(() => this.showStatus()
     ? (this.learned() ? 'Aprendida' : 'Aprendendo')
     : (this.data.toqueById().get(this.song().toque[0])?.name ?? ''));
-  readonly statusColor = computed(() => this.showStatus() ? (this.learned() ? '#23a26a' : 'var(--n-tx3)') : 'var(--n-tx2)');
+  readonly statusColor = computed(() => this.showStatus() ? (this.learned() ? 'var(--n-ok)' : 'var(--n-tx3)') : 'var(--n-tx2)');
 
   play(): void {
     const q = this.queue().length ? this.queue() : [this.song().id];

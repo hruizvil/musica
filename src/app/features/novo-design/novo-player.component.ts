@@ -62,7 +62,7 @@ import { plainText, seedOf } from './novo-data';
             </div>
             <a [routerLink]="['/novo/cantigas', item.songId]" class="min-w-0 flex flex-col gap-0.5 hover:no-underline">
               <span class="text-[13px] text-[var(--n-tx3)] truncate">{{ player.previousLine()?.pt || ' ' }}</span>
-              <span class="n-disp text-xl font-semibold tracking-[-0.02em] text-[var(--n-tx)] truncate">{{ line.pt }}</span>
+              <span class="text-xl font-extrabold tracking-[-0.01em] text-[var(--n-tx)] truncate">{{ line.pt }}</span>
               @if (line.en) { <span class="text-sm text-[var(--n-acc-tx)] truncate">{{ plain(line.en) }}</span> }
             </a>
           } @else {
@@ -105,7 +105,7 @@ import { plainText, seedOf } from './novo-data';
         <a [routerLink]="item.songId ? ['/novo/cantigas', item.songId] : ['/novo/toques', item.toqueId]" class="flex-1 min-w-0 flex flex-col hover:no-underline">
           <span class="text-xs font-bold text-[var(--n-tx3)] truncate">{{ item.title }}</span>
           @if (player.currentLine(); as line) {
-            <span class="n-disp text-[14px] font-semibold tracking-[-0.02em] text-[var(--n-tx)] truncate">{{ line.pt }}</span>
+            <span class="text-[15px] font-extrabold text-[var(--n-tx)] truncate">{{ line.pt }}</span>
             @if (line.en) { <span class="text-[12px] text-[var(--n-acc-tx)] truncate">{{ plain(line.en) }}</span> }
           } @else {
             <span class="text-[13px] text-[var(--n-tx2)] truncate">{{ subtitle(item) }}</span>

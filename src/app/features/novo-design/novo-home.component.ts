@@ -23,7 +23,7 @@ import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, plainText, seedOf, so
             <app-novo-cover [color]="color(f.song)" [title]="f.song.title" [label]="toqueName(f.song)" [size]="168" [radius]="14" [seed]="seed(f.song)" class="hidden md:block" />
             <div class="min-w-0 flex flex-col gap-1.5 md:gap-2.5 justify-center">
               <span class="text-[11px] md:text-xs font-extrabold tracking-[0.1em] uppercase text-[var(--n-acc-tx)]">{{ f.resume ? 'Continue de onde parou' : 'Comece por aqui' }}</span>
-              <a [routerLink]="['/novo/cantigas', f.song.id]" class="min-h-10 inline-flex items-center n-disp text-lg md:text-[28px] font-bold tracking-[-0.03em] leading-tight">{{ f.song.title }}</a>
+              <a [routerLink]="['/novo/cantigas', f.song.id]" class="min-h-10 inline-flex items-center text-xl md:text-[28px] font-extrabold tracking-[-0.02em] leading-tight">{{ f.song.title }}</a>
               @if (f.line; as line) {
                 <span class="text-sm md:text-[17px] text-[var(--n-tx)] truncate">“{{ line.pt }}”</span>
                 @if (line.en) { <span class="hidden md:block text-[15px] text-[var(--n-tx2)] truncate">{{ plain(line.en) }}</span> }

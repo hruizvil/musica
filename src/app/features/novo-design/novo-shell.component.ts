@@ -28,18 +28,21 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
   encapsulation: ViewEncapsulation.None,
   styles: [`
     .novo {
-      --n-bg: #f6f5f1; --n-surf: #ffffff; --n-raise: #efede7; --n-line: #e2dfd6;
-      --n-tx: #15161a; --n-tx2: #50535c; --n-tx3: #6e717b; --n-acc: #ffc21a; --n-acc-tx: #8a6400;
+      /* Light is the default. Every text colour here is at least 6:1 on the page. */
+      --n-bg: #f7f6f2; --n-surf: #ffffff; --n-raise: #eeece6; --n-line: #dcd8ce;
+      --n-tx: #101114; --n-tx2: #3b3e46; --n-tx3: #5a5d66; --n-acc: #ffc21a; --n-acc-tx: #6b4d00; --n-ok: #0a7550;
       font-family: 'Figtree', system-ui, sans-serif; color: var(--n-tx); background: var(--n-bg); color-scheme: light;
     }
     .novo.novo-dark {
       --n-bg: #101114; --n-surf: #181a1f; --n-raise: #22252c; --n-line: #2d3038;
-      --n-tx: #f4f3ef; --n-tx2: #b4b6bd; --n-tx3: #8f929b; --n-acc: #ffc21a; --n-acc-tx: #ffc21a;
+      --n-tx: #f4f3ef; --n-tx2: #b4b6bd; --n-tx3: #8f929b; --n-acc: #ffc21a; --n-acc-tx: #ffc21a; --n-ok: #3fcf8e;
       color-scheme: dark;
     }
     .novo .n-disp { font-family: 'Unbounded', system-ui, sans-serif; }
-    .novo a { color: inherit; }
-    .novo a:hover { text-decoration: underline; }
+    /* :where() keeps these at zero specificity, so a link's own colour class (white text on
+       a toque card, the selected tab) always wins over "inherit". */
+    :where(.novo) a { color: inherit; }
+    :where(.novo) a:hover { text-decoration: underline; }
     .novo a:focus-visible, .novo button:focus-visible, .novo input:focus-visible {
       outline: 2px solid var(--n-acc); outline-offset: 2px;
     }
@@ -51,7 +54,7 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
 
       <header class="no-print sticky top-0 z-30 bg-[var(--n-surf)] border-b border-[var(--n-line)]">
         <div class="max-w-[1440px] mx-auto h-[60px] md:h-[72px] flex items-center gap-4 md:gap-9 pl-[18px] pr-2 md:px-10">
-          <a routerLink="/novo" class="min-h-11 inline-flex items-center n-disp font-bold text-[17px] md:text-xl tracking-[-0.03em] hover:no-underline">abadá<span class="text-[var(--n-acc)]">.</span>música</a>
+          <a routerLink="/novo" class="min-h-11 inline-flex items-center n-disp font-bold text-[17px] md:text-xl tracking-[-0.03em] hover:no-underline">abadá<span class="text-[var(--n-acc-tx)]">.</span>música</a>
 
           <nav aria-label="Principal" class="hidden md:flex gap-7 h-full">
             @for (item of nav; track item.link) {

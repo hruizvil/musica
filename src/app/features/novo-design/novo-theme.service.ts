@@ -4,8 +4,8 @@ const KEY = 'novo-theme';
 
 /**
  * Light or dark for the new design only. Kept apart from the current site's theme, so
- * switching here never changes how the current site looks. First visit follows the
- * device's setting.
+ * switching here never changes how the current site looks. Light is the default for
+ * everyone; a visitor who switches to dark keeps it.
  */
 @Injectable({ providedIn: 'root' })
 export class NovoThemeService {
@@ -19,9 +19,9 @@ export class NovoThemeService {
 
   private initial(): boolean {
     try {
-      const stored = localStorage.getItem(KEY);
-      if (stored) return stored === 'dark';
-    } catch { /* fall through */ }
-    return typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches;
+      return localStorage.getItem(KEY) === 'dark';
+    } catch {
+      return false;
+    }
   }
 }

@@ -1,7 +1,8 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { FavoritesService } from '../../core/services/favorites.service';
-import { PATTERNS, STROKE_LABEL, Stroke } from './novo-data';
+import { PATTERNS, Stroke } from './novo-data';
+import { NovoLangService } from './novo-lang.service';
 
 /** Stroke icons for the new design, by name. */
 @Component({
@@ -32,6 +33,7 @@ import { PATTERNS, STROKE_LABEL, Stroke } from './novo-data';
         @case ('min') { <path d="M5 12h14"/> }
         @case ('close') { <path d="M6 6l12 12M18 6L6 18"/> }
         @case ('sun') { <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/> }
+        @case ('user') { <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/> }
         @case ('moon') { <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/> }
       }
     </svg>
@@ -53,7 +55,7 @@ export class NovoIconComponent {
   imports: [NovoIconComponent],
   host: { class: 'block shrink-0' },
   template: `
-    <span class="relative block overflow-hidden" role="img" [attr.aria-label]="'Capa: ' + (title() || label())"
+    <span class="relative block overflow-hidden" role="img" [attr.aria-label]="L.s().coverOf(title() || label())"
           [style.width.px]="size()" [style.height.px]="size()" [style.border-radius.px]="radius()" [style.background]="color()">
       <span class="absolute rounded-full box-border" [style]="ringStyle()"></span>
       <span class="absolute rounded-full bg-black/20" [style]="dotStyle()"></span>
@@ -76,6 +78,7 @@ export class NovoCoverComponent {
   radius = input<number>(10);
   seed = input<number>(0);
   icon = input<string | null>(null);
+  readonly L = inject(NovoLangService);
 
   readonly labelSize = computed(() => Math.max(9, this.size() * 0.065));
   readonly titleSize = computed(() => this.size() * (this.title().length < 18 ? 0.12 : 0.095));
@@ -102,7 +105,7 @@ export class NovoCoverComponent {
   host: { class: 'inline-flex' },
   template: `
     @if (strokes(); as seq) {
-      <span class="relative inline-flex" role="img" [attr.aria-label]="'Padrão do berimbau: ' + spoken()" [style.gap.px]="dims().gap" [style.padding]="'0 ' + dims().gap + 'px'">
+      <span class="relative inline-flex" role="img" [attr.aria-label]="L.s().patternAria(spoken())" [style.gap.px]="dims().gap" [style.padding]="'0 ' + dims().gap + 'px'">
         <span class="absolute inset-x-0 top-0" [style.height.px]="dims().lane * 3" aria-hidden="true">
           @for (k of [0, 1, 2]; track k) {
             <span class="absolute inset-x-0 h-px" [style.top.px]="dims().lane * k + dims().lane / 2" [style.background]="onColor() ? 'rgba(255,255,255,0.3)' : 'var(--n-line)'"></span>
@@ -127,7 +130,7 @@ export class NovoCoverComponent {
       </span>
     } @else {
       <span class="inline-flex items-center font-semibold" [style.min-height.px]="dims().lane * 3" [style.font-size.px]="size() === 'l' ? 15 : 12"
-            [style.color]="onColor() ? 'rgba(255,255,255,0.85)' : 'var(--n-tx3)'">Padrão do berimbau ainda não cadastrado</span>
+            [style.color]="onColor() ? 'rgba(255,255,255,0.85)' : 'var(--n-tx3)'">{{ L.s().patternNone }}</span>
     }
   `,
 })
@@ -138,7 +141,12 @@ export class NovoPatternComponent {
   active = input<number | null>(null);
 
   readonly strokes = computed<Stroke[] | null>(() => PATTERNS[this.toqueId()] ?? null);
-  readonly spoken = computed(() => (this.strokes() ?? []).map(s => s + ' (' + STROKE_LABEL[s] + ')').join(', '));
+  readonly L = inject(NovoLangService);
+  readonly spoken = computed(() => {
+    const d = this.L.s();
+    const word: Record<Stroke, string> = { tch: d.strokeTch, dom: d.strokeDom, dim: d.strokeDim };
+    return (this.strokes() ?? []).map(s => s + ' (' + word[s] + ')').join(', ');
+  });
   readonly dims = computed(() => {
     const beat = { s: 16, m: 26, l: 44 }[this.size()];
     return { beat, gap: { s: 6, m: 10, l: 16 }[this.size()], lane: beat + 4 };
@@ -157,7 +165,7 @@ export class NovoPatternComponent {
   imports: [NovoIconComponent],
   template: `
     <button type="button" (click)="favorites.toggle(songId()); $event.stopPropagation()"
-      [attr.aria-pressed]="on()" [attr.aria-label]="(on() ? 'Tirar das curtidas: ' : 'Curtir: ') + title()"
+      [attr.aria-pressed]="on()" [attr.aria-label]="on() ? L.s().unlikeSong(title()) : L.s().likeNamed(title())"
       class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-[var(--n-raise)] transition-colors"
       [style.color]="on() ? 'var(--n-acc-tx)' : 'var(--n-tx3)'">
       <app-novo-icon name="heart" [size]="size()" [filled]="on()" />
@@ -169,6 +177,7 @@ export class NovoHeartComponent {
   title = input<string>('');
   size = input<number>(18);
   readonly favorites = inject(FavoritesService);
+  readonly L = inject(NovoLangService);
   private firebase = inject(FirebaseService);
   readonly on = computed(() => this.firebase.favorites().has(this.songId()));
 }

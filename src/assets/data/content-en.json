@@ -1,0 +1,216 @@
+{
+  "toques": {
+    "angola": {
+      "description": "The oldest and most fundamental toque of Capoeira Angola. A slow, deep rhythm, played on the berimbau gunga, that sets the philosophical, cautious tone of the *jogo*.",
+      "context": "Played at the start of every Angola game. It sets up a game close to the ground, full of *malícia* and contemplation. The most senior mestre plays the gunga and leads the *roda*.",
+      "gameCharacter": "Slow, low to the ground, cunning, philosophical",
+      "instruments": [
+        "berimbau gunga (the lowest-pitched berimbau)",
+        "berimbau médio (the mid-pitched berimbau)",
+        "berimbau viola (the highest-pitched berimbau)",
+        "pandeiro (tambourine)",
+        "atabaque (tall hand drum)",
+        "agogô (double bell)",
+        "reco-reco (scraper)"
+      ]
+    },
+    "sao-bento-pequeno": {
+      "description": "Also called 'Inverted Angola.' The gunga's high and low notes are swapped, creating a subtle variation that signals a close, careful game.",
+      "context": "A close, tight game requiring great attention. The capoeiristas stay near each other, reading every small movement the opponent makes.",
+      "gameCharacter": "Close, tight, attentive, minutely detailed",
+      "instruments": [
+        "berimbau gunga (the lowest-pitched berimbau)",
+        "berimbau médio (the mid-pitched berimbau)",
+        "berimbau viola (the highest-pitched berimbau)",
+        "pandeiro (tambourine)",
+        "atabaque (tall hand drum)"
+      ]
+    },
+    "sao-bento-grande-angola": {
+      "description": "A fast, expansive rhythm within Capoeira Angola. It allows for wide, acrobatic movement while keeping the essence of Angola-style *mandinga*.",
+      "context": "Played for more open, faster games within the Angola tradition. It widens the playing space without losing the Angola philosophy.",
+      "gameCharacter": "Fast, expansive, wide-ranging movement",
+      "instruments": [
+        "berimbau gunga (the lowest-pitched berimbau)",
+        "berimbau médio (the mid-pitched berimbau)",
+        "berimbau viola (the highest-pitched berimbau)",
+        "pandeiro (tambourine)",
+        "atabaque (tall hand drum)",
+        "agogô (double bell)",
+        "reco-reco (scraper)"
+      ]
+    },
+    "sao-bento-grande-regional": {
+      "description": "Created by Mestre Bimba for Capoeira Regional. An explosive, fast, sharply marked rhythm that drives a dynamic game of direct strikes and quick dodges.",
+      "context": "The main toque of Capoeira Regional. It sets up a fast, athletic game played at a greater distance. It's also widely used in Capoeira Contemporânea and Abadá *rodas*.",
+      "gameCharacter": "Explosive, athletic, wide distance, direct strikes",
+      "instruments": [
+        "berimbau",
+        "pandeiro (tambourine)",
+        "pandeiro (tambourine)"
+      ]
+    },
+    "iuna": {
+      "description": "A medium-tempo toque, graceful and elegant. In Capoeira Regional it is played exclusively for graduates and mestres.",
+      "context": "Reserved for graduated players in Regional *rodas*. It calls for technical and philosophical maturity. In Abadá it may be played at special moments such as *batizados*.",
+      "gameCharacter": "Graceful, elegant, technical, reserved for graduates",
+      "instruments": [
+        "berimbau",
+        "pandeiro (tambourine)",
+        "pandeiro (tambourine)"
+      ]
+    },
+    "santa-maria": {
+      "description": "One of the toques from Mestre Bimba's original sequence. A striking, solemn rhythm associated with a game of precision and mutual respect.",
+      "context": "Played in formal training settings and Capoeira Regional events. It encourages a technical game of well-defined movement without excess.",
+      "gameCharacter": "Striking, precise, solemn, technical",
+      "instruments": [
+        "berimbau",
+        "pandeiro (tambourine)",
+        "pandeiro (tambourine)"
+      ]
+    },
+    "idalina": {
+      "description": "A soft, delicate toque from the Regional repertoire. The name is feminine, and the toque reflects that elegance — it invites a game of fluid movement and expressiveness.",
+      "context": "Played for demonstration games and lighter moments in the *roda*. It values creativity and bodily expressiveness over power.",
+      "gameCharacter": "Delicate, fluid, expressive, elegant",
+      "instruments": [
+        "berimbau",
+        "pandeiro (tambourine)",
+        "pandeiro (tambourine)"
+      ]
+    },
+    "amazonas": {
+      "description": "A dynamic toque from Mestre Bimba's repertoire, evoking the vastness and power of the Amazon rainforest. Its rhythm swings between tension and lightness.",
+      "context": "It encourages a game of great range, with wide movement and creative use of space. Capoeiristas explore acrobatics and takedowns fluidly.",
+      "gameCharacter": "Wide-ranging, dynamic, creative, expansive",
+      "instruments": [
+        "berimbau",
+        "pandeiro (tambourine)",
+        "pandeiro (tambourine)"
+      ]
+    },
+    "cavalaria": {
+      "description": "A toque historically used to warn capoeiristas that the mounted police were arriving, from the period when capoeira was outlawed in Brazil (before 1937).",
+      "context": "When Cavalaria sounded, capoeiristas would stop the game and pretend to be working. Today it is played at special events and for educational purposes, recalling capoeira's history of resistance.",
+      "gameCharacter": "Historic, alerting, a signal of danger",
+      "instruments": [
+        "berimbau"
+      ]
+    },
+    "sao-bento-abada": {
+      "description": "The main toque of Abadá-Capoeira, developed within the tradition founded by Mestre Camisa. It combines the energy of São Bento Regional with Abadá's own identity.",
+      "context": "Played in Abadá-Capoeira *rodas* and *batizados*. It sets the base rhythm of the game in the school's tradition, encouraging speed, power, and technical precision.",
+      "gameCharacter": "Fast, powerful, technical, distinctly Abadá",
+      "instruments": [
+        "berimbau",
+        "pandeiro (tambourine)",
+        "pandeiro (tambourine)",
+        "atabaque (tall hand drum)"
+      ]
+    },
+    "benguela": {
+      "description": "A slow, fluid toque from the Abadá tradition. It invites the 'jogo de floreios' — a beautiful, cooperative game full of bodily expressiveness.",
+      "context": "It encourages a game close to the ground, cooperative and aesthetically beautiful. Capoeiristas show off flourishes, balance, and creativity. It isn't a fighting game but a bodily dialogue.",
+      "gameCharacter": "Fluid, cooperative, beautiful, expressive, close to the ground",
+      "instruments": [
+        "berimbau gunga (the lowest-pitched berimbau)",
+        "berimbau médio (the mid-pitched berimbau)",
+        "berimbau viola (the highest-pitched berimbau)",
+        "pandeiro (tambourine)",
+        "atabaque (tall hand drum)"
+      ]
+    },
+    "siriunha": {
+      "description": "A vibrant toque of Abadá-Capoeira, also spelled Siriúna. An upbeat rhythm that energizes the *roda* and invites an agile, joyful game.",
+      "context": "Played to liven up high-spirited moments in the Abadá *roda*. Capoeiristas respond with livelier movement, acrobatics, and playful interaction.",
+      "gameCharacter": "Upbeat, agile, joyful, energetic",
+      "instruments": [
+        "berimbau",
+        "pandeiro (tambourine)",
+        "pandeiro (tambourine)",
+        "atabaque (tall hand drum)"
+      ]
+    },
+    "jogo-dos-bichos": {
+      "description": "A playful, distinctive toque of Abadá-Capoeira. Capoeiristas imitate the movements of animals — cat, monkey, snake, alligator — turning the game into a theater of bodily expression.",
+      "context": "Especially popular in children's classes and cultural performances. It builds creativity, body awareness, and a connection to nature. Each animal has its own movement pattern.",
+      "gameCharacter": "Playful, creative, theatrical, animal mimicry",
+      "instruments": [
+        "berimbau",
+        "pandeiro (tambourine)",
+        "atabaque (tall hand drum)"
+      ]
+    },
+    "capuxadama": {
+      "description": "A distinctive toque of Abadá-Capoeira with a striking rhythm and identity all its own. Little known outside the Abadá tradition, it is part of the repertoire taught to graduates.",
+      "context": "Played within Abadá's own settings, such as graduation events and regional gatherings. It reinforces the school's identity and community ties.",
+      "gameCharacter": "Striking, distinctly Abadá, communal",
+      "instruments": [
+        "berimbau",
+        "pandeiro (tambourine)",
+        "pandeiro (tambourine)",
+        "atabaque (tall hand drum)"
+      ]
+    },
+    "toque-do-berimbau": {
+      "description": "A reverential toque of Abadá-Capoeira that celebrates the berimbau itself and its central role in capoeira. A contemplative rhythm inviting reflection on musicality.",
+      "context": "Played to honor the berimbau at special moments in the Abadá *roda*. Capoeiristas pause to listen and take in the musicality before resuming the game.",
+      "gameCharacter": "Contemplative, reverential, musical, reflective",
+      "instruments": [
+        "berimbau gunga (the lowest-pitched berimbau)",
+        "berimbau médio (the mid-pitched berimbau)",
+        "berimbau viola (the highest-pitched berimbau)",
+        "pandeiro (tambourine)"
+      ]
+    },
+    "capopasso": {
+      "description": "A dynamic toque of Abadá-Capoeira with a distinctive rhythmic character. It is part of the musical vocabulary taught within the tradition founded by Mestre Camisa.",
+      "context": "Present in Abadá's internal *rodas* and in musical training curricula. It develops musicians' skill and players' bodily response to the rhythm.",
+      "gameCharacter": "Dynamic, sharply marked, instructive, distinctly Abadá",
+      "instruments": [
+        "berimbau",
+        "pandeiro (tambourine)",
+        "pandeiro (tambourine)",
+        "atabaque (tall hand drum)"
+      ]
+    },
+    "samba-de-roda": {
+      "description": "The rhythm of the traditional Sambas de Roda from the Recôncavo Baiano region, considered one of Brazil's oldest rhythms. In capoeira it is played on the berimbau viola as a celebration after the *roda*.",
+      "context": "Played at the end of Angola *rodas* to celebrate. Capoeiristas and musicians sing and dance samba de roda around the *bateria* (the music section). It can also appear in cultural performances.",
+      "gameCharacter": "Festive, celebratory, communal dance",
+      "instruments": [
+        "berimbau viola (the highest-pitched berimbau)",
+        "pandeiro (tambourine)",
+        "atabaque (tall hand drum)",
+        "agogô (double bell)"
+      ]
+    },
+    "maculele": {
+      "description": "The rhythm of the Maculelê warrior dance, originating in Santo Amaro da Purificação, Bahia. Dancers strike sticks (biriba wood batons) or machetes together in time with the music.",
+      "context": "Played during Maculelê performances — the warriors' stick dance. It is often presented at *batizados* and Abadá cultural events alongside capoeira.",
+      "gameCharacter": "Warrior-like, percussive, theatrical, sharply marked rhythm",
+      "instruments": [
+        "atabaque (tall hand drum)",
+        "agogô (double bell)",
+        "pandeiro (tambourine)"
+      ]
+    }
+  },
+  "songs": {
+    "paranue-paranua": {
+      "notes": "One of the oldest and best-known *ladainhas*. The word 'Paranauê' has no direct translation — it's a calling or invocation cry, possibly of Yoruba origin.",
+      "themes": ["Angola", "Zambi", "*saudade*", "Bahia", "identity"]
+    },
+    "zum-zum-zum": {
+      "notes": "'Me matou' ('killed me') here means 'completely won me over' — a metaphorical death from a passion for capoeira. The 'Zum Zum Zum' imitates the sound of the berimbau.",
+      "themes": ["capoeira", "passion", "*jogo*"]
+    },
+    "hoje-tem-capoeira": {
+      "themes": ["*roda*", "community", "*jogo*", "invitation"]
+    },
+    "vou-lhe-dizer-o-que-me-alegra": {
+      "notes": "The 'Hino do Abadá' ('Anthem of Abadá', also known as 'Vou lhe dizer o que me alegra') is the signature song of the ABADÁ-Capoeira association, composed by Lampréia and Macaco Preto. The lyrics express the joy and energy of a capoeira *roda* with the full *bateria* and the sound of the berimbau."
+    }
+  }
+}

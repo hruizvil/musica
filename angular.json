@@ -20,6 +20,9 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
+            "server": "src/main.server.ts",
+            "outputMode": "static",
+            "allowedCommonJsDependencies": ["@grpc/grpc-js", "@grpc/proto-loader"],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {

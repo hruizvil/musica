@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { DataService } from '../../core/services/data.service';
 import { Song } from '../../core/models/song.model';
 import { YtPlayer, YT_ENDED, loadYouTubeApi } from '../../shared/components/youtube-embed/youtube-api';
+import { NovoLangService } from './novo-lang.service';
 import { LyricLine, lyricLines, songColor, toqueColor, youTubeId } from './novo-data';
 
 /** The few player calls this design needs beyond the site's shared typings. */
@@ -39,6 +40,7 @@ export interface PlayItem {
 @Injectable({ providedIn: 'root' })
 export class NovoPlayerService {
   private data = inject(DataService);
+  private lang = inject(NovoLangService);
 
   readonly queue = signal<PlayItem[]>([]);
   readonly index = signal(0);
@@ -89,7 +91,7 @@ export class NovoPlayerService {
     const videoId = youTubeId(video?.youtubeId ?? t?.videoLinks[0]?.url);
     if (!t) return;
     this.start([{
-      key: 'toque:' + toqueId, songId: null, toqueId, title: t.name, subtitle: 'Demonstração do toque',
+      key: 'toque:' + toqueId, songId: null, toqueId, title: t.name, subtitle: this.lang.s().toqueDemo,
       color: toqueColor(toqueId), videoId, fromToque: false,
     }], 0);
   }

@@ -489,6 +489,12 @@ type PanelMode = 'none' | 'edit' | 'add';
                       placeholder="Contexto histórico, dicas de pronúncia, uso em aulas..."
                       class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm leading-relaxed placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold resize-y">
                     </textarea>
+                    <!-- Shown on the English site. Words kept in Portuguese go in *asterisks* and render in italics. -->
+                    <p class="text-xs font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500 mt-4 mb-3">Notas (English)</p>
+                    <textarea [(ngModel)]="editNotesEn" name="notesEn" rows="4"
+                      placeholder="The same notes in English, for the English site. Keep capoeira terms in *asterisks*: *roda*, *ginga*..."
+                      class="w-full px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 text-sm leading-relaxed placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-capoeira-gold resize-y">
+                    </textarea>
                   </div>
 
                 </div>
@@ -819,6 +825,7 @@ export class AdminComponent implements OnInit {
   editLyrics = '';
   editTranslation = '';
   editNotes = '';
+  editNotesEn = '';
   editRefrao = '';
   editRefraoTranslation = '';
   editPreview = false;
@@ -833,7 +840,7 @@ export class AdminComponent implements OnInit {
   youtubeMeta = signal<{ title: string; author: string } | null>(null);
   private youtubeMetaFetchedId = '';
 
-  private snapshot: { title: string; toque: string[]; composer: string; youtube: string; spotify: string; lyrics: string; translation: string; notes: string; refrao: string; refraoTranslation: string; preview: boolean } | null = null;
+  private snapshot: { title: string; toque: string[]; composer: string; youtube: string; spotify: string; lyrics: string; translation: string; notes: string; notesEn: string; refrao: string; refraoTranslation: string; preview: boolean } | null = null;
 
   ngOnInit() {
     this.theme.init();
@@ -849,6 +856,7 @@ export class AdminComponent implements OnInit {
       s.lyrics !== this.editLyrics ||
       s.translation !== this.editTranslation ||
       s.notes !== this.editNotes ||
+      s.notesEn !== this.editNotesEn ||
       s.refrao !== this.editRefrao ||
       s.refraoTranslation !== this.editRefraoTranslation ||
       s.preview !== this.editPreview ||
@@ -860,7 +868,7 @@ export class AdminComponent implements OnInit {
       title: this.editTitle, toque: [...this.editToque],
       composer: this.editComposer, youtube: this.editYoutube, spotify: this.editSpotify,
       lyrics: this.editLyrics, translation: this.editTranslation,
-      notes: this.editNotes, refrao: this.editRefrao, refraoTranslation: this.editRefraoTranslation, preview: this.editPreview,
+      notes: this.editNotes, notesEn: this.editNotesEn, refrao: this.editRefrao, refraoTranslation: this.editRefraoTranslation, preview: this.editPreview,
     };
   }
 
@@ -914,6 +922,7 @@ export class AdminComponent implements OnInit {
     this.editLyrics = song.lyrics ?? '';
     this.editTranslation = song.translation ?? '';
     this.editNotes = song.notes ?? '';
+    this.editNotesEn = song.notesEn ?? '';
     this.editRefrao = song.refrao ?? '';
     this.editRefraoTranslation = song.refraoTranslation ?? '';
     this.editPreview = song.preview ?? false;
@@ -937,6 +946,7 @@ export class AdminComponent implements OnInit {
     this.editLyrics = '';
     this.editTranslation = '';
     this.editNotes = '';
+    this.editNotesEn = '';
     this.editRefrao = '';
     this.editRefraoTranslation = '';
     this.editPreview = false;
@@ -1077,6 +1087,7 @@ export class AdminComponent implements OnInit {
           lyrics: this.editLyrics.trim(),
           translation: this.editTranslation.trim() || null,
           notes: this.editNotes.trim() || null,
+          notesEn: this.editNotesEn.trim() || null,
           refrao: this.editRefrao.trim() || null,
           refraoTranslation: this.editRefraoTranslation.trim() || null,
           preview: this.editPreview,
@@ -1095,6 +1106,8 @@ export class AdminComponent implements OnInit {
         if (this.editLyrics.trim()) override.lyrics = this.editLyrics.trim();
         if (this.editTranslation.trim()) override.translation = this.editTranslation.trim();
         if (this.editNotes.trim()) override.notes = this.editNotes.trim();
+        // Always written, so clearing the English notes removes them.
+        override.notesEn = this.editNotesEn.trim() || null;
         if (this.editRefrao.trim()) override.refrao = this.editRefrao.trim();
         if (this.editRefraoTranslation.trim()) override.refraoTranslation = this.editRefraoTranslation.trim();
         await this.fb.saveSongOverride(song.id, override);
@@ -1130,6 +1143,7 @@ export class AdminComponent implements OnInit {
         lyrics: this.editLyrics.trim(),
         translation: this.editTranslation.trim() || null,
         notes: this.editNotes.trim() || null,
+        notesEn: this.editNotesEn.trim() || null,
         refrao: this.editRefrao.trim() || null,
         refraoTranslation: this.editRefraoTranslation.trim() || null,
         themes: [],
@@ -1150,6 +1164,7 @@ export class AdminComponent implements OnInit {
       this.editSpotify = '';
       this.editTranslation = '';
       this.editNotes = '';
+      this.editNotesEn = '';
       this.editRefrao = '';
       this.editRefraoTranslation = '';
       this.editPreview = false;

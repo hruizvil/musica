@@ -1,12 +1,14 @@
 import { Component, OnDestroy, computed, effect, inject, input, signal, untracked } from '@angular/core';
-import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
 import { NovoPlayerService } from './novo-player.service';
 import { NovoIconComponent, NovoPatternComponent } from './novo-ui';
 import { NovoSongRowComponent } from './novo-parts';
 import { BerimbauSynth } from './novo-berimbau';
-import { CATEGORY_LABEL, PATTERNS, byTitle, toqueColor, youTubeId } from './novo-data';
+import { PATTERNS, TextRun, byTitle, emphasis, plainText, toqueColor, youTubeId } from './novo-data';
+import { NovoLangService } from './novo-lang.service';
+import { NovoContentService } from './novo-content.service';
+import { NovoSeoService, SITE_ORIGIN } from './novo-seo.service';
 
 const BEAT_MS = 420;
 
@@ -20,19 +22,19 @@ const BEAT_MS = 420;
       <section class="bg-[var(--n-surf)] border-b border-[var(--n-line)]">
         <div class="max-w-[1360px] mx-auto px-4 md:px-10 py-6 md:py-10 grid lg:grid-cols-[minmax(0,1fr)_540px] gap-6 lg:gap-10 items-center">
           <div class="flex flex-col gap-3 md:gap-3.5 min-w-0">
-            <a routerLink="/novo/toques" class="self-start inline-flex items-center gap-1 min-h-9 text-sm font-semibold text-[var(--n-tx2)]"><app-novo-icon name="back" [size]="16" />Toques</a>
-            <span class="self-start px-3 py-1 rounded-full text-white text-xs font-extrabold tracking-[0.1em] uppercase" [style.background]="color()">Toque · {{ category() }}</span>
+            <a [routerLink]="L.to('/toques')" class="self-start inline-flex items-center gap-1 min-h-9 text-sm font-semibold text-[var(--n-tx2)]"><app-novo-icon name="back" [size]="16" />{{ L.s().toques }}</a>
+            <span class="self-start px-3 py-1 rounded-full text-white text-xs font-extrabold tracking-[0.1em] uppercase" [style.background]="color()">{{ L.s().toqueLabel }} · {{ category() }}</span>
             <h1 class="m-0 n-disp text-[40px] md:text-[72px] font-bold tracking-[-0.05em] leading-[0.95]">{{ t.name }}</h1>
-            <p class="m-0 max-w-[620px] text-base md:text-[17px] leading-relaxed text-[var(--n-tx2)]">{{ t.description }}</p>
+            <p class="m-0 max-w-[620px] text-base md:text-[17px] leading-relaxed text-[var(--n-tx2)]">@for (r of runs(content.toqueDescription(t)); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</p>
             <div class="flex flex-wrap gap-2.5 mt-1">
               @if (songs().length) {
                 <button type="button" (click)="playSongs()" class="h-12 px-5 rounded-xl bg-[var(--n-acc)] text-[#1a1400] inline-flex items-center gap-2 text-[15px] md:text-base font-extrabold">
-                  <app-novo-icon name="play" [size]="16" />Tocar {{ songs().length === 1 ? 'a cantiga' : 'as ' + songs().length + ' cantigas' }}
+                  <app-novo-icon name="play" [size]="16" />{{ L.s().playSongs(songs().length) }}
                 </button>
               }
               @if (hasVideo()) {
                 <button type="button" (click)="player.playToque(t.id)" class="h-12 px-[18px] rounded-xl border border-[var(--n-line)] inline-flex items-center gap-2 text-[15px] md:text-base font-bold">
-                  <app-novo-icon name="video" [size]="18" />Ver o vídeo do toque
+                  <app-novo-icon name="video" [size]="18" />{{ L.s().watchToque }}
                 </button>
               }
             </div>
@@ -40,10 +42,10 @@ const BEAT_MS = 420;
 
           <div class="p-4 md:p-6 rounded-[20px] text-white flex flex-col gap-4 md:gap-[18px] min-w-0" [style.background]="color()">
             <div class="flex items-center justify-between gap-3">
-              <span class="text-xs md:text-[13px] font-extrabold tracking-[0.1em] uppercase">Padrão do berimbau</span>
+              <span class="text-xs md:text-[13px] font-extrabold tracking-[0.1em] uppercase">{{ L.s().patternTitle }}</span>
               @if (hasPattern()) {
                 <button type="button" (click)="togglePattern()" [attr.aria-pressed]="patternPlaying()" class="h-10 px-4 rounded-xl bg-white inline-flex items-center gap-2 text-sm font-extrabold" [style.color]="color()">
-                  <app-novo-icon [name]="patternPlaying() ? 'pause' : 'play'" [size]="14" />{{ patternPlaying() ? 'Parar' : 'Ouvir o padrão' }}
+                  <app-novo-icon [name]="patternPlaying() ? 'pause' : 'play'" [size]="14" />{{ patternPlaying() ? L.s().stop : L.s().hearPattern }}
                 </button>
               }
             </div>
@@ -52,11 +54,11 @@ const BEAT_MS = 420;
               <app-novo-pattern [toqueId]="t.id" size="l" [onColor]="true" [active]="beat()" class="hidden sm:inline-flex" />
             </div>
             <div class="flex flex-wrap gap-x-4 gap-y-1 text-[13px] md:text-sm text-white/90">
-              <span><b>dim</b> agudo</span><span><b>tch</b> chiado</span><span><b>dom</b> grave</span>
-              <span class="basis-full md:basis-auto md:ml-auto">{{ t.gameCharacter }}</span>
+              <span><b>dim</b> {{ L.s().strokeDim }}</span><span><b>tch</b> {{ L.s().strokeTch }}</span><span><b>dom</b> {{ L.s().strokeDom }}</span>
+              <span class="basis-full md:basis-auto md:ml-auto">{{ content.toqueCharacter(t) }}</span>
             </div>
             @if (hasPattern()) {
-              <p class="m-0 text-xs text-white/80">O som do botão é uma aproximação sintetizada. Para o berimbau de verdade, veja o vídeo do toque.</p>
+              <p class="m-0 text-xs text-white/80">{{ L.s().patternSynthNote }}</p>
             }
           </div>
         </div>
@@ -64,30 +66,30 @@ const BEAT_MS = 420;
 
       <div class="max-w-[1360px] mx-auto px-4 md:px-10 py-6 md:py-8 grid lg:grid-cols-[minmax(0,1fr)_380px] gap-8 lg:gap-10">
         <section class="flex flex-col gap-1.5" aria-labelledby="t-songs">
-          <h2 id="t-songs" class="m-0 mb-2 n-disp text-[22px] md:text-[26px] font-bold tracking-[-0.03em]">Cantigas neste toque</h2>
+          <h2 id="t-songs" class="m-0 mb-2 n-disp text-[22px] md:text-[26px] font-bold tracking-[-0.03em]">{{ L.s().songsInToque }}</h2>
           @for (s of songs(); track s.id; let i = $index) {
             <app-novo-song-row [song]="s" [n]="i + 1" [queue]="songIds()" />
           } @empty {
-            <p class="m-0 text-[15px] leading-relaxed text-[var(--n-tx2)]">Ainda não há cantigas cadastradas neste toque.{{ hasVideo() ? ' O vídeo e o padrão já ajudam a reconhecê-lo na roda.' : '' }}</p>
+            <p class="m-0 text-[15px] leading-relaxed text-[var(--n-tx2)]">{{ L.s().toqueNoSongs }}{{ hasVideo() ? L.s().toqueNoSongsVideo : '' }}</p>
           }
         </section>
         <aside class="flex flex-col gap-3.5">
           <div class="p-5 rounded-[18px] bg-[var(--n-surf)] border border-[var(--n-line)] flex flex-col gap-2.5">
-            <span class="text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">Quando se toca</span>
-            <p class="m-0 text-[15px] leading-relaxed text-[var(--n-tx2)]">{{ t.context }}</p>
+            <span class="text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">{{ L.s().whenPlayed }}</span>
+            <p class="m-0 text-[15px] leading-relaxed text-[var(--n-tx2)]">@for (r of runs(content.toqueContext(t)); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</p>
           </div>
           <div class="p-5 rounded-[18px] bg-[var(--n-surf)] border border-[var(--n-line)] flex flex-col gap-2.5">
-            <span class="text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">Instrumentos</span>
+            <span class="text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">{{ L.s().instruments }}</span>
             <div class="flex flex-wrap gap-1.5">
-              @for (i of t.instruments; track i) { <span class="px-3 py-1.5 rounded-full bg-[var(--n-raise)] text-sm">{{ i }}</span> }
+              @for (i of content.instruments(t); track $index) { <span class="px-3 py-1.5 rounded-full bg-[var(--n-raise)] text-sm">{{ i }}</span> }
             </div>
           </div>
           @if (related().length) {
             <div class="p-5 rounded-[18px] bg-[var(--n-surf)] border border-[var(--n-line)] flex flex-col gap-2.5">
-              <span class="text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">Toques próximos</span>
+              <span class="text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">{{ L.s().relatedToques }}</span>
               <div class="flex flex-wrap gap-2">
                 @for (r of related(); track r.id) {
-                  <a [routerLink]="['/novo/toques', r.id]" class="min-h-10 px-3.5 rounded-xl text-white inline-flex items-center text-sm font-bold hover:no-underline" [style.background]="colorOf(r.id)">{{ r.name }}</a>
+                  <a [routerLink]="L.to('/toques/' + r.id)" class="min-h-10 px-3.5 rounded-xl text-white inline-flex items-center text-sm font-bold hover:no-underline" [style.background]="colorOf(r.id)">{{ r.name }}</a>
                 }
               </div>
             </div>
@@ -96,8 +98,8 @@ const BEAT_MS = 420;
       </div>
     } @else if (data.toques().length) {
       <div class="max-w-md mx-auto px-4 py-20 text-center flex flex-col gap-4 items-center">
-        <h1 class="m-0 n-disp text-2xl font-bold">Toque não encontrado</h1>
-        <a routerLink="/novo/toques" class="h-11 px-5 rounded-xl bg-[var(--n-acc)] text-[#1a1400] font-extrabold inline-flex items-center hover:no-underline">Ver todos os toques</a>
+        <h1 class="m-0 n-disp text-2xl font-bold">{{ L.s().toqueNotFound }}</h1>
+        <a [routerLink]="L.to('/toques')" class="h-11 px-5 rounded-xl bg-[var(--n-acc)] text-[#1a1400] font-extrabold inline-flex items-center hover:no-underline">{{ L.s().seeAllToques }}</a>
       </div>
     }
   `,
@@ -105,13 +107,15 @@ const BEAT_MS = 420;
 export class NovoToqueComponent implements OnDestroy {
   readonly data = inject(DataService);
   readonly player = inject(NovoPlayerService);
-  private titleService = inject(Title);
+  readonly content = inject(NovoContentService);
+  readonly L = inject(NovoLangService);
+  private seo = inject(NovoSeoService);
 
   id = input.required<string>();
 
   readonly toque = computed(() => this.data.toqueById().get(this.id()));
   readonly color = computed(() => toqueColor(this.id()));
-  readonly category = computed(() => CATEGORY_LABEL[this.toque()?.category ?? 'other']);
+  readonly category = computed(() => this.content.category(this.toque()?.category ?? 'other'));
   readonly songs = computed(() => [...(this.data.songsByToque().get(this.id()) ?? [])].sort(byTitle));
   readonly songIds = computed(() => this.songs().map(s => s.id));
   readonly hasPattern = computed(() => !!PATTERNS[this.id()]);
@@ -126,8 +130,24 @@ export class NovoToqueComponent implements OnDestroy {
 
   constructor() {
     effect(() => {
-      const t = this.toque();
-      if (t) this.titleService.setTitle(t.name + ' · Toques · Abadá Música');
+      const t = this.toque(); const d = this.L.s();
+      if (t) {
+        this.seo.set({
+          title: t.name + ' · ' + d.toques,
+          description: d.seoToque(t.name) + ' ' + plainText(this.content.toqueDescription(t)),
+          path: '/toques/' + t.id,
+          jsonLd: {
+            '@type': 'CreativeWork',
+            name: t.name,
+            description: plainText(this.content.toqueDescription(t)),
+            genre: 'Capoeira',
+            inLanguage: d.htmlLang,
+            url: SITE_ORIGIN + this.L.to('/toques/' + t.id),
+          },
+        });
+      } else if (this.data.toques().length) {
+        this.seo.set({ title: d.toqueNotFound, description: d.notFoundBody, path: '/toques/' + this.id(), noindex: true });
+      }
     });
     // Moving to another toque stops the pattern that was playing.
     effect(() => { this.id(); this.stopPattern(); });
@@ -141,6 +161,7 @@ export class NovoToqueComponent implements OnDestroy {
   }
 
   colorOf(id: string): string { return toqueColor(id); }
+  runs(text: string): TextRun[] { return emphasis(text); }
 
   playSongs(): void { this.player.playSongs(this.songIds()); }
 

@@ -7,6 +7,72 @@
     }
   },
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.csr.html"
+    }
+  ],
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/novo",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/novo/:path*",
+      "destination": "/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/musicas",
+      "destination": "/cantigas",
+      "permanent": true
+    },
+    {
+      "source": "/musicas/:id",
+      "destination": "/cantigas/:id",
+      "permanent": true
+    },
+    {
+      "source": "/minhas",
+      "destination": "/curtidas",
+      "permanent": true
+    },
+    {
+      "source": "/minhas/tocar",
+      "destination": "/curtidas",
+      "permanent": true
+    },
+    {
+      "source": "/videos",
+      "destination": "/toques",
+      "permanent": true
+    },
+    {
+      "source": "/roda",
+      "destination": "/curtidas",
+      "permanent": true
+    },
+    {
+      "source": "/pt/musicas",
+      "destination": "/pt/cantigas",
+      "permanent": true
+    },
+    {
+      "source": "/pt/musicas/:id",
+      "destination": "/pt/cantigas/:id",
+      "permanent": true
+    },
+    {
+      "source": "/pt/minhas",
+      "destination": "/pt/curtidas",
+      "permanent": true
+    },
+    {
+      "source": "/pt/videos",
+      "destination": "/pt/toques",
+      "permanent": true
+    }
   ]
 }

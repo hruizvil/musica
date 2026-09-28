@@ -1,4 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DOCUMENT, OnDestroy, inject, OnInit } from '@angular/core';
+import { Meta } from '@angular/platform-browser';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
@@ -29,7 +30,7 @@ import { SigninPromptComponent } from '../../shared/components/signin-prompt/sig
         class="no-print fixed bottom-6 left-1/2 -translate-x-1/2 z-[75] flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-xl bg-stone-800 text-white shadow-lg whitespace-nowrap">
         <span class="text-sm font-semibold">{{ toast.text }}</span>
         @if (toast.linkToLibrary) {
-          <a routerLink="/minhas" class="h-10 px-2 flex items-center text-sm font-bold text-capoeira-gold hover:underline">Ver favoritas</a>
+          <a routerLink="/classico/minhas" class="h-10 px-2 flex items-center text-sm font-bold text-capoeira-gold hover:underline">Ver favoritas</a>
         }
       </div>
     }
@@ -51,12 +52,23 @@ import { SigninPromptComponent } from '../../shared/components/signin-prompt/sig
     }
   `,
 })
-export class ShellComponent implements OnInit {
+export class ShellComponent implements OnInit, OnDestroy {
   private theme = inject(ThemeService);
+  private meta = inject(Meta);
+  private doc = inject(DOCUMENT);
   readonly pwa = inject(PwaUpdateService);
   readonly favorites = inject(FavoritesService);
 
   ngOnInit(): void {
     this.theme.init();
+    // The classic design stays reachable at /classico during the move, but its pages
+    // duplicate the main site's; keep them out of search results.
+    this.meta.updateTag({ name: 'robots', content: 'noindex, follow' });
+    // Its pages are in Portuguese; the page skeleton now defaults to English.
+    this.doc.documentElement.lang = 'pt-BR';
+  }
+
+  ngOnDestroy(): void {
+    this.meta.removeTag('name="robots"');
   }
 }

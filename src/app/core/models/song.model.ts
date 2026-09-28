@@ -14,6 +14,8 @@ export interface Song {
   themes: string[];
   audioLinks: AudioLinks;
   notes: string | null;
+  /** English version of the notes, written in the admin. */
+  notesEn?: string | null;
   refrao?: string | null;
   refraoTranslation?: string | null;
   dateAdded: string;

@@ -1,19 +1,20 @@
 import { Component, DOCUMENT, ViewEncapsulation, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { filter, map } from 'rxjs';
+import { filter } from 'rxjs';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { FavoritesService } from '../../core/services/favorites.service';
 import { NovoThemeService } from './novo-theme.service';
 import { NovoPlayerService } from './novo-player.service';
 import { NovoPlayerComponent } from './novo-player.component';
 import { NovoIconComponent } from './novo-ui';
+import { NovoLangService } from './novo-lang.service';
 
 const FONTS_ID = 'novo-design-fonts';
 const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Figtree:wght@400;500;600;700;800&display=swap';
 
 /**
- * The frame for the new design ("Abadá") at /novo. It sits beside the current site's shell,
+ * The frame for the main site ("Abadá" design), in English at / and Portuguese at /pt. It sits beside the classic shell (/classico),
  * never inside it, and reuses the site's data and account services as they are, so
  * Curtidas and Aprendidas are the same lists on both designs.
  *
@@ -53,11 +54,11 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
     <div class="novo min-h-screen flex flex-col" [class.novo-dark]="theme.dark()">
 
       <header class="no-print sticky top-0 z-30 bg-[var(--n-surf)] border-b border-[var(--n-line)]">
-        <div class="max-w-[1440px] mx-auto h-[60px] md:h-[72px] flex items-center gap-4 md:gap-9 pl-[18px] pr-2 md:px-10">
-          <a routerLink="/novo" class="min-h-11 inline-flex items-center n-disp font-bold text-[17px] md:text-xl tracking-[-0.03em] hover:no-underline">abadá<span class="text-[var(--n-acc-tx)]">.</span>música</a>
+        <div class="max-w-[1440px] mx-auto h-[60px] md:h-[72px] flex items-center gap-2 md:gap-9 pl-4 pr-2 md:px-10">
+          <a [routerLink]="L.to('/')" class="min-h-11 inline-flex items-center n-disp font-bold text-[15px] min-[380px]:text-[17px] md:text-xl tracking-[-0.03em] hover:no-underline">abadá<span class="text-[var(--n-acc-tx)]">.</span>música</a>
 
-          <nav aria-label="Principal" class="hidden md:flex gap-7 h-full">
-            @for (item of nav; track item.link) {
+          <nav [attr.aria-label]="L.s().navMain" class="hidden md:flex gap-7 h-full">
+            @for (item of nav(); track item.link) {
               <a [routerLink]="item.link" routerLinkActive="!text-[var(--n-tx)] !border-[var(--n-acc)]" [routerLinkActiveOptions]="{ exact: item.exact }"
                  class="h-full inline-flex items-center text-[15px] font-bold text-[var(--n-tx2)] border-b-[3px] border-transparent box-border hover:no-underline hover:text-[var(--n-tx)]">{{ item.label }}</a>
             }
@@ -66,40 +67,51 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
           <form role="search" (submit)="search($event, q.value)" class="hidden md:flex ml-auto">
             <label class="w-[300px] h-[42px] px-3.5 rounded-[10px] bg-[var(--n-raise)] flex items-center gap-2.5 text-[var(--n-tx3)]">
               <app-novo-icon name="search" [size]="17" />
-              <span class="sr-only">Buscar</span>
-              <input #q id="novo-search" type="search" placeholder="Cantiga, verso ou toque" class="flex-1 min-w-0 bg-transparent border-0 outline-none text-[15px] text-[var(--n-tx)] placeholder:text-[var(--n-tx3)]" />
+              <span class="sr-only">{{ L.s().searchLabel }}</span>
+              <input #q id="novo-search" type="search" [placeholder]="L.s().searchPlaceholder" class="flex-1 min-w-0 bg-transparent border-0 outline-none text-[15px] text-[var(--n-tx)] placeholder:text-[var(--n-tx3)]" />
             </label>
           </form>
 
           <div class="hidden md:flex items-center gap-2 text-[13px] font-semibold text-[var(--n-tx2)]">
-            <span id="novo-theme-label">Escuro</span>
+            <span id="novo-theme-label">{{ L.s().themeDark }}</span>
             <button type="button" role="switch" (click)="theme.toggle()" [attr.aria-checked]="theme.dark()" aria-labelledby="novo-theme-label"
               class="relative w-11 h-[26px] rounded-full transition-colors" [style.background]="theme.dark() ? 'var(--n-acc)' : 'var(--n-line)'">
               <span class="absolute top-[3px] w-5 h-5 rounded-full transition-[left]" [style.left.px]="theme.dark() ? 21 : 3" [style.background]="theme.dark() ? '#1a1400' : '#ffffff'"></span>
             </button>
           </div>
 
-          <a [href]="currentSiteUrl()" class="hidden lg:inline-flex h-9 px-3 rounded-full border border-dashed border-[var(--n-line)] items-center text-[13px] font-semibold text-[var(--n-tx2)] whitespace-nowrap">Site atual ↗</a>
+          <a [href]="L.otherUrl()" [attr.hreflang]="L.lang() === 'en' ? 'pt-BR' : 'en'" (click)="switchLang($event)"
+             class="hidden md:flex items-center gap-2 text-[13px] font-semibold text-[var(--n-tx2)] hover:no-underline" [attr.aria-label]="L.s().switchHint">
+            <span lang="pt-BR">Português</span>
+            <span aria-hidden="true" class="relative w-11 h-[26px] rounded-full transition-colors" [style.background]="L.lang() === 'pt' ? 'var(--n-acc)' : 'var(--n-line)'">
+              <span class="absolute top-[3px] w-5 h-5 rounded-full transition-[left]" [style.left.px]="L.lang() === 'pt' ? 21 : 3" [style.background]="L.lang() === 'pt' ? '#1a1400' : '#ffffff'"></span>
+            </span>
+          </a>
 
-          <div class="relative ml-auto md:ml-0 flex items-center gap-1">
-            <button type="button" (click)="theme.toggle()" class="md:hidden w-11 h-11 rounded-full flex items-center justify-center text-[var(--n-tx)]" [attr.aria-label]="theme.dark() ? 'Usar tema claro' : 'Usar tema escuro'">
+          <div class="relative ml-auto md:ml-0 flex items-center gap-0.5 min-[380px]:gap-1">
+            <button type="button" (click)="theme.toggle()" class="md:hidden w-10 h-10 rounded-full flex items-center justify-center text-[var(--n-tx)]" [attr.aria-label]="theme.dark() ? L.s().useLight : L.s().useDark">
               <app-novo-icon [name]="theme.dark() ? 'sun' : 'moon'" [size]="20" />
             </button>
-            <a routerLink="/novo/cantigas" [queryParams]="{ buscar: 1 }" class="md:hidden w-11 h-11 rounded-full flex items-center justify-center text-[var(--n-tx)]" aria-label="Buscar"><app-novo-icon name="search" [size]="21" /></a>
+            <a [href]="L.otherUrl()" (click)="switchLang($event)" [attr.hreflang]="L.lang() === 'en' ? 'pt-BR' : 'en'" [attr.aria-label]="L.s().switchHint"
+               class="md:hidden h-10 min-w-10 px-2 rounded-full border border-[var(--n-line)] flex items-center justify-center text-[13px] font-extrabold text-[var(--n-tx)] hover:no-underline">{{ L.s().switchToShort }}</a>
+            <a [routerLink]="L.to('/cantigas')" [queryParams]="{ buscar: 1 }" class="md:hidden w-10 h-10 rounded-full flex items-center justify-center text-[var(--n-tx)]" [attr.aria-label]="L.s().searchLabel"><app-novo-icon name="search" [size]="21" /></a>
             @if (firebase.currentUser(); as user) {
-              <button type="button" (click)="accountOpen.set(!accountOpen())" [attr.aria-expanded]="accountOpen()" [attr.aria-label]="'Conta: ' + (user.displayName || user.email)"
+              <button type="button" (click)="accountOpen.set(!accountOpen())" [attr.aria-expanded]="accountOpen()" [attr.aria-label]="L.s().account + ': ' + (user.displayName || user.email)"
                 class="w-[38px] h-[38px] rounded-full bg-[var(--n-acc)] text-[#1a1400] font-extrabold flex items-center justify-center">{{ initial() }}</button>
               @if (accountOpen()) {
                 <div class="absolute right-0 top-12 w-64 p-4 rounded-2xl bg-[var(--n-surf)] border border-[var(--n-line)] shadow-lg flex flex-col gap-3 z-50">
-                  <div class="min-w-0"><p class="m-0 font-bold truncate">{{ user.displayName || 'Sua conta' }}</p><p class="m-0 text-sm text-[var(--n-tx2)] truncate">{{ user.email }}</p></div>
-                  <a [href]="currentSiteUrl()" class="lg:hidden text-sm font-semibold">Ver no site atual ↗</a>
-                  <button type="button" (click)="signOut()" class="h-10 rounded-xl border border-[var(--n-line)] font-bold text-sm">Sair</button>
+                  <div class="min-w-0"><p class="m-0 font-bold truncate">{{ user.displayName || L.s().yourAccount }}</p><p class="m-0 text-sm text-[var(--n-tx2)] truncate">{{ user.email }}</p></div>
+                  <a [href]="classicUrl()" class="text-sm font-semibold">{{ L.s().classicLong }} ↗</a>
+                  <button type="button" (click)="signOut()" class="h-10 rounded-xl border border-[var(--n-line)] font-bold text-sm">{{ L.s().signOut }}</button>
                 </div>
               }
             } @else if (firebase.pendingSignedIn()) {
               <span aria-hidden="true" class="block w-[38px] h-[38px] rounded-full bg-[var(--n-raise)] animate-pulse"></span>
             } @else {
-              <a routerLink="/login" [queryParams]="{ returnUrl: router.url }" class="h-10 px-4 rounded-xl bg-[var(--n-acc)] text-[#1a1400] text-sm font-extrabold inline-flex items-center hover:no-underline">Entrar</a>
+              <a [routerLink]="L.to('/login')" [queryParams]="{ returnUrl: router.url }" class="hidden md:inline-flex h-10 px-4 rounded-xl bg-[var(--n-acc)] text-[#1a1400] text-sm font-extrabold items-center hover:no-underline">{{ L.s().signIn }}</a>
+              <!-- Phones: an icon, so the header fits with the language and theme buttons. -->
+              <a [routerLink]="L.to('/login')" [queryParams]="{ returnUrl: router.url }" [attr.aria-label]="L.s().signIn"
+                 class="md:hidden w-10 h-10 rounded-full bg-[var(--n-acc)] text-[#1a1400] flex items-center justify-center hover:no-underline"><app-novo-icon name="user" [size]="20" /></a>
             }
           </div>
         </div>
@@ -111,13 +123,16 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
 
       <footer class="no-print hidden md:block border-t border-[var(--n-line)]" [class.md:mb-24]="!!player.current()">
         <div class="max-w-[1440px] mx-auto px-10 py-6 flex items-center justify-between text-sm text-[var(--n-tx2)]">
-          <span><span class="n-disp font-bold text-[var(--n-tx)]">abadá.música</span> · novo design, em teste</span>
-          <a [href]="currentSiteUrl()" class="font-semibold text-[var(--n-acc-tx)]">Ver esta página no site atual</a>
+          <span><span class="n-disp font-bold text-[var(--n-tx)]">abadá.música</span> · {{ L.s().footerNote }}</span>
+          <span class="flex items-center gap-5">
+            <a [href]="L.otherUrl()" (click)="switchLang($event)" [attr.hreflang]="L.lang() === 'en' ? 'pt-BR' : 'en'" class="font-semibold">{{ L.s().switchHint }}</a>
+            <a [href]="classicUrl()" class="font-semibold text-[var(--n-acc-tx)]">{{ L.s().classicLong }}</a>
+          </span>
         </div>
       </footer>
 
-      <nav aria-label="Principal" class="no-print md:hidden fixed inset-x-0 bottom-0 z-40 flex px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),14px)] bg-[var(--n-surf)] border-t border-[var(--n-line)]">
-        @for (item of tabs; track item.label) {
+      <nav [attr.aria-label]="L.s().navMain" class="no-print md:hidden fixed inset-x-0 bottom-0 z-40 flex px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),14px)] bg-[var(--n-surf)] border-t border-[var(--n-line)]">
+        @for (item of tabs(); track item.link) {
           <a [routerLink]="item.link" routerLinkActive="!text-[var(--n-acc-tx)]" [routerLinkActiveOptions]="{ exact: item.exact }"
              class="flex-1 min-h-[52px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold text-[var(--n-tx3)] hover:no-underline">
             <app-novo-icon [name]="item.icon" [size]="22" />{{ item.label }}
@@ -130,17 +145,17 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
       <!-- Tapping a heart while signed out: the shared favourites action opens this. -->
       @if (favorites.promptOpen()) {
         <div class="fixed inset-0 z-[80] flex items-end sm:items-center justify-center">
-          <button type="button" aria-label="Fechar" (click)="favorites.closePrompt()" class="absolute inset-0 bg-black/55 cursor-default"></button>
+          <button type="button" [attr.aria-label]="L.s().close" (click)="favorites.closePrompt()" class="absolute inset-0 bg-black/55 cursor-default"></button>
           <section role="dialog" aria-modal="true" aria-labelledby="novo-signin-title" tabindex="-1" (keydown.escape)="favorites.closePrompt()"
             class="relative w-full sm:max-w-sm bg-[var(--n-surf)] text-[var(--n-tx)] rounded-t-3xl sm:rounded-3xl px-6 pt-3 pb-[max(env(safe-area-inset-bottom),28px)] sm:pt-7 shadow-2xl flex flex-col items-center gap-4 text-center">
             <span aria-hidden="true" class="sm:hidden w-10 h-1.5 rounded-full bg-[var(--n-line)]"></span>
             <span aria-hidden="true" class="mt-2 sm:mt-0 w-14 h-14 rounded-2xl bg-[#4338ca] text-white flex items-center justify-center"><app-novo-icon name="heart" [size]="26" [filled]="true" /></span>
-            <h2 id="novo-signin-title" class="m-0 n-disp text-[22px] font-bold tracking-[-0.03em]">Guarde suas curtidas</h2>
-            <p class="m-0 text-[15px] leading-relaxed text-[var(--n-tx2)]">Entre com o Google para guardar as cantigas que você curte em qualquer aparelho e tocar todas em sequência.</p>
+            <h2 id="novo-signin-title" class="m-0 n-disp text-[22px] font-bold tracking-[-0.03em]">{{ L.s().keepLiked }}</h2>
+            <p class="m-0 text-[15px] leading-relaxed text-[var(--n-tx2)]">{{ L.s().keepLikedBody }}</p>
             <div class="self-stretch flex flex-col gap-2 mt-1">
-              <a routerLink="/login" [queryParams]="{ returnUrl: router.url }" (click)="favorites.closePrompt()"
-                class="h-12 rounded-xl bg-[var(--n-acc)] text-[#1a1400] font-extrabold flex items-center justify-center hover:no-underline">Entrar com Google</a>
-              <button type="button" (click)="favorites.closePrompt()" class="h-12 rounded-xl font-bold text-[var(--n-tx2)] hover:bg-[var(--n-raise)]">Agora não</button>
+              <a [routerLink]="L.to('/login')" [queryParams]="{ returnUrl: router.url }" (click)="favorites.closePrompt()"
+                class="h-12 rounded-xl bg-[var(--n-acc)] text-[#1a1400] font-extrabold flex items-center justify-center hover:no-underline">{{ L.s().signInGoogle }}</a>
+              <button type="button" (click)="favorites.closePrompt()" class="h-12 rounded-xl font-bold text-[var(--n-tx2)] hover:bg-[var(--n-raise)]">{{ L.s().notNow }}</button>
             </div>
           </section>
         </div>
@@ -150,7 +165,7 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
         <div role="status" class="no-print fixed bottom-[190px] md:bottom-32 left-1/2 -translate-x-1/2 z-[75] flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-xl bg-[#15161a] text-white shadow-lg whitespace-nowrap">
           <span class="text-sm font-semibold">{{ toastText(toast.text) }}</span>
           @if (toast.linkToLibrary) {
-            <a routerLink="/novo/curtidas" class="h-10 px-2 flex items-center text-sm font-bold text-[#ffc21a]">Ver curtidas</a>
+            <a [routerLink]="L.to('/curtidas')" class="h-10 px-2 flex items-center text-sm font-bold text-[#ffc21a]">{{ L.s().seeLiked }}</a>
           }
         </div>
       }
@@ -165,30 +180,27 @@ export class NovoShellComponent {
   readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
 
-  readonly nav = [
-    { label: 'Início', link: '/novo', exact: true },
-    { label: 'Toques', link: '/novo/toques', exact: false },
-    { label: 'Cantigas', link: '/novo/cantigas', exact: false },
-    { label: 'Curtidas', link: '/novo/curtidas', exact: false },
-  ];
-  readonly tabs = [
-    { label: 'Início', link: '/novo', exact: true, icon: 'home' },
-    { label: 'Toques', link: '/novo/toques', exact: false, icon: 'drum' },
-    { label: 'Cantigas', link: '/novo/cantigas', exact: false, icon: 'note' },
-    { label: 'Curtidas', link: '/novo/curtidas', exact: false, icon: 'heart' },
-  ];
+  readonly L = inject(NovoLangService);
+
+  readonly nav = computed(() => [
+    { label: this.L.s().navHome, link: this.L.to('/'), exact: true },
+    { label: this.L.s().navToques, link: this.L.to('/toques'), exact: false },
+    { label: this.L.s().navSongs, link: this.L.to('/cantigas'), exact: false },
+    { label: this.L.s().navLiked, link: this.L.to('/curtidas'), exact: false },
+  ]);
+  readonly tabs = computed(() => [
+    { label: this.L.s().navHome, link: this.L.to('/'), exact: true, icon: 'home' },
+    { label: this.L.s().navToques, link: this.L.to('/toques'), exact: false, icon: 'drum' },
+    { label: this.L.s().navSongs, link: this.L.to('/cantigas'), exact: false, icon: 'note' },
+    { label: this.L.s().navLiked, link: this.L.to('/curtidas'), exact: false, icon: 'heart' },
+  ]);
 
   readonly accountOpen = signal(false);
 
-  private readonly url = toSignal(
-    this.router.events.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd), map(e => e.urlAfterRedirects)),
-    { initialValue: this.router.url },
-  );
-
-  /** The same page on the current site, for comparing the two designs. */
-  readonly currentSiteUrl = computed(() => {
-    const path = this.url().split(/[?#]/)[0].replace(/^\/novo/, '');
-    return path.replace(/^\/cantigas/, '/musicas').replace(/^\/curtidas/, '/minhas') || '/';
+  /** The same page on the classic design, which lives at /classico during the transition. */
+  readonly classicUrl = computed(() => {
+    const path = this.L.bare().replace(/^\/cantigas/, '/musicas').replace(/^\/curtidas/, '/minhas').replace(/^\/login$/, '/');
+    return path === '/' ? '/classico' : '/classico' + path;
   });
 
   readonly initial = computed(() => {
@@ -223,17 +235,26 @@ export class NovoShellComponent {
     this.player.toggle();
   }
 
-  /** The shared favourites service speaks of "favoritas"; this design calls them curtidas. */
+  /** The shared favourites service speaks Portuguese ("favoritas"); show its messages in this design's words and language. */
   toastText(text: string): string {
-    if (text === 'Salva nas favoritas') return 'Salva nas curtidas';
-    if (text === 'Removida das favoritas') return 'Removida das curtidas';
+    const d = this.L.s();
+    if (text === 'Salva nas favoritas') return d.savedToLiked;
+    if (text === 'Removida das favoritas') return d.removedFromLiked;
+    if (text.startsWith('Não foi possível')) return d.couldNotSave;
     return text;
+  }
+
+  /** The language switch is a real link (so search engines find the other language), handled in-app so the player keeps going. */
+  switchLang(event: MouseEvent): void {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+    event.preventDefault();
+    void this.router.navigateByUrl(this.L.otherUrl());
   }
 
   search(event: Event, value: string): void {
     event.preventDefault();
     const q = value.trim();
-    void this.router.navigate(['/novo/cantigas'], { queryParams: q ? { q } : {} });
+    void this.router.navigate([this.L.to('/cantigas')], { queryParams: q ? { q } : {} });
   }
 
   async signOut(): Promise<void> {

@@ -1,9 +1,11 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { Song } from '../../core/models/song.model';
 import { NovoPlayerService } from './novo-player.service';
+import { NovoLangService } from './novo-lang.service';
+import { NovoSeoService, SITE_ORIGIN } from './novo-seo.service';
 import { NovoCoverComponent, NovoIconComponent } from './novo-ui';
 import { NovoSongRowComponent, NovoToqueCardComponent } from './novo-parts';
 import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, plainText, seedOf, songColor } from './novo-data';
@@ -16,20 +18,22 @@ import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, plainText, seedOf, so
   template: `
     <div class="max-w-[1360px] mx-auto px-4 md:px-10 py-5 md:py-8 flex flex-col gap-7 md:gap-9">
 
+      <h1 class="m-0 max-w-3xl n-disp text-[26px] md:text-[40px] font-bold tracking-[-0.04em] leading-[1.05] text-balance">{{ L.s().tagline }}</h1>
+
       <div class="grid lg:grid-cols-[1.6fr_1fr_1fr] gap-3.5 md:gap-4">
         @if (feature(); as f) {
           <div class="grid grid-cols-[96px_minmax(0,1fr)] md:grid-cols-[168px_minmax(0,1fr)] gap-4 md:gap-6 p-3.5 md:p-5 rounded-[20px] bg-[var(--n-surf)] border border-[var(--n-line)]">
             <app-novo-cover [color]="color(f.song)" [size]="96" [radius]="14" [seed]="seed(f.song)" class="md:hidden" />
             <app-novo-cover [color]="color(f.song)" [title]="f.song.title" [label]="toqueName(f.song)" [size]="168" [radius]="14" [seed]="seed(f.song)" class="hidden md:block" />
             <div class="min-w-0 flex flex-col gap-1.5 md:gap-2.5 justify-center">
-              <span class="text-[11px] md:text-xs font-extrabold tracking-[0.1em] uppercase text-[var(--n-acc-tx)]">{{ f.resume ? 'Continue de onde parou' : 'Comece por aqui' }}</span>
-              <a [routerLink]="['/novo/cantigas', f.song.id]" class="min-h-10 inline-flex items-center text-xl md:text-[28px] font-extrabold tracking-[-0.02em] leading-tight">{{ f.song.title }}</a>
+              <span class="text-[11px] md:text-xs font-extrabold tracking-[0.1em] uppercase text-[var(--n-acc-tx)]">{{ f.resume ? L.s().resume : L.s().startHere }}</span>
+              <a [routerLink]="L.to('/cantigas/' + f.song.id)" class="min-h-10 inline-flex items-center text-xl md:text-[28px] font-extrabold tracking-[-0.02em] leading-tight">{{ f.song.title }}</a>
               @if (f.line; as line) {
                 <span class="text-sm md:text-[17px] text-[var(--n-tx)] truncate">“{{ line.pt }}”</span>
                 @if (line.en) { <span class="hidden md:block text-[15px] text-[var(--n-tx2)] truncate">{{ plain(line.en) }}</span> }
               }
               <button type="button" (click)="playFeature(f.song)" class="self-start mt-1 h-10 md:h-11 px-4 md:px-[18px] rounded-xl bg-[var(--n-acc)] text-[#1a1400] inline-flex items-center gap-2 text-sm md:text-[15px] font-extrabold">
-                <app-novo-icon name="play" [size]="15" />{{ f.resume ? 'Continuar' : 'Tocar' }}
+                <app-novo-icon name="play" [size]="15" />{{ f.resume ? L.s().continue : L.s().play }}
               </button>
             </div>
           </div>
@@ -39,21 +43,21 @@ import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, plainText, seedOf, so
           <div class="p-4 md:p-5 rounded-[20px] bg-[var(--n-surf)] border border-[var(--n-line)] flex flex-col gap-2.5">
             <div class="flex items-center gap-2.5">
               <span class="w-8 h-8 rounded-lg flex items-center justify-center text-white" [style.background]="list.color"><app-novo-icon [name]="list.icon" [size]="16" [filled]="list.icon === 'heart'" /></span>
-              <a routerLink="/novo/curtidas" [queryParams]="list.params" class="min-h-10 inline-flex items-center text-[17px] font-extrabold">{{ list.title }}</a>
+              <a [routerLink]="L.to('/curtidas')" [queryParams]="list.params" class="min-h-10 inline-flex items-center text-[17px] font-extrabold">{{ list.title }}</a>
               <span class="ml-auto text-sm text-[var(--n-tx3)] tabular-nums">{{ list.songs.length }}</span>
             </div>
             @if (!firebase.currentUser() && !firebase.pendingSignedIn()) {
               <p class="m-0 text-sm text-[var(--n-tx2)] leading-relaxed">{{ list.empty }}</p>
-              <a routerLink="/login" [queryParams]="{ returnUrl: '/novo' }" class="self-start h-10 px-4 rounded-xl border border-[var(--n-line)] inline-flex items-center text-sm font-bold hover:no-underline">Entrar com Google</a>
+              <a [routerLink]="L.to('/login')" [queryParams]="{ returnUrl: L.to('/') }" class="self-start h-10 px-4 rounded-xl border border-[var(--n-line)] inline-flex items-center text-sm font-bold hover:no-underline">{{ L.s().signInGoogle }}</a>
             } @else if (list.songs.length) {
               @for (s of list.songs.slice(0, 3); track s.id) {
-                <a [routerLink]="['/novo/cantigas', s.id]" class="flex items-center gap-3 py-1.5 border-t border-[var(--n-line)] hover:no-underline">
+                <a [routerLink]="L.to('/cantigas/' + s.id)" class="flex items-center gap-3 py-1.5 border-t border-[var(--n-line)] hover:no-underline">
                   <app-novo-cover [color]="color(s)" [size]="40" [radius]="8" [seed]="seed(s)" />
                   <span class="flex-1 min-w-0 text-[15px] font-bold truncate">{{ s.title }}</span>
                 </a>
               }
               <button type="button" (click)="playAll(list.songs)" class="self-start mt-1 h-10 px-3.5 rounded-xl border border-[var(--n-line)] inline-flex items-center gap-2 text-sm font-bold">
-                <app-novo-icon name="play" [size]="13" />Tocar tudo
+                <app-novo-icon name="play" [size]="13" />{{ L.s().playAll }}
               </button>
             } @else {
               <p class="m-0 text-sm text-[var(--n-tx2)] leading-relaxed">{{ list.none }}</p>
@@ -64,9 +68,9 @@ import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, plainText, seedOf, so
 
       <section class="flex flex-col gap-4" aria-labelledby="toques-h">
         <div class="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-          <h2 id="toques-h" class="m-0 n-disp text-2xl md:text-[28px] font-bold tracking-[-0.03em]">Toques</h2>
-          <span class="hidden sm:inline-flex gap-4 text-[13px] text-[var(--n-tx2)]"><span><b class="text-[var(--n-tx)]">dim</b> agudo</span><span><b class="text-[var(--n-tx)]">tch</b> chiado</span><span><b class="text-[var(--n-tx)]">dom</b> grave</span></span>
-          <a routerLink="/novo/toques" class="ml-auto min-h-10 inline-flex items-center text-[15px] font-bold text-[var(--n-acc-tx)]">Todos os {{ data.toques().length }} toques</a>
+          <h2 id="toques-h" class="m-0 n-disp text-2xl md:text-[28px] font-bold tracking-[-0.03em]">{{ L.s().toques }}</h2>
+          <span class="hidden sm:inline-flex gap-4 text-[13px] text-[var(--n-tx2)]"><span><b class="text-[var(--n-tx)]">dim</b> {{ L.s().strokeDim }}</span><span><b class="text-[var(--n-tx)]">tch</b> {{ L.s().strokeTch }}</span><span><b class="text-[var(--n-tx)]">dom</b> {{ L.s().strokeDom }}</span></span>
+          <a [routerLink]="L.to('/toques')" class="ml-auto min-h-10 inline-flex items-center text-[15px] font-bold text-[var(--n-acc-tx)]">{{ L.s().allToques(data.toques().length) }}</a>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
           @for (t of featuredToques(); track t.id) { <app-novo-toque-card [toque]="t" /> }
@@ -75,8 +79,8 @@ import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, plainText, seedOf, so
 
       <section class="flex flex-col gap-2" aria-labelledby="recent-h">
         <div class="flex items-baseline justify-between mb-1.5">
-          <h2 id="recent-h" class="m-0 n-disp text-2xl md:text-[28px] font-bold tracking-[-0.03em]">Adicionadas recentemente</h2>
-          <a routerLink="/novo/cantigas" class="min-h-10 inline-flex items-center text-[15px] font-bold text-[var(--n-acc-tx)]">Todas</a>
+          <h2 id="recent-h" class="m-0 n-disp text-2xl md:text-[28px] font-bold tracking-[-0.03em]">{{ L.s().recentlyAdded }}</h2>
+          <a [routerLink]="L.to('/cantigas')" class="min-h-10 inline-flex items-center text-[15px] font-bold text-[var(--n-acc-tx)]">{{ L.s().all }}</a>
         </div>
         @for (s of recent(); track s.id; let i = $index) {
           <app-novo-song-row [song]="s" [n]="i + 1" [queue]="recentIds()" />
@@ -88,7 +92,30 @@ import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, plainText, seedOf, so
 export class NovoHomeComponent {
   readonly data = inject(DataService);
   readonly firebase = inject(FirebaseService);
+  readonly L = inject(NovoLangService);
   private player = inject(NovoPlayerService);
+  private seo = inject(NovoSeoService);
+
+  constructor() {
+    effect(() => {
+      const d = this.L.s();
+      this.seo.set({
+        description: d.seoHome,
+        path: '/',
+        jsonLd: {
+          '@type': 'WebSite',
+          name: d.site,
+          url: SITE_ORIGIN + this.L.to('/'),
+          inLanguage: d.htmlLang,
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: SITE_ORIGIN + this.L.to('/cantigas') + '?q={search_term_string}',
+            'query-input': 'required name=search_term_string',
+          },
+        },
+      });
+    });
+  }
 
   private songsFrom(ids: Set<string>): Song[] {
     const byId = this.data.songById();
@@ -98,12 +125,13 @@ export class NovoHomeComponent {
   readonly liked = computed(() => this.songsFrom(this.firebase.favorites()));
   readonly learned = computed(() => this.songsFrom(this.firebase.learnedSongs()));
 
-  readonly lists = computed(() => [
-    { key: 'c', title: 'Curtidas', icon: 'heart', color: LIKED_COLOR, songs: this.liked(), params: {},
-      empty: 'Entre para guardar as cantigas que você curte e tocar todas em sequência.', none: 'Toque no coração de uma cantiga para guardá-la aqui.' },
-    { key: 'a', title: 'Aprendidas', icon: 'check', color: LEARNED_COLOR, songs: this.learned(), params: { lista: 'aprendidas' },
-      empty: 'Entre para marcar as cantigas que você já sabe cantar.', none: 'Abra uma cantiga e marque como aprendida quando souber.' },
-  ]);
+  readonly lists = computed(() => {
+    const d = this.L.s();
+    return [
+      { key: 'c', title: d.liked, icon: 'heart', color: LIKED_COLOR, songs: this.liked(), params: {}, empty: d.likedSignedOut, none: d.likedEmpty },
+      { key: 'a', title: d.learned, icon: 'check', color: LEARNED_COLOR, songs: this.learned(), params: { lista: 'aprendidas' }, empty: d.learnedSignedOut, none: d.learnedEmpty },
+    ];
+  });
 
   /** What is playing, else the first curtida, else the newest song. Only the first is a real "resume". */
   readonly feature = computed(() => {

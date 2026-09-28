@@ -5,6 +5,7 @@ import {
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideServiceWorker } from '@angular/service-worker';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 import { routes } from './app.routes';
 import { PwaUpdateService } from './core/services/pwa-update.service';
@@ -23,6 +24,9 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' }),
     ),
     provideHttpClient(withFetch()),
+    // The main site's pages are generated as HTML at build time; hydration reuses that
+    // markup instead of throwing it away and drawing the page again.
+    provideClientHydration(withEventReplay()),
     // Offline caching is opt-in, so this only registers for someone who turned it on
     // (OfflineService writes that preference). isDevMode() keeps it out of `ng serve`
     // entirely, where a service worker fights live reload.

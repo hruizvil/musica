@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build && node scripts/sitemap.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"
@@ -24,13 +24,15 @@
   "private": true,
   "packageManager": "npm@10.2.5",
   "dependencies": {
-    "@angular/common": "^21.1.0",
+    "@angular/common": "^21.2.13",
     "@angular/compiler": "^21.1.0",
-    "@angular/core": "^21.1.0",
+    "@angular/core": "^21.2.13",
     "@angular/forms": "^21.1.0",
-    "@angular/platform-browser": "^21.1.0",
-    "@angular/router": "^21.1.0",
+    "@angular/platform-browser": "^21.2.13",
+    "@angular/platform-server": "^21.2.13",
+    "@angular/router": "^21.2.13",
     "@angular/service-worker": "^21.1.0",
+    "@angular/ssr": "^21.2.11",
     "firebase": "^12.13.0",
     "firebase-admin": "^13.10.0",
     "rxjs": "~7.8.0",

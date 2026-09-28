@@ -1,5 +1,4 @@
 import { Component, OnDestroy, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
-import { Title } from '@angular/platform-browser';
 import { Router, RouterLink } from '@angular/router';
 import { DataService } from '../../core/services/data.service';
 import { FirebaseService } from '../../core/services/firebase.service';
@@ -7,7 +6,10 @@ import { FavoritesService } from '../../core/services/favorites.service';
 import { Song } from '../../core/models/song.model';
 import { NovoPlayerService } from './novo-player.service';
 import { NovoCoverComponent, NovoIconComponent } from './novo-ui';
-import { TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, seedOf, songColor } from './novo-data';
+import { TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, plainText, seedOf, songColor } from './novo-data';
+import { NovoLangService } from './novo-lang.service';
+import { NovoContentService } from './novo-content.service';
+import { NovoSeoService, SITE_ORIGIN } from './novo-seo.service';
 
 /**
  * A song. The lyrics are the page: each line with its translation beneath, and tapping a
@@ -27,28 +29,28 @@ import { TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, s
             <app-novo-cover [color]="color()" [size]="84" [radius]="14" [seed]="seed()" class="lg:hidden" />
             <div class="min-w-0 flex flex-col gap-1">
               <h1 class="m-0 n-disp text-2xl md:text-[30px] font-bold tracking-[-0.03em] leading-tight">{{ s.title }}</h1>
-              <a [routerLink]="['/novo/toques', s.toque[0]]" class="self-start min-h-10 inline-flex items-center text-[15px] font-bold text-[var(--n-acc-tx)]">{{ toqueName() }}</a>
+              <a [routerLink]="L.to('/toques/' + s.toque[0])" class="self-start min-h-10 inline-flex items-center text-[15px] font-bold text-[var(--n-acc-tx)]">{{ toqueName() }}</a>
               @if (s.composer) { <span class="text-sm text-[var(--n-tx3)]">{{ s.composer }}</span> }
             </div>
           </div>
           <button type="button" (click)="play()" class="h-12 rounded-xl bg-[var(--n-acc)] text-[#1a1400] flex items-center justify-center gap-2 text-base font-extrabold">
-            <app-novo-icon [name]="isPlaying() ? 'pause' : 'play'" [size]="16" />{{ isPlaying() ? 'Pausar' : (isCurrent() ? 'Continuar' : 'Tocar') }}
+            <app-novo-icon [name]="isPlaying() ? 'pause' : 'play'" [size]="16" />{{ isPlaying() ? L.s().pause : (isCurrent() ? L.s().continue : L.s().play) }}
           </button>
           @if (!hasRecording()) {
-            <p class="m-0 -mt-1 text-[13px] text-[var(--n-tx3)]">{{ toqueVideo() ? 'Ainda sem gravação: toca o vídeo do toque.' : 'Ainda sem gravação desta cantiga nem do toque.' }}</p>
+            <p class="m-0 -mt-1 text-[13px] text-[var(--n-tx3)]">{{ toqueVideo() ? L.s().noRecordingToque : L.s().noRecordingAtAll }}</p>
           }
           <div class="flex gap-2">
             <button type="button" (click)="favorites.toggle(s.id)" [attr.aria-pressed]="liked()"
               class="flex-1 h-11 rounded-xl border flex items-center justify-center gap-2 text-sm font-bold"
               [class]="liked() ? 'border-[var(--n-acc)] text-[var(--n-acc-tx)]' : 'border-[var(--n-line)]'">
-              <app-novo-icon name="heart" [size]="17" [filled]="liked()" />{{ liked() ? 'Curtida' : 'Curtir' }}
+              <app-novo-icon name="heart" [size]="17" [filled]="liked()" />{{ liked() ? L.s().likedBtn : L.s().like }}
             </button>
             <button type="button" (click)="toggleLearned()" [attr.aria-pressed]="learned()"
               class="flex-1 h-11 rounded-xl border flex items-center justify-center gap-2 text-sm font-bold"
               [class]="learned() ? 'bg-[#047857] border-[#047857] text-white' : 'border-[var(--n-line)]'">
-              <app-novo-icon name="check" [size]="17" />{{ learned() ? 'Aprendida' : 'Aprendi' }}
+              <app-novo-icon name="check" [size]="17" />{{ learned() ? L.s().learnedBtn : L.s().learnedAsk }}
             </button>
-            <button type="button" (click)="share()" [attr.aria-label]="shared() ? 'Link copiado' : 'Compartilhar'" class="w-11 h-11 shrink-0 rounded-xl border border-[var(--n-line)] flex items-center justify-center">
+            <button type="button" (click)="share()" [attr.aria-label]="shared() ? L.s().linkCopied : L.s().share" class="w-11 h-11 shrink-0 rounded-xl border border-[var(--n-line)] flex items-center justify-center">
               <app-novo-icon [name]="shared() ? 'check' : 'share'" [size]="17" />
             </button>
           </div>
@@ -56,10 +58,10 @@ import { TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, s
 
         <section class="min-w-0 flex flex-col gap-3 lg:row-span-2" aria-labelledby="letra-h">
           <div class="flex items-center justify-between gap-3">
-            <h2 id="letra-h" class="m-0 text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">Letra</h2>
+            <h2 id="letra-h" class="m-0 text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">{{ L.s().lyrics }}</h2>
             @if (translated()) {
               <div class="flex items-center gap-2.5 text-sm font-bold">
-                <span id="trad-label">Tradução</span>
+                <span id="trad-label">{{ L.s().translation }}</span>
                 <button type="button" role="switch" (click)="showEn.set(!showEn())" [attr.aria-checked]="showEn()" aria-labelledby="trad-label"
                   class="relative w-11 h-[26px] rounded-full transition-colors before:content-[''] before:absolute before:-inset-[9px]" [style.background]="showEn() ? 'var(--n-acc)' : 'var(--n-line)'">
                   <span class="absolute top-[3px] w-5 h-5 rounded-full transition-[left]" [style.left.px]="showEn() ? 21 : 3" [style.background]="showEn() ? '#1a1400' : '#ffffff'"></span>
@@ -69,7 +71,7 @@ import { TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, s
           </div>
           @if (s.refrao && !coroOnly()) {
             <div class="p-4 rounded-2xl bg-[var(--n-raise)] flex flex-col gap-2">
-              <span class="text-xs font-extrabold tracking-[0.1em] uppercase text-[var(--n-acc-tx)]">Coro</span>
+              <span class="text-xs font-extrabold tracking-[0.1em] uppercase text-[var(--n-acc-tx)]">{{ L.s().coro }}</span>
               <div class="grid gap-x-8 gap-y-1" [class.md:grid-cols-2]="showEn() && !!s.refraoTranslation">
                 <p class="m-0 text-lg md:text-[19px] font-bold leading-snug whitespace-pre-line">{{ s.refrao }}</p>
                 @if (showEn() && s.refraoTranslation) {
@@ -79,13 +81,13 @@ import { TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, s
             </div>
           }
           @if (lines().length) {
-            <p class="m-0 text-[13px] text-[var(--n-tx3)]">{{ coroOnly() ? 'Esta cantiga tem só o coro. ' : '' }}Toque numa linha para acompanhar: ela aparece no player enquanto a música toca.</p>
+            <p class="m-0 text-[13px] text-[var(--n-tx3)]">{{ coroOnly() ? L.s().coroOnlyHint : '' }}{{ L.s().tapHint }}</p>
           }
           <ol class="m-0 p-0 list-none flex flex-col">
             @for (line of lines(); track $index; let i = $index) {
               <li [class.mt-4]="line.stanzaStart">
                 <button type="button" (click)="pick(i)" [attr.aria-current]="current() === i ? 'true' : null"
-                  class="w-full text-left py-1.5 px-3 -mx-3 rounded-lg transition-colors hover:bg-[var(--n-raise)] grid gap-x-8 gap-y-0.5 items-baseline"
+                  class="w-full text-left py-2 md:py-1.5 px-3 -mx-3 rounded-lg transition-colors hover:bg-[var(--n-raise)] grid gap-x-8 gap-y-0.5 items-baseline"
                   [class.md:grid-cols-2]="showEn() && !!line.en"
                   [style.background]="current() === i ? 'var(--n-raise)' : ''"
                   [style.box-shadow]="current() === i ? 'inset 3px 0 0 var(--n-acc)' : ''">
@@ -100,14 +102,14 @@ import { TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, s
         </section>
 
         <aside class="flex flex-col gap-3.5 min-w-0 lg:col-start-1 lg:row-start-2">
-          @if (s.notes || s.themes.length) {
+          @if (notes() || themes().length) {
             <div class="p-5 rounded-[18px] bg-[var(--n-surf)] border border-[var(--n-line)] flex flex-col gap-2.5">
-              <span class="text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">Sobre a cantiga</span>
-              @if (s.notes) { <p class="m-0 text-[15px] leading-relaxed text-[var(--n-tx2)]">{{ s.notes }}</p> }
-              @if (s.themes.length) {
+              <span class="text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)]">{{ L.s().aboutSong }}</span>
+              @if (notes(); as n) { <p class="m-0 text-[15px] leading-relaxed text-[var(--n-tx2)]">@for (r of runs(n); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</p> }
+              @if (themes().length) {
                 <div class="flex flex-wrap gap-1.5">
-                  @for (th of s.themes; track th) {
-                    <a routerLink="/novo/cantigas" [queryParams]="{ q: th }" class="min-h-9 px-3 rounded-full bg-[var(--n-raise)] inline-flex items-center text-[13px] hover:no-underline">{{ th }}</a>
+                  @for (th of themes(); track $index) {
+                    <a [routerLink]="L.to('/cantigas')" [queryParams]="{ q: plain(th) }" class="min-h-9 px-3 rounded-full bg-[var(--n-raise)] inline-flex items-center text-[13px] hover:no-underline">{{ plain(th) }}</a>
                   }
                 </div>
               }
@@ -115,9 +117,9 @@ import { TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, s
           }
           @if (same().length) {
             <div class="p-5 rounded-[18px] bg-[var(--n-surf)] border border-[var(--n-line)] flex flex-col gap-1">
-              <span class="text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)] pb-1.5">Também no toque {{ toqueName() }}</span>
+              <span class="text-[13px] font-extrabold tracking-[0.1em] uppercase text-[var(--n-tx3)] pb-1.5">{{ L.s().alsoInToque(toqueName()) }}</span>
               @for (o of same(); track o.id) {
-                <a [routerLink]="['/novo/cantigas', o.id]" class="flex items-center gap-3 py-1.5 hover:no-underline">
+                <a [routerLink]="L.to('/cantigas/' + o.id)" class="flex items-center gap-3 py-1.5 hover:no-underline">
                   <app-novo-cover [color]="colorOf(o)" [size]="40" [radius]="8" [seed]="seedOf(o)" />
                   <span class="min-w-0 text-[15px] font-bold truncate">{{ o.title }}</span>
                 </a>
@@ -128,8 +130,8 @@ import { TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, s
       </div>
     } @else if (data.songsLoaded()) {
       <div class="max-w-md mx-auto px-4 py-20 text-center flex flex-col gap-4 items-center">
-        <h1 class="m-0 n-disp text-2xl font-bold">Cantiga não encontrada</h1>
-        <a routerLink="/novo/cantigas" class="h-11 px-5 rounded-xl bg-[var(--n-acc)] text-[#1a1400] font-extrabold inline-flex items-center hover:no-underline">Ver todas as cantigas</a>
+        <h1 class="m-0 n-disp text-2xl font-bold">{{ L.s().songNotFound }}</h1>
+        <a [routerLink]="L.to('/cantigas')" class="h-11 px-5 rounded-xl bg-[var(--n-acc)] text-[#1a1400] font-extrabold inline-flex items-center hover:no-underline">{{ L.s().seeAllSongs }}</a>
       </div>
     }
   `,
@@ -140,7 +142,9 @@ export class NovoCantigaComponent implements OnDestroy {
   readonly favorites = inject(FavoritesService);
   readonly player = inject(NovoPlayerService);
   private router = inject(Router);
-  private titleService = inject(Title);
+  readonly L = inject(NovoLangService);
+  private content = inject(NovoContentService);
+  private seo = inject(NovoSeoService);
 
   id = input.required<string>();
 
@@ -162,7 +166,11 @@ export class NovoCantigaComponent implements OnDestroy {
     return s ? [...(this.data.songsByToque().get(s.toque[0]) ?? [])].filter(o => o.id !== s.id).sort(byTitle).slice(0, 5) : [];
   });
 
-  readonly showEn = signal(true);
+  readonly notes = computed(() => (this.song() ? this.content.songNotes(this.song()!) : null));
+  readonly themes = computed(() => (this.song() ? this.content.songThemes(this.song()!) : []));
+
+  /** Translations are on by default in English, where they are the point; off in Portuguese. The switch overrides. */
+  readonly showEn = linkedSignal(() => this.L.lang() === 'en');
   /** The picked line: the player's while this song plays, otherwise this page's own. */
   private readonly localLine = linkedSignal<string, number | null>({ source: () => this.id(), computation: () => null });
   readonly current = computed<number | null>(() => (this.isCurrent() ? this.player.line() : this.localLine()));
@@ -172,14 +180,36 @@ export class NovoCantigaComponent implements OnDestroy {
 
   constructor() {
     effect(() => {
-      const s = this.song();
-      if (s) this.titleService.setTitle(s.title + ' · Abadá Música');
+      const s = this.song(); const d = this.L.s();
+      if (!s) {
+        if (this.data.songsLoaded()) this.seo.set({ title: d.songNotFound, description: d.notFoundBody, path: '/cantigas/' + this.id(), noindex: true });
+        return;
+      }
+      const lines = this.lines();
+      const excerpt = lines.slice(0, 2).map(l => this.L.lang() === 'en' && l.en ? plainText(l.en) : l.pt).join(' / ');
+      this.seo.set({
+        title: s.title,
+        description: d.seoSong(s.title, this.toqueName()) + (excerpt ? ' “' + excerpt + '…”' : ''),
+        path: '/cantigas/' + s.id,
+        jsonLd: {
+          '@type': 'MusicComposition',
+          name: s.title,
+          url: SITE_ORIGIN + this.L.to('/cantigas/' + s.id),
+          genre: 'Capoeira',
+          inLanguage: 'pt-BR',
+          ...(s.composer ? { composer: { '@type': 'Person', name: s.composer } } : {}),
+          ...(this.notes() ? { description: plainText(this.notes()!) } : {}),
+          lyrics: { '@type': 'CreativeWork', inLanguage: 'pt-BR', text: lines.map(l => l.pt).join('\n') },
+          ...(lines.some(l => l.en) ? { workTranslation: { '@type': 'CreativeWork', inLanguage: 'en', text: lines.map(l => plainText(l.en)).join('\n') } } : {}),
+        },
+      });
     });
   }
 
   ngOnDestroy(): void { clearTimeout(this.shareTimer); }
 
   runs(text: string): TextRun[] { return emphasis(text); }
+  plain(text: string): string { return plainText(text); }
   colorOf(s: Song): string { return songColor(s); }
   seedOf(s: Song): number { return seedOf('song:' + s.id); }
 

@@ -1,4 +1,5 @@
-import { Injectable, inject, computed, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, computed, signal } from '@angular/core';
+import { isPlatformServer } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
@@ -6,6 +7,7 @@ import { Song } from '../models/song.model';
 import { Toque } from '../models/toque.model';
 import { Video } from '../models/video.model';
 import { FirebaseService, SongOverride } from './firebase.service';
+import { readSongCollections } from './firestore-rest';
 
 // Last server state, kept in localStorage so a refresh can hide deleted songs on
 // the very first paint instead of showing them until Firestore answers.
@@ -60,6 +62,7 @@ export class DataService {
         // The admin saves these three, so they have to be merged back or the edit
         // is silently discarded on render.
         notes: ov.notes ?? song.notes,
+        notesEn: ov.notesEn ?? song.notesEn,
         refrao: ov.refrao ?? song.refrao,
         refraoTranslation: ov.refraoTranslation ?? song.refraoTranslation,
         audioLinks: {
@@ -127,7 +130,18 @@ export class DataService {
       .slice(0, 6)
   );
 
+  private readonly onServer = isPlatformServer(inject(PLATFORM_ID));
+
   constructor() {
+    if (this.onServer) {
+      // Prerendering at build time: read the admin's songs over HTTP, which the
+      // renderer waits for, so each generated page has the real song list.
+      readSongCollections(this.http).subscribe({
+        next: ([overrides, extra]) => { this.overrides.set(overrides); this.extraSongs.set(extra); },
+        error: () => { /* offline build: bundled songs only */ },
+      });
+      return;
+    }
     this.seedFromCache();
     this.refreshOverrides();
   }

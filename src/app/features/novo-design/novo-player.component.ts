@@ -1,4 +1,6 @@
-import { Component, ElementRef, OnDestroy, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, OnDestroy, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
+import { fromEvent } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FirebaseService } from '../../core/services/firebase.service';
@@ -28,9 +30,16 @@ import { plainText, seedOf } from './novo-data';
   template: `
     <!-- The YouTube frame. Always mounted so playback survives navigation; moved off screen
          (never shrunk) when there is nothing to show, and paused whenever it is off screen. -->
-    <section [attr.aria-label]="L.s().playerAndVideo" class="no-print fixed z-40 overflow-hidden rounded-2xl bg-[var(--n-raise)] border border-[var(--n-line)] shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
-      [class]="player.videoShown() ? 'inset-x-2.5 bottom-[84px] md:inset-x-auto md:left-6 md:bottom-[112px] md:w-[356px]' : '-left-[9999px] bottom-0 w-[356px] opacity-0 pointer-events-none'"
+    <section #card [attr.aria-label]="L.s().playerAndVideo" class="no-print fixed z-40 overflow-hidden rounded-2xl bg-[var(--n-raise)] border border-[var(--n-line)] shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
+      [class]="cardClass()" [style.left.px]="player.videoShown() && pos() ? pos()!.x : null" [style.top.px]="player.videoShown() && pos() ? pos()!.y : null"
       [attr.aria-hidden]="!player.videoShown()">
+      <!-- Grip: drag the video anywhere on screen, like a floating player. Double-tap (or Enter) puts it back. -->
+      <button type="button" class="w-full h-8 flex items-center justify-center touch-none select-none cursor-grab active:cursor-grabbing text-[var(--n-tx3)]"
+        [attr.aria-label]="L.s().moveVideo" [attr.title]="L.s().moveVideo"
+        (pointerdown)="dragStart($event)" (pointermove)="dragMove($event)" (pointerup)="dragEnd($event)" (pointercancel)="dragEnd($event)"
+        (dblclick)="resetPos()" (keydown)="dragKey($event)">
+        <span aria-hidden="true" class="w-10 h-1.5 rounded-full bg-current opacity-60"></span>
+      </button>
       <div class="relative w-full aspect-video min-h-[200px] bg-black">
         <div #ytHost class="absolute inset-0 w-full h-full"></div>
       </div>
@@ -141,13 +150,96 @@ export class NovoPlayerComponent implements OnDestroy {
   readonly L = inject(NovoLangService);
   private firebase = inject(FirebaseService);
   private ytHost = viewChild.required<ElementRef<HTMLElement>>('ytHost');
+  private card = viewChild.required<ElementRef<HTMLElement>>('card');
+
+  // ── Moving the video around ──
+  /** Where the video card was dragged to; null keeps it in its usual spot. Remembered per screen size. */
+  readonly pos = signal<{ x: number; y: number } | null>(null);
+  private drag: { dx: number; dy: number; id: number; moved: boolean } | null = null;
+
+  readonly cardClass = computed(() => {
+    if (!this.player.videoShown()) return '-left-[9999px] bottom-0 w-[356px] opacity-0 pointer-events-none';
+    if (this.pos()) return 'w-[calc(100vw-20px)] md:w-[356px]';
+    return 'inset-x-2.5 bottom-[84px] md:inset-x-auto md:left-6 md:bottom-[112px] md:w-[356px]';
+  });
 
   readonly expanded = signal(false);
+  private destroyRef = inject(DestroyRef);
   readonly liked = computed(() => !!this.player.current()?.songId && this.firebase.favorites().has(this.player.current()!.songId!));
   readonly rateLabel = computed(() => String(this.player.rate()).replace('.', ',') + '×');
 
   constructor() {
-    afterNextRender(() => this.player.attach(this.ytHost().nativeElement));
+    afterNextRender(() => {
+      this.player.attach(this.ytHost().nativeElement);
+      this.pos.set(this.readPos());
+      // Rotating or resizing keeps the card on screen.
+      fromEvent(window, 'resize').pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+        const p = this.readPos();
+        this.pos.set(p ? this.clamp(p.x, p.y) : null);
+      });
+    });
+  }
+
+  dragStart(e: PointerEvent): void {
+    const r = this.card().nativeElement.getBoundingClientRect();
+    this.drag = { dx: e.clientX - r.left, dy: e.clientY - r.top, id: e.pointerId, moved: false };
+    // Keeps the drag going when the finger slides over the video frame, which would otherwise swallow the events.
+    try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
+  }
+
+  dragMove(e: PointerEvent): void {
+    if (!this.drag || e.pointerId !== this.drag.id) return;
+    this.drag.moved = true;
+    this.pos.set(this.clamp(e.clientX - this.drag.dx, e.clientY - this.drag.dy));
+  }
+
+  dragEnd(e: PointerEvent): void {
+    if (!this.drag || e.pointerId !== this.drag.id) return;
+    if (this.drag.moved) this.savePos();
+    this.drag = null;
+  }
+
+  dragKey(e: KeyboardEvent): void {
+    const step = 40;
+    const r = this.card().nativeElement.getBoundingClientRect();
+    const at = this.pos() ?? { x: r.left, y: r.top };
+    const moves: Record<string, [number, number]> = { ArrowUp: [0, -step], ArrowDown: [0, step], ArrowLeft: [-step, 0], ArrowRight: [step, 0] };
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.resetPos(); return; }
+    const m = moves[e.key];
+    if (!m) return;
+    e.preventDefault();
+    this.pos.set(this.clamp(at.x + m[0], at.y + m[1]));
+    this.savePos();
+  }
+
+  resetPos(): void {
+    this.pos.set(null);
+    try { localStorage.removeItem(this.posKey()); } catch { /* ignore */ }
+  }
+
+  /** Keeps the whole card between the header and the bottom bar, and inside the screen. */
+  private clamp(x: number, y: number): { x: number; y: number } {
+    const r = this.card().nativeElement.getBoundingClientRect();
+    const phone = window.innerWidth < 768;
+    const top = phone ? 64 : 80;
+    const bottom = window.innerHeight - (phone ? 84 : 104) - r.height;
+    const right = window.innerWidth - r.width - 10;
+    return { x: Math.round(Math.min(Math.max(10, x), Math.max(10, right))), y: Math.round(Math.min(Math.max(top, y), Math.max(top, bottom))) };
+  }
+
+  private posKey(): string { return 'novo-player-pos-' + (window.innerWidth < 768 ? 'phone' : 'wide'); }
+
+  private savePos(): void {
+    try { const p = this.pos(); if (p) localStorage.setItem(this.posKey(), JSON.stringify(p)); } catch { /* ignore */ }
+  }
+
+  private readPos(): { x: number; y: number } | null {
+    try {
+      const raw = localStorage.getItem(this.posKey());
+      if (!raw) return null;
+      const p = JSON.parse(raw) as { x: number; y: number };
+      return typeof p.x === 'number' && typeof p.y === 'number' ? this.clamp(p.x, p.y) : null;
+    } catch { return null; }
   }
 
   ngOnDestroy(): void {

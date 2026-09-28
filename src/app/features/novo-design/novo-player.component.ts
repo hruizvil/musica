@@ -34,13 +34,13 @@ import { plainText, seedOf } from './novo-data';
       [class]="cardClass()" [style.left.px]="player.videoShown() && pos() ? pos()!.x : null" [style.top.px]="player.videoShown() && pos() ? pos()!.y : null"
       [attr.aria-hidden]="!player.videoShown()">
       <!-- Grip: drag the video anywhere on screen, like a floating player. Double-tap (or Enter) puts it back. -->
-      <button type="button" class="w-full h-8 flex items-center justify-center touch-none select-none cursor-grab active:cursor-grabbing text-[var(--n-tx3)]"
+      <button type="button" class="w-full h-6 flex items-center justify-center touch-none select-none cursor-grab active:cursor-grabbing text-[var(--n-tx3)]"
         [attr.aria-label]="L.s().moveVideo" [attr.title]="L.s().moveVideo"
         (pointerdown)="dragStart($event)" (pointermove)="dragMove($event)" (pointerup)="dragEnd($event)" (pointercancel)="dragEnd($event)"
         (dblclick)="resetPos()" (keydown)="dragKey($event)">
         <span aria-hidden="true" class="w-10 h-1.5 rounded-full bg-current opacity-60"></span>
       </button>
-      <div class="relative w-full aspect-video min-h-[200px] bg-black">
+      <div class="relative w-full h-[200px] bg-black">
         <div #ytHost class="absolute inset-0 w-full h-full"></div>
       </div>
       @if (player.current(); as item) {
@@ -123,7 +123,7 @@ import { plainText, seedOf } from './novo-data';
 
     <ng-template #phoneControls let-item>
       <span class="absolute left-0 top-0 h-[3px] bg-[var(--n-acc)] transition-[width] duration-500 ease-linear" [style.width.%]="player.progress() * 100" aria-hidden="true"></span>
-      <div class="flex items-center gap-2 pl-3.5 pr-2 py-2">
+      <div class="flex items-center gap-2 pl-3 pr-1.5 py-1.5">
         <a [routerLink]="L.to(item.songId ? '/cantigas/' + item.songId : '/toques/' + item.toqueId)" class="flex-1 min-w-0 flex flex-col hover:no-underline">
           <span class="text-xs font-bold text-[var(--n-tx3)] truncate">{{ item.title }}</span>
           @if (player.currentLine(); as line) {
@@ -133,9 +133,9 @@ import { plainText, seedOf } from './novo-data';
             <span class="text-[13px] text-[var(--n-tx2)] truncate">{{ subtitle(item) }}</span>
           }
         </a>
-        <button type="button" (click)="expanded.set(!expanded())" [attr.aria-expanded]="expanded()" [attr.aria-label]="L.s().moreControls" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon [name]="expanded() ? 'down' : 'up'" [size]="20" /></button>
+        <button type="button" (click)="expanded.set(!expanded())" [attr.aria-expanded]="expanded()" [attr.aria-label]="L.s().moreControls" class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon [name]="expanded() ? 'down' : 'up'" [size]="20" /></button>
         <button type="button" (click)="player.toggle()" [disabled]="!item.videoId" [attr.aria-label]="player.playing() ? L.s().pause : L.s().play"
-          class="w-11 h-11 shrink-0 rounded-[14px] bg-[var(--n-acc)] text-[#1a1400] flex items-center justify-center disabled:opacity-40"><app-novo-icon [name]="player.playing() ? 'pause' : 'play'" [size]="18" /></button>
+          class="w-10 h-10 shrink-0 rounded-[12px] bg-[var(--n-acc)] text-[#1a1400] flex items-center justify-center disabled:opacity-40"><app-novo-icon [name]="player.playing() ? 'pause' : 'play'" [size]="18" /></button>
       </div>
       @if (expanded()) {
         <div class="flex items-center justify-between px-1.5 pb-2">
@@ -171,8 +171,9 @@ export class NovoPlayerComponent implements OnDestroy {
 
   readonly cardClass = computed(() => {
     if (!this.player.videoShown()) return '-left-[9999px] bottom-0 w-[356px] opacity-0 pointer-events-none';
-    if (this.pos()) return 'w-[calc(100vw-20px)] md:w-[356px]';
-    return 'inset-x-2.5 bottom-[84px] md:inset-x-auto md:left-6 md:bottom-[112px] md:w-[356px]';
+    // 356x200 is the smallest 16:9 player YouTube allows (200px minimum height); phones use it too.
+    if (this.pos()) return 'w-[min(356px,calc(100vw-20px))] md:w-[356px]';
+    return 'left-1/2 -translate-x-1/2 bottom-[84px] w-[min(356px,calc(100vw-20px))] md:translate-x-0 md:left-6 md:bottom-[112px] md:w-[356px]';
   });
 
   readonly expanded = signal(false);

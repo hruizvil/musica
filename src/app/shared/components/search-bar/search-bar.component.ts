@@ -31,7 +31,7 @@ import { SearchService } from '../../../core/services/search.service';
               <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Músicas</p>
             </div>
             @for (song of results().songs; track song.id) {
-              <a [routerLink]="['/musicas', song.id]" (mousedown)="close()"
+              <a [routerLink]="['/classico/musicas', song.id]" (mousedown)="close()"
                  class="flex items-center gap-3 px-3 py-3 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
                 <span class="text-sm text-stone-700 dark:text-stone-200 truncate">{{ song.title }}</span>
               </a>
@@ -43,7 +43,7 @@ import { SearchService } from '../../../core/services/search.service';
               <p class="text-xs font-semibold text-stone-400 uppercase tracking-wide">Toques</p>
             </div>
             @for (toque of results().toques; track toque.id) {
-              <a [routerLink]="['/toques', toque.id]" (mousedown)="close()"
+              <a [routerLink]="['/classico/toques', toque.id]" (mousedown)="close()"
                  class="flex items-center gap-3 px-3 py-3 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors">
                 <span class="text-base shrink-0">🪘</span>
                 <span class="text-sm text-stone-700 dark:text-stone-200 truncate">{{ toque.name }}</span>

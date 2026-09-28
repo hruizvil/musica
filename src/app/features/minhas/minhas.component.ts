@@ -31,7 +31,7 @@ import { Song } from '../../core/models/song.model';
             </h2>
             <!-- The favourites are the setlist now, and this is the way in to playing them. -->
             @if (favorites().length) {
-              <a routerLink="/minhas/tocar"
+              <a routerLink="/classico/minhas/tocar"
                  class="flex items-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-capoeira-gold text-capoeira-brown text-sm font-bold hover:bg-amber-400 transition-colors shadow-sm">
                 ▶ Tocar favoritas
               </a>

@@ -56,7 +56,7 @@ const CATEGORY_LABELS: Record<VideoCategory, string> = {
                   <p class="text-xs text-stone-500 dark:text-stone-400">{{ video.description }}</p>
                 }
                 @if (toqueOf(video); as toque) {
-                  <a [routerLink]="['/toques', toque.id]"
+                  <a [routerLink]="['/classico/toques', toque.id]"
                      class="inline-flex items-center gap-1 text-xs font-medium text-capoeira-brown dark:text-capoeira-gold hover:underline py-1 stretched-link">
                     Ver o toque {{ toque.name }}
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

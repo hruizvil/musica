@@ -59,7 +59,7 @@ const TAB_LABELS: Record<string, string> = {
 
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @for (toque of group.toques; track toque.id) {
-              <a [routerLink]="['/toques', toque.id]"
+              <a [routerLink]="['/classico/toques', toque.id]"
                  class="group p-5 rounded-2xl border border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm hover:shadow-md hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
                 <div class="flex items-start justify-between gap-2 mb-3">
                   <h3 class="font-display text-base font-bold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug">

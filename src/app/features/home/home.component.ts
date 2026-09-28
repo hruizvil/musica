@@ -46,7 +46,7 @@ interface InstallPromptEvent extends Event {
         </p>
 
         <div class="flex flex-wrap gap-3">
-          <a routerLink="/musicas"
+          <a routerLink="/classico/musicas"
              class="px-6 py-3 rounded-xl bg-capoeira-gold text-capoeira-brown font-bold text-sm hover:bg-amber-400 transition-colors shadow-lg shadow-capoeira-gold/20">
             Explorar músicas
           </a>
@@ -113,7 +113,7 @@ interface InstallPromptEvent extends Event {
     <section class="mb-10">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-display text-lg font-bold text-stone-800 dark:text-stone-100 border-l-4 border-capoeira-gold pl-4">Últimas adicionadas</h2>
-        <a routerLink="/musicas" class="inline-flex items-center min-h-[44px] -my-3 text-xs text-capoeira-gold hover:underline font-medium">Ver todas →</a>
+        <a routerLink="/classico/musicas" class="inline-flex items-center min-h-[44px] -my-3 text-xs text-capoeira-gold hover:underline font-medium">Ver todas →</a>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3">
         @for (song of data.recentSongs(); track song.id) {
@@ -252,17 +252,17 @@ export class HomeComponent implements OnInit, OnDestroy {
     const week = this.addedThisWeek();
     return [
       {
-        path: '/musicas', icon: '🎵', label: 'músicas',
+        path: '/classico/musicas', icon: '🎵', label: 'músicas',
         count: `${this.data.songs().length}`,
         detail: week > 0 ? `+${week} esta semana` : 'Letras com tradução',
       },
       {
-        path: '/toques', icon: '🪘', label: 'toques',
+        path: '/classico/toques', icon: '🪘', label: 'toques',
         count: `${this.data.toques().length}`,
         detail: this.toqueSummary(),
       },
       {
-        path: '/videos', icon: '📹', label: 'vídeos',
+        path: '/classico/videos', icon: '📹', label: 'vídeos',
         count: `${videos}`,
         detail: videos > 0 ? 'Aulas e demonstrações' : 'Em breve',
       },
@@ -284,14 +284,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       icon: '💬',
       title: 'Tradução em inglês',
       body: 'Cada letra tem tradução completa para inglês. Sites gratuitos só têm o português — sem contexto para quem está aprendendo.',
-      link: '/musicas' as string | null,
+      link: '/classico/musicas' as string | null,
       linkLabel: 'Ver as letras',
     },
     {
       icon: '🥁',
       title: 'Organizados por toque',
       body: 'Encontre músicas pelo ritmo que o berimbau está tocando. Angola, Regional, Abadá — cada tradição tem seu repertório.',
-      link: '/toques' as string | null,
+      link: '/classico/toques' as string | null,
       linkLabel: 'Ver os toques',
     },
     {

@@ -19,7 +19,7 @@ import { Song } from '../../../core/models/song.model';
   imports: [RouterLink],
   template: `
     <div class="group relative flex flex-col gap-2 p-3 sm:p-4 min-h-[6.5rem] rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg hover:border-capoeira-gold/40 hover:-translate-y-0.5 transition-all duration-200">
-      <a [routerLink]="['/musicas', song().id]"
+      <a [routerLink]="['/classico/musicas', song().id]"
          class="stretched-link after:rounded-2xl pr-9 text-[15px] font-bold text-stone-800 dark:text-stone-100 group-hover:text-capoeira-brown dark:group-hover:text-capoeira-gold leading-snug line-clamp-2">
         {{ song().title }}
       </a>

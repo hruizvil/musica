@@ -86,7 +86,7 @@ export class FooterComponent {
   // No Vídeos link: a demonstration lives on its toque's page, which is where people
   // go looking for it. /videos still resolves as an index of everything.
   readonly nav = [
-    { path: '/musicas', label: 'Músicas' },
-    { path: '/toques', label: 'Toques' },
+    { path: '/classico/musicas', label: 'Músicas' },
+    { path: '/classico/toques', label: 'Toques' },
   ];
 }

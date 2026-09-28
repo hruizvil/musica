@@ -22,7 +22,7 @@ import { ActionBarComponent, ActionItem } from '../../../shared/components/actio
     <div class="space-y-5">
 
       <div class="flex items-center gap-3 flex-wrap">
-        <a routerLink="/minhas"
+        <a routerLink="/classico/minhas"
            class="flex items-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-semibold text-stone-500 dark:text-stone-400 hover:text-capoeira-brown dark:hover:text-capoeira-gold hover:border-capoeira-gold transition-colors shadow-sm">
           ← Minhas
         </a>
@@ -51,7 +51,7 @@ import { ActionBarComponent, ActionItem } from '../../../shared/components/actio
             Você ainda não tem favoritas. Abra uma música e toque no
             <span class="text-red-400 font-semibold">♥</span> para montar a sua lista.
           </p>
-          <a routerLink="/musicas" class="inline-block mt-4 text-sm font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline">
+          <a routerLink="/classico/musicas" class="inline-block mt-4 text-sm font-semibold text-capoeira-brown dark:text-capoeira-gold hover:underline">
             Ver músicas →
           </a>
         </div>
@@ -76,7 +76,7 @@ import { ActionBarComponent, ActionItem } from '../../../shared/components/actio
             <!-- Anterior and Próxima are pinned: transport that hides in a menu is
                  worse than useless. Only Aleatório may fold away. -->
             <div class="flex items-center justify-between gap-3">
-              <a [routerLink]="['/musicas', activeSong()!.id]"
+              <a [routerLink]="['/classico/musicas', activeSong()!.id]"
                  class="shrink-0 px-1.5 py-2 rounded text-xs text-stone-400 hover:text-capoeira-gold hover:underline">
                 Ver letra completa
               </a>

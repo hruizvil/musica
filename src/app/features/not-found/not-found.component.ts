@@ -14,11 +14,11 @@ import { RouterLink } from '@angular/router';
         O link pode estar errado ou a página foi removida.
       </p>
       <div class="flex flex-wrap justify-center gap-3 mt-2">
-        <a routerLink="/musicas"
+        <a routerLink="/classico/musicas"
           class="h-11 px-5 rounded-xl bg-capoeira-gold text-capoeira-night font-bold flex items-center hover:bg-amber-400 transition-colors">
           Ver músicas
         </a>
-        <a routerLink="/"
+        <a routerLink="/classico"
           class="h-11 px-5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 font-semibold flex items-center hover:border-capoeira-gold transition-colors">
           Página inicial
         </a>

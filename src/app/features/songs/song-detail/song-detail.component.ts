@@ -40,7 +40,7 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
 
         <!-- Breadcrumb -->
         <nav class="flex items-center gap-1.5 text-sm text-stone-400 mb-6 no-print">
-          <a routerLink="/musicas" class="inline-flex items-center min-h-[44px] -my-3 hover:text-capoeira-gold transition-colors">Músicas</a>
+          <a routerLink="/classico/musicas" class="inline-flex items-center min-h-[44px] -my-3 hover:text-capoeira-gold transition-colors">Músicas</a>
           <span class="text-stone-300 dark:text-stone-600">›</span>
           <span class="text-stone-600 dark:text-stone-300 truncate max-w-[280px]">{{ song()!.title }}</span>
         </nav>
@@ -71,7 +71,7 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
 
               <div class="flex flex-wrap gap-2">
                 @for (t of song()!.toque; track t) {
-                  <a [routerLink]="['/toques', t]"
+                  <a [routerLink]="['/classico/toques', t]"
                      class="no-print inline-flex items-center min-h-[44px] sm:min-h-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-capoeira-gold/10 text-capoeira-brown dark:text-capoeira-gold border border-capoeira-gold/20 hover:bg-capoeira-gold/20 transition-colors">
                     RITMO: {{ toqueName(t).toUpperCase() }}
                   </a>
@@ -286,12 +286,12 @@ const LANGUAGE_KEY = 'capoeira-lyrics-language';
                   <div class="flex items-center justify-between mb-3">
                     <h2 class="text-xs font-bold text-stone-400 uppercase tracking-widest">Músicas Relacionadas</h2>
                     @if (song()!.toque.length) {
-                      <a [routerLink]="['/toques', song()!.toque[0]]" class="text-xs text-capoeira-gold hover:underline">Ver todas →</a>
+                      <a [routerLink]="['/classico/toques', song()!.toque[0]]" class="text-xs text-capoeira-gold hover:underline">Ver todas →</a>
                     }
                   </div>
                   <div class="space-y-2">
                     @for (related of relatedSongs(); track related.id) {
-                      <a [routerLink]="['/musicas', related.id]"
+                      <a [routerLink]="['/classico/musicas', related.id]"
                          class="flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 hover:border-capoeira-gold/30 hover:shadow-sm transition-all group">
                         <div class="w-7 h-7 rounded-lg bg-capoeira-gold/10 flex items-center justify-center shrink-0">
                           <svg class="w-3.5 h-3.5 text-capoeira-gold" fill="currentColor" viewBox="0 0 24 24">

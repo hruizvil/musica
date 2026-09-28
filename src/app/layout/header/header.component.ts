@@ -15,7 +15,7 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
       <div class="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
 
         <!-- Logo -->
-        <a routerLink="/" class="flex items-center shrink-0 py-2 -my-2">
+        <a routerLink="/classico" class="flex items-center shrink-0 py-2 -my-2">
           <span class="font-display text-lg font-bold text-capoeira-brown dark:text-capoeira-gold leading-tight">
             Abadá <span class="text-capoeira-gold dark:text-capoeira-cream">Música</span>
           </span>
@@ -31,7 +31,7 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
               {{ link.label }}
             </a>
           }
-          <a routerLink="/minhas" routerLinkActive #an="routerLinkActive"
+          <a routerLink="/classico/minhas" routerLinkActive #an="routerLinkActive"
              [attr.aria-current]="an.isActive ? 'page' : null"
              class="px-3 py-1.5 rounded-md transition-colors"
              [class]="an.isActive ? activeClass : idleClass">
@@ -205,7 +205,7 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
                 {{ link.label }}
               </a>
             }
-            <a routerLink="/minhas" routerLinkActive #dn="routerLinkActive"
+            <a routerLink="/classico/minhas" routerLinkActive #dn="routerLinkActive"
                [attr.aria-current]="dn.isActive ? 'page' : null"
                (click)="mobileOpen.set(false)"
                class="px-3 py-2.5 rounded-md text-sm transition-colors"
@@ -286,8 +286,8 @@ export class HeaderComponent {
   // toque's page, which is where people look for it. The /videos index still exists
   // as a way to see them all at once, linked from the footer rather than from here.
   navLinks = [
-    { path: '/musicas', label: 'Músicas' },
-    { path: '/toques', label: 'Toques' },
+    { path: '/classico/musicas', label: 'Músicas' },
+    { path: '/classico/toques', label: 'Toques' },
   ];
 
   // Swapped, not stacked: handing "text-capoeira-gold" to routerLinkActive left two

@@ -1,0 +1,339 @@
+{
+ "fetchedAt": "2026-09-28T22:26:48.760Z",
+ "overrides": {
+  "apanha-laranja-no-chao": {
+   "deleted": true
+  },
+  "berimbau-instrumento": {
+   "deleted": true
+  },
+  "capoeira-mandinga": {
+   "deleted": true
+  },
+  "capoeira-sereia": {
+   "deleted": true
+  },
+  "e-bimba": {
+   "deleted": true
+  },
+  "hoje-tem-capoeira": {
+   "youtube": "l0wZzKLi4UQ",
+   "type": "corrido",
+   "preview": true,
+   "toque": [
+    "sao-bento-grande-regional",
+    "sao-bento-grande-angola"
+   ],
+   "lyrics": "Olha pega a beriba e começa a tocar\nPandeiro, atabaque não pode faltar\nNo jogo ligeiro que lá na Bahia\nAprendi a jogar\n\nMeia-lua, rasteira, martelo e pisão\nSolta a mandinga conforme a razão\nNa reza cantada pede proteção\n\nO meu mestre foi Bimba\nNegro mandingueiro com quem esta arte\nAprendi a jogar\n\nJá joguei na ribeira\nNo pé da ladeira na beira do mar\nPula daqui, joga pra lá\nDiscípulo de Bimba\nChegou pra jogar\n\nOlha pega a beriba e começa a tocar\nPandeiro, atabaque não pode faltar\nNo jogo ligeiro que lá na Bahia\nAprendi a jogar",
+   "refrao": "E hoje tem capoeira (coro)\nNo toque da viola chega pra roda (coro)\nE vamos jogar",
+   "translation": "Look, pick up the beer and start playing\nPandeiro, atabaque cannot be missed\nIn the light game that there in Bahia\nI learned to play\n\nHalf-moon, sweep, hammer and stomp\nRelease the mandinga according to reason\nIn the sung prayer he asks for protection\n\nMy master was Bimba\nMandingueiro black man with whom this art\nI learned to play\n\nI've played in the river\nAt the foot of the hill by the sea\nJump from here, throw there\nBimba's disciple\nArrived to play\n\nLook, pick up the beer and start playing\nPandeiro, atabaque cannot be missed\nIn the light game that there in Bahia\nI learned to play",
+   "refraoTranslation": "And today there's capoeira (choir)\nWhen the viola plays, it comes to the circle (choir)\nAnd let's play"
+  },
+  "jogo-bonito": {
+   "deleted": true
+  },
+  "louvacao-abertura": {
+   "deleted": true
+  },
+  "louvacao-camisa-roxa": {
+   "deleted": true
+  },
+  "louvacao-fechamento": {
+   "deleted": true
+  },
+  "louvacao-mestre-camisa": {
+   "deleted": true
+  },
+  "menino-do-pastinha": {
+   "deleted": true
+  },
+  "meu-gunga": {
+   "deleted": true
+  },
+  "paranue-paranua": {
+   "lyrics": "Oiá iá iá ía\nFoge o nêgo sinhá \n\nOiá iá iá ía\nTraz o nêgo sinhá \n\nParanauê, paranauê paraná\nParanauê, paranauê paraná\n \nParanauê, paranauê paraná\nParanauê, paranauê paraná \n\nOô, oô, oô oô oô\nOô, oô, oô oô oô",
+   "translation": "Oiá iá iá ía\nThe Black man is running away, Mistress\n\nOiá iá iá ía\nBring the Black man back, Mistress\n\nParanauê, paranauê paraná\nParanauê, paranauê paraná\n\nParanauê, paranauê paraná\nParanauê, paranauê paraná\n\nOô, oô, oô oô oô\nOô, oô, oô oô oô",
+   "youtube": "qHEVPw0bUXw",
+   "type": "ladainha",
+   "notes": "Uma das ladainhas mais antigas e conhecidas. A palavra 'Paranauê' não tem tradução direta — é uma exclamação de chamado ou invocação, possivelmente de origem iorubá.",
+   "preview": true,
+   "toque": [
+    "sao-bento-grande-regional"
+   ]
+  },
+  "quadra-abada-mundo": {
+   "deleted": true
+  },
+  "quadra-berimbau-som": {
+   "deleted": true
+  },
+  "quadra-capoeira-arte": {
+   "deleted": true
+  },
+  "quadra-ginga-mandinga": {
+   "deleted": true
+  },
+  "quadra-roda-sagrada": {
+   "deleted": true
+  },
+  "que-maravilha": {
+   "deleted": true
+  },
+  "rio-vermelho": {
+   "deleted": true
+  },
+  "sabia": {
+   "deleted": true
+  },
+  "sao-benedito": {
+   "deleted": true
+  },
+  "saudade-da-bahia": {
+   "deleted": true
+  },
+  "sou-angoleiro": {
+   "deleted": true,
+   "translation": "I am an angoleiro\nI am an angoleiro yes\nI am an angoleiro\nCapoeira is my art\n\nMy mestre taught me\nTo play capoeira\nWith cunning and mandinga\nAnd the ginga of capoeira\n\nI am an angoleiro\nI am an angoleiro yes",
+   "lyrics": "Sou angoleiro\nSou angoleiro sim\nSou angoleiro\nCapoeira é minha arte\n\nMeu mestre me ensinou\nA jogar capoeira\nCom malícia e mandinga\nE a ginga da capoeira\n\nSou angoleiro\nSou angoleiro sim",
+   "type": "ladainha"
+  },
+  "test-mpafsl0b": {
+   "type": "corrido"
+  },
+  "vai-camara": {
+   "deleted": true
+  },
+  "volta-do-mundo": {
+   "deleted": true
+  },
+  "zum-zum-zum": {
+   "notes": "'Me matou' aqui tem o sentido de 'me conquistou completamente' — é uma morte metafórica pela paixão pela capoeira. O 'Zum Zum Zum' imita o som do berimbau.",
+   "translation": "Zum zum zum\nCapoeira kills one - x3\n\nWhere are the wasps?\n\nIt's zum zum zum! - x3\n\nO A O A E\nI want to see you hit\nI want to see you fall - x3",
+   "youtube": "-SufUq4M0EY",
+   "refrao": "Zum zum zum\nCapoeira mata um\n\nÉ zum zum zum!\n\nQuero ver bater \nQuero ver cair",
+   "type": "corrido",
+   "preview": true,
+   "toque": [
+    "sao-bento-grande-regional"
+   ],
+   "refraoTranslation": "Zum zum zum\nCapoeira kills one\n\nIt's zum zum zum!\n\nI want to see you hit me! I want to see you fall!",
+   "lyrics": "Zum zum zum\nCapoeira mata um - x3\n\nOnde tem marimbondo?\nÉ zum zum zum! - z3\n\nO A O A E\nQuero ver bater \nQuero ver cair - x3"
+  }
+ },
+ "extra": [
+  {
+   "notes": null,
+   "themes": [],
+   "composer": null,
+   "toque": [
+    "banguela"
+   ],
+   "album": null,
+   "dateAdded": "2026-08-05",
+   "refraoTranslation": "Hey, add some *dendê*—I want to see it,\nAdd some *dendê*—I want to see it,\nYou add the *dendê*",
+   "refrao": "Aee Bota dendê que eu quero ver,\nBota dendê que eu quero ver,\nVocê bota dendê",
+   "preview": true,
+   "id": "ae-bota-dende-que-eu-quero-ver-msfgoojh",
+   "translation": "Put some *dendê* into your style of play,\nPut some *dendê* into this circle,\nPut some *dendê* into the *berimbau*'s rhythm.\n\nThe *berimbau* is playing—come and see,\nLook at that rhythmic sway—\nThat young man has *dendê*.\n\nYour singing makes shivers run down my body,\nAnd there’s no explaining it: a well-played\n*berimbau* stirs my heart.\n\nYour movement has a certain way\nThat masks the cunning—\nThat is *dendê*, the art of *capoeira*.",
+   "title": "Aê BOTA DENDÊ que eu quero ver",
+   "audioLinks": {
+    "youtube": "rOgh4wBw_co"
+   },
+   "lyrics": "Bota dendê no seu jeito de jogar,\nBota dendê nessa roda,\nBota dendê no toque do berimbau \n\nO berimbau ta tocando venha ver,\nOlha o balanço do negro, \nEsse moço tem dendê  \n\nSeu canto faz meu corpo arrepiar \ne não tem explicação, um berimbau bem \ntocado mexe com meu coração \n\nSeu balanço tem um jeito \nQue disfarça a malandragem \nIsso é dendê, arte da capoeiragem",
+   "type": "corrido",
+   "mestre": "BOA VOZ"
+  },
+  {
+   "preview": false,
+   "refraoTranslation": "How I wanted to go back in time\nHow I wanted to go back in time\nTo see Mestre Bimba playing São Bento\nTo see Mestre Bimba playing São Bento",
+   "id": "como-eu-queria-voltar-no-tempo-viagem-no-tempo-msfgdr6p",
+   "mestre": "Mosquito",
+   "lyrics": "Valha meu Deus nessa vivência\nVer seu Bimba sentado no banco\nEnsinando balões e sequência\nPara o seu aluno Cisnando\n\nSeu Bimba cantando quadra e corrido\nXaranga, dois pandeiros e um berimbau\nMestre Gigante, fazendo alarido\nTocando nas rodas da regional\n\nViajei no tempo só imaginando\nMeu Deus do céu mais que coisa tão linda\nSeu Bimba, entregando as medalhas\nNo bairro do Nordeste de Amaralina\n\nQueria voltar pra ver as emboscadas\nNo dia 2 de julho da formatura\nNo Samba De Roda tomar a barbada\nVer seu Camisa Roxa fazendo cintura",
+   "audioLinks": {
+    "youtube": "cbcXt7LX2rs"
+   },
+   "translation": "Good Lord, what an experience it was\nTo see Mestre Bimba sitting on the bench\nTeaching *balões* and sequences\nTo his student, Cisnando\n\nMestre Bimba singing *quadras* and *corridos*\nWith the *xaranga* band, two tambourines, and a *berimbau*\nMestre Gigante making a stir\nPlaying in the *Regional* circles\n\nI traveled back in time just imagining it\nMy God, what a beautiful sight\nMestre Bimba handing out the medals\nIn the Nordeste de Amaralina neighborhood\n\nI wish I could go back to see the *emboscadas*\nOn the July 2nd graduation day\nTo join the *Samba de Roda* with ease\nAnd watch Mestre Camisa Roxa showing off his moves",
+   "title": "Como eu queria voltar  no tempo / Viagem no tempo",
+   "type": "corrido",
+   "dateAdded": "2026-08-05",
+   "album": null,
+   "refrao": "Como eu queria voltar no tempo\nComo eu queria voltar no tempo\nPra ver mestre bimba tocando São Bento\nPra ver mestre bimba tocando São Bento",
+   "composer": null,
+   "notes": null,
+   "themes": [],
+   "toque": [
+    "banguela"
+   ]
+  },
+  {
+   "refraoTranslation": "Eh aê aê aê aê, dendê tide\nOh, dendê, tide!",
+   "refrao": "Ê aê aê aê aê, dendê maré\nÔ, dendê, maré!",
+   "album": null,
+   "dateAdded": "2026-08-05",
+   "notes": null,
+   "toque": [
+    "sao-bento-grande-regional"
+   ],
+   "id": "e-ae-ae-ae-ae-dende-mare-msfgxpnx",
+   "themes": [],
+   "preview": true,
+   "mestre": "Feijão",
+   "lyrics": "Quando a maré tá baixa\nDá pro capoeira remar\nQuando a maré tá alta\nAi que o barco não vai virar\nÔ, dendê, maré!\n\nAguenta firme capoeira\nTem correnteza querendo te derrubar\nMais não consegue se tiver sangue de Zumbi\nE a força de Besouro Mangangá\nÔ, dendê, maré!\n\nA vida é com a capoeira\nQuem ganha também pode perder\nMais são como os tombos da vida\nAi que fazem o homem crescer\nÔ, dendê, maré!\n\nO berimbau tem que ter um tocador\nO tocador toca com seu coração\nLevando para sua vida inteira\nMestre Bimba como sua inspiração\nÔ, dendê, maré!",
+   "type": "corrido",
+   "translation": "When the tide is low\nCan you paddle for capoeira?\nWhen the tide is high\nOh, the boat won't capsize\nOh, palm oil, tide!\n\nHold on tight capoeira\nThere's a current trying to knock you down\nBut you can't do it if you have zombie blood\nAnd the strength of Besouro Mangangá\nOh, palm oil, tide!\n\nLife is with capoeira\nWhoever wins can also lose\nBut they are like the falls of life\nOh, what makes a man grow\nOh, palm oil, tide!\n\nThe berimbau must have a player\nThe player plays with his heart\nTaking it for your whole life\nMestre Bimba as his inspiration\nOh, palm oil, tide!",
+   "audioLinks": {
+    "youtube": "CwxOxR5XyYM"
+   },
+   "composer": null,
+   "title": "Ê aê aê aê aê, dendê maré"
+  },
+  {
+   "mestre": "Mestrando Coala",
+   "id": "e-roda-vem-jogar-mpail3m4",
+   "type": "ladainha",
+   "composer": null,
+   "lyrics": "Escuta so quem esta chamando\nA roda ja se formou\nAgora e berimbau\nOi pandeiro, atabaque e agogo\n\nBerimbau toca Regional\nO corpo se arrepia\nCriada por Mestre Bimba\nEsse jogo na Bahia\n\nRegional Bimba criou\nEssa luta eficente\nEssa luta so funciona\nQuando incorporada a gente\n\nMas joga ai quem tem coragem\nNao e pra qualquer um nao\nO jogo da Regional\nMais vai bater forte o coracao\n\nMas agora ja nao tem jeito\nBerimbau ja lhe chamou\nPe quente cabeca fria\nComo o Mestre me ensinou",
+   "title": "É roda, vem jogar",
+   "refrao": "e roda, vem jogar\nBerimbau ta tocando\nO jogo e Regional",
+   "audioLinks": {
+    "youtube": "h3HLKd_cDys"
+   },
+   "album": null,
+   "dateAdded": "2026-05-18",
+   "refraoTranslation": "Come to the *roda*, come and play\nThe *berimbau* is playing\nThe game is *Regional*",
+   "preview": true,
+   "toque": [
+    "sao-bento-abada"
+   ],
+   "translation": "Listen to the call\nThe *roda* has formed\nNow the *berimbau* plays\nAlong with the *pandeiro*, *atabaque*, and *agogô*\n\nThe *berimbau* plays *Regional*\nIt sends shivers through the body\nCreated by Mestre Bimba\nThis game from Bahia\n\nBimba created *Regional*\nThis effective martial art\nIt only truly works\nWhen it becomes a part of us\n\nSo play, if you have the courage\nIt’s not for just anyone\nThe game of *Regional*\nWill make your heart beat strong\n\nBut now there’s no turning back\nThe *berimbau* has called you\nHot feet, cool head\nJust as the Mestre taught me",
+   "notes": null,
+   "themes": []
+  },
+  {
+   "album": null,
+   "themes": [],
+   "dateAdded": "2026-08-24",
+   "refrao": "Eu disse camarada que eu vinha\nNa sua aldeia camarada um dia",
+   "toque": [
+    "maculele"
+   ],
+   "preview": true,
+   "notes": null,
+   "composer": null,
+   "id": "eu-disse-camarada-que-um-dia-mt6s2tf3",
+   "title": "Eu disse camarada que um dia",
+   "translation": null,
+   "audioLinks": {
+    "youtube": "gpJ4ybVRDAo"
+   },
+   "lyrics": "",
+   "refraoTranslation": "I said, friend, that I would come\nTo your village, friend, one day"
+  },
+  {
+   "album": null,
+   "dateAdded": "2026-09-24",
+   "audioLinks": {
+    "youtube": "J1LxJfRo66g"
+   },
+   "preview": true,
+   "notes": null,
+   "mestre": "Mestrando Pretinho",
+   "lyrics": "Preserve o aluno de hoje dê o respeito para ser respeitado\nNão tire onde não balance corda se é graduado\nLembre que todo respeito parte de alguém\nHoje tu é graduado mas ontem vc foi aluno também\n\nVê se não vai esquecer o que voçê foi la no passado\nJa me disseram que quando era aluno era mais motivado\nLembre que tudo que sabe teve ensinamento\nHoje tu é graduado mas lembre que voçê tem que dar exemplo\n\nVê se peça por favor se for pegar qualquer instrumento \nNão bata no aluno novo porque ele guarda o rescentimento\nQuem bate esquece mas quem apanha não vai esquecer\nHoje o aluno ta novo mas daqui um tempo ele vai crescer\n\nO Mestre sempre te fala e você não entende\nQue o professor que ensina é aquele que aprende \nTodo mundo te fala e voçê não da bola \nVoçê só vai dar valor quando tiver la do lado de fora",
+   "refraoTranslation": "I been told the name is pure capoeira\nI been told if berimbau is in your hand, hold it\nI been told it's Angola and Regional\nBut never been told manners are fundamental",
+   "toque": [
+    "benguela"
+   ],
+   "composer": null,
+   "themes": [],
+   "id": "ja-me-disseram-mufqwrsc",
+   "refrao": "Já me disseram quê o seu nome e capoeira pura\nJá me disseram se der berimbau na mão você segura\nJá me disseram que e Angola e também Regional\nÓ mais não me disseram que e educação que e fundamental",
+   "title": "Já Me Disseram",
+   "translation": "Look after today’s student; show respect so you can be respected\nDon't act arrogant just because you hold a rank or a cord\nRemember that respect has to start somewhere\nToday you’re Graduated, but yesterday you were a student too\n\nMake sure you don't forget who you were in the past\nI’ve been told that when you were a student, you were more motivated\nRemember that everything you know came from being taught\nToday you’re Graduated, but remember you have to set an example\n\nMake sure to ask \"please\" if you’re going to pick up any instrument\nDon't hit the new student, because he’ll hold onto that resentment\nThe one who strikes forgets, but the one who gets hit won't forget\nToday the student is new, but in time he will grow\n\nThe Mestre keeps telling you, but you don't understand\nThat the teacher who teaches is the one who learns\nEveryone tells you, but you pay no heed\nYou’ll only value it when you’re standing on the outside",
+   "type": "corrido"
+  },
+  {
+   "album": null,
+   "refrao": "A capoeira é assim\nE malicia é manha\nO mandingueiro vadeia\nCheio de artimanha",
+   "audioLinks": {
+    "youtube": "NyBhItiiSPM"
+   },
+   "notes": null,
+   "refraoTranslation": "That’s how capoeira is\nAnd *malícia* is cunning\nThe *mandingueiro* moves in the game\nFull of guile",
+   "themes": [],
+   "id": "malicia-e-manha-a-capoeira-e-assim-mscjgm1y",
+   "toque": [
+    "benguela"
+   ],
+   "mestre": "Gordinho",
+   "lyrics": "Se cai levanta sorrindo\nEle nao fica nervoso\nEle poe um tempero na ginga\nE te pega daqui a pouco\nE assim\n\nEle se finge de morto\nAte faz você acreditar\nVai jogando em cima em baixo\nDaqui a pouco cê pode esperar\nE assim\n\nO fraco e o forte na roda\nEsses nao ficam pra tras\nQuando cê é mandingueiro\nNa capoeira isso tanto faz\nE assim\n\nE tudo que os olhos vêem\nQue a boca come\nMandinga, malicia e dendê\nNa capoeira é o que o corpo consome",
+   "preview": true,
+   "dateAdded": "2026-08-03",
+   "translation": "If you fall, you get up smiling\nHe doesn't get nervous\nHe puts some spice in the ginga\nAnd catch you soon\nAnd so\n\nHe pretends to be dead\nIt even makes you believe\nIt goes from top to bottom\nIn a little while you can wait\nAnd so\n\nThe weak and the strong in the circle\nThese are not left behind\nWhen you are a mandingueiro\nIn capoeira this doesn't matter\nAnd so\n\nAnd everything that the eyes see\nThat the mouth eats\nMandingo, malice and palm oil\nIn capoeira it is what the body consumes",
+   "title": "Malicia e manha (A capoeira é assim)",
+   "type": "corrido",
+   "composer": null
+  },
+  {
+   "album": null,
+   "translation": "A place needs people. people from everywhere\nAlongside the *mandingueiros*,\nFrom *Angola* and *Regional* styles.\n\nThe *berimbau* plays softly, signaling the moment;\nIf the game holds a secret, it reveals itself now.\n\nThe time has come, and everyone is waiting;\nThe *gunga* speaks out, starting the *roda*.\n\nWe are searching, looking to find it;\nOnce found, there’s no turning back—lower your body and play.\n\nIt’s a new day for the *mandingueiro* and his style of play;\nIt doesn't matter, *camarada*—the call has come to play the game.",
+   "refraoTranslation": "Let's go to capoeira roda \nLet's go let the berimbau takes you there",
+   "mestre": "Mestrando Coala",
+   "notes": null,
+   "composer": null,
+   "lyrics": "E lugar precisa gente, gente de tudo lugar\nJunto com os mandingueros\nDa Angola e regional\n\nBerimbau tocou sereno, indico que e a hora\nSe um jogo tem secreto, ele se revela agora\n\nJá e chega lá hora, e todos já esperando\nE um gunga vozeiro, a roda iniciando\n\n\nA gente tá procurando, e procura de axa\nSi encontro não tem jeito, abaixa o logo e vai jogar \n\n\nE manhã e mandingueiro, e estilo de jogar\nNão importa camarada, ele chamou e vadiar",
+   "toque": [
+    "benguela"
+   ],
+   "dateAdded": "2026-09-24",
+   "themes": [],
+   "id": "vamos-embora-mufr8v2u",
+   "type": "corrido",
+   "refrao": "Vamos embora pra roda de capoeira\nVamos embora deixa o berimbau levar",
+   "preview": true,
+   "audioLinks": {},
+   "title": "Vamos Embora"
+  },
+  {
+   "translation": "Good wood is like friendship\nBut it's hard to find\nI keep friendship in my chest\nAnd I'm going to make my Berimbau out of wood\n\nIf Mestre Bimba were here\nTo teach me how to choose wood\nI was now entering the forest\nTirava Ipê and Pau Pereira\n\nThe night comes I enter the forest\nMoon brightens, I'll look for\nJequitibá and Maçaranduba\nI must find the guatambu\n\nIn old Africa, Ungo was used\nOn major religious festivals\nKingenge is an Umbundu dialect\nIt's Berimbau who conquered the world\n\nAt the full moon I will reap the fruits\nAnd in the waning I remove the wood\nI'm going to do my Berimbau\nI'm going to play Capoeira",
+   "title": "VOU ESPERAR LUA VOLTAR",
+   "refrao": "Vou esperar a lua voltar\nEu quero entrar na mata ê\nEu vou tirar madeira boa\nPro meu berimbau fazer",
+   "dateAdded": "2026-08-05",
+   "themes": [],
+   "refraoTranslation": "I’ll wait for the moon to return\nI want to go into the woods\nI’ll cut good wood\nTo make my berimbau",
+   "preview": false,
+   "type": "corrido",
+   "notes": null,
+   "lyrics": "Madeira boa é como amizade\nMas é difícil de se encontrar\nA amizade eu guardo no peito\nE da madeira vou fazer meu Berimbau\n\nSe Mestre Bimba estivesse aqui\nPra me ensinar a escolher madeira\nEu entrava agora na mata\nTirava Ipê e Pau Pereira\n\nA noite vem eu entro na mata\nLua clareia, vou procurar\nJequitibá e maçaranduba\nO guatambu eu devo achar\n\nNa velha África se usava o Ungo\nNas grandes festas religiosas\nO Kingenge é um dialeto Umbundo\nÉ o Berimbau que conquistou o mundo\n\nNa lua cheia vou colher os frutos\nE na minguante eu tiro a madeira\nVou pra fazer o meu Berimbau\nVou pra tocar na Capoeira",
+   "id": "vou-esperar-lua-voltar-msfh1uqb",
+   "composer": null,
+   "toque": [
+    "sao-bento-abada"
+   ],
+   "mestre": "Cobra",
+   "album": null,
+   "audioLinks": {
+    "youtube": "OOBxSovvfRM"
+   }
+  },
+  {
+   "title": "Vou lhe dizer o que me alegra",
+   "refrao": "Capoeira Abadá",
+   "audioLinks": {
+    "youtube": "cYX4lJn6E9M"
+   },
+   "themes": [],
+   "lyrics": "Vou lhe dizer o que me alegra\nNuma roda de Capoeira\nQuando eu começo a tocar\nTrês berimbaus\nGunga, médio e uma viola\nAtabaque e o pandeiro\nE dois cabras pra jogar\n\nVou jogando Capoeira\nAté o dia clarear\n\nSe você é Capoeira\nNunca pare de treinar\n\nCante um corrido\nUm coro bem respondido\nUma energia imensa\nQue parado não vai dar\n\nDe Segunda a Sexta-feira\nTem roda no Humaitá\n\nCapoeira que é bamba\nJoga em qualquer lugar\n\nUm jogo duro\nUma armada e uma ponteira\nMeia-lua e uma rasteira\nContinue a jogar\n\nSe você é Capoeira\nNunca deixe de treinar\n\nJoga em cima\nJoga embaixo\nNo que o berimbau mandar",
+   "notes": "O \"Hino do Abadá\" (ou \"Vou lhe dizer o que me alegra\") é a música de referência da associação ABADÁ-Capoeira, composta por Lampréia e Macaco Preto. A letra expressa a alegria e a energia de uma roda de capoeira com a bateria completa e o toque do berimbau.",
+   "id": "vou-lhe-dizer-o-que-me-alegra-msgmjr2j",
+   "dateAdded": "2026-08-05",
+   "translation": "I'll tell you what makes me happy\nIn a Capoeira circle\nWhen I start playing\nThree berimbaus\nGunga, medium and a viola\nAtabaque and the tambourine\nAnd two goats to play with\n\nI'm going to play Capoeira\nUntil the day lightens\n\nIf you are Capoeira\nNever stop training\n\nSing a corrido\nA well-answered chorus\nAn immense energy\nThat stopping won't work\n\nFrom Monday to Friday\nThere is a wheel in Humaitá\n\nCapoeira is awesome\nPlay anywhere\n\nA tough game\nAn armada and a pointer\nHalf moon and a sweep\nKeep playing\n\nIf you are Capoeira\nNever stop training\n\nPlay on top\nPlay below\nWhat the berimbau says",
+   "toque": [
+    "sao-bento-abada"
+   ],
+   "album": null,
+   "refraoTranslation": "Abadá Capoeira",
+   "preview": false,
+   "composer": "Lampreia e Macaco Preto"
+  }
+ ]
+}

@@ -33,8 +33,9 @@ import { plainText, seedOf } from './novo-data';
     <section #card [attr.aria-label]="L.s().playerAndVideo" class="no-print fixed z-40 overflow-hidden rounded-t-2xl rounded-b-2xl md:rounded-b-none bg-[var(--n-raise)] border border-[var(--n-line)] shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
       [class]="cardClass()" [style.left.px]="player.videoShown() && pos() ? pos()!.x : null" [style.top.px]="player.videoShown() && pos() ? pos()!.y : null"
       [attr.aria-hidden]="!player.videoShown()">
-      <!-- Grip: drag the video anywhere on screen, like a floating player. Double-tap (or Enter) puts it back. -->
-      <button type="button" class="w-full h-6 flex items-center justify-center touch-none select-none cursor-grab active:cursor-grabbing text-[var(--n-tx3)]"
+      <!-- Desktop grip: drag the video anywhere on screen. Double-tap (or Enter) puts it back.
+           Phones drag by the controls strip under the video instead, which saves this bar's height. -->
+      <button type="button" class="hidden md:flex w-full h-6 items-center justify-center touch-none select-none cursor-grab active:cursor-grabbing text-[var(--n-tx3)]"
         [attr.aria-label]="L.s().moveVideo" [attr.title]="L.s().moveVideo"
         (pointerdown)="dragStart($event)" (pointermove)="dragMove($event)" (pointerup)="dragEnd($event)" (pointercancel)="dragEnd($event)"
         (dblclick)="resetPos()" (keydown)="dragKey($event)">
@@ -44,7 +45,9 @@ import { plainText, seedOf } from './novo-data';
         <div #ytHost class="absolute inset-0 w-full h-full"></div>
       </div>
       @if (player.current(); as item) {
-        <div class="md:hidden relative">
+        <div class="md:hidden relative pt-1 touch-none select-none"
+          (pointerdown)="rowDown($event)" (pointermove)="rowMove($event)" (pointerup)="rowUp($event)" (pointercancel)="rowUp($event)">
+          <span aria-hidden="true" class="absolute left-1/2 -translate-x-1/2 top-[5px] w-8 h-1 rounded-full bg-[var(--n-tx3)] opacity-40"></span>
           <ng-container [ngTemplateOutlet]="phoneControls" [ngTemplateOutletContext]="{ $implicit: item }" />
         </div>
       }
@@ -167,6 +170,12 @@ export class NovoPlayerComponent implements OnDestroy {
   // ── Moving the video around ──
   /** Where the video card was dragged to; null keeps it in its usual spot. Remembered per screen size. */
   readonly pos = signal<{ x: number; y: number } | null>(null);
+  /** A press on the phone's controls strip that may turn into a drag once it moves far enough. */
+  private pending: { x: number; y: number; id: number; el: HTMLElement } | null = null;
+  /** Until when a click counts as "the end of a drag" and is swallowed, so it doesn't also open
+   *  the song or press a button. Time-limited: on touch a drag often produces no click at all,
+   *  and a plain flag would then eat the next real tap. */
+  private suppressClickUntil = 0;
   private drag: { dx: number; dy: number; id: number; moved: boolean; startLeft: number; width: number } | null = null;
 
   readonly cardClass = computed(() => {
@@ -185,6 +194,15 @@ export class NovoPlayerComponent implements OnDestroy {
     afterNextRender(() => {
       this.player.attach(this.ytHost().nativeElement);
       this.pos.set(this.readPos());
+      // Swallow the click that ends a drag on the controls strip (capture phase, before any link or button sees it).
+      const onClick = (ev: Event) => {
+        if (performance.now() > this.suppressClickUntil) return;
+        this.suppressClickUntil = 0;
+        ev.preventDefault();
+        ev.stopPropagation();
+      };
+      document.addEventListener('click', onClick, true);
+      this.destroyRef.onDestroy(() => document.removeEventListener('click', onClick, true));
       // Rotating or resizing keeps the card on screen.
       fromEvent(window, 'resize').pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
         const p = this.readPos();
@@ -253,6 +271,30 @@ export class NovoPlayerComponent implements OnDestroy {
   /** Where the edge tab sits: level with the card's video, kept on screen. */
   private tabY(cardTop: number): number {
     return Math.round(Math.min(Math.max(72, cardTop + 60), window.innerHeight - 170));
+  }
+
+  rowDown(e: PointerEvent): void {
+    if (!this.player.videoShown()) return;
+    this.pending = { x: e.clientX, y: e.clientY, id: e.pointerId, el: e.currentTarget as HTMLElement };
+  }
+
+  rowMove(e: PointerEvent): void {
+    if (this.drag) { this.dragMove(e); return; }
+    const p = this.pending;
+    if (!p || e.pointerId !== p.id || Math.hypot(e.clientX - p.x, e.clientY - p.y) < 8) return;
+    // Moved far enough to mean "drag", not "tap": start dragging from where the finger went down.
+    const r = this.card().nativeElement.getBoundingClientRect();
+    this.drag = { dx: p.x - r.left, dy: p.y - r.top, id: p.id, moved: false, startLeft: r.left, width: r.width };
+    try { p.el.setPointerCapture(p.id); } catch { /* pointer already gone */ }
+    this.dragMove(e);
+  }
+
+  rowUp(e: PointerEvent): void {
+    if (this.drag) {
+      if (this.drag.moved) this.suppressClickUntil = performance.now() + 400;
+      this.dragEnd(e);
+    }
+    this.pending = null;
   }
 
   resetPos(): void {

@@ -7,7 +7,7 @@ import { Song } from '../models/song.model';
 import { Toque } from '../models/toque.model';
 import { Video } from '../models/video.model';
 import { FirebaseService, SongOverride } from './firebase.service';
-import { readSongCollections } from './firestore-rest';
+import { snapshotCollections } from './songs-remote';
 
 // Last server state, kept in localStorage so a refresh can hide deleted songs on
 // the very first paint instead of showing them until Firestore answers.
@@ -133,15 +133,12 @@ export class DataService {
   private readonly onServer = isPlatformServer(inject(PLATFORM_ID));
 
   constructor() {
-    if (this.onServer) {
-      // Prerendering at build time: read the admin's songs over HTTP, which the
-      // renderer waits for, so each generated page has the real song list.
-      readSongCollections(this.http).subscribe({
-        next: ([overrides, extra]) => { this.overrides.set(overrides); this.extraSongs.set(extra); },
-        error: () => { /* offline build: bundled songs only */ },
-      });
-      return;
-    }
+    // Start from the snapshot saved at build time. The prerendered pages are built from it,
+    // and in the browser it covers a first visit before (or without) Firestore.
+    const { overrides, extra } = snapshotCollections();
+    this.overrides.set(overrides);
+    this.extraSongs.set(extra);
+    if (this.onServer) return;
     this.seedFromCache();
     this.refreshOverrides();
   }

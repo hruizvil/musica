@@ -55,7 +55,7 @@ const fold = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,
           <tbody>
             @for (s of rows(); track s.id) {
               <tr (click)="open(s)" class="cursor-pointer border-t border-[var(--n-line)] hover:bg-[var(--n-bg)]">
-                <td class="px-3.5 py-2.5 font-bold max-w-[340px] truncate"><a [routerLink]="['/admin/new/songs', s.id]" (click)="$event.stopPropagation()">{{ s.title }}</a></td>
+                <td class="px-3.5 py-2.5 font-bold max-w-[340px] truncate"><a [routerLink]="['/admin/songs', s.id]" (click)="$event.stopPropagation()">{{ s.title }}</a></td>
                 <td class="px-3.5 py-2.5 text-[var(--n-tx2)] max-w-[220px] truncate">{{ toques(s) }}</td>
                 <td class="px-3.5 py-2.5"><span [class]="markClass(!has(s, 'video'))">{{ mark(!has(s, 'video')) }}</span></td>
                 <td class="px-3.5 py-2.5"><span [class]="markClass(!has(s, 'translation') && !has(s, 'chorusEn'))">{{ mark(!has(s, 'translation') && !has(s, 'chorusEn')) }}</span></td>
@@ -72,7 +72,7 @@ const fold = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,
       <!-- Phone: list -->
       <div class="md:hidden rounded-2xl border border-[var(--n-line)] bg-[var(--n-surf)] overflow-hidden">
         @for (s of rows(); track s.id; let first = $first) {
-          <a [routerLink]="['/admin/new/songs', s.id]" class="flex items-center gap-3 px-4 py-3 border-[var(--n-line)]" [class.border-t]="!first">
+          <a [routerLink]="['/admin/songs', s.id]" class="flex items-center gap-3 px-4 py-3 border-[var(--n-line)]" [class.border-t]="!first">
             <div class="flex-1 min-w-0">
               <div class="font-bold truncate">{{ s.title }}</div>
               <div class="text-[12.5px] text-[var(--n-tx3)] truncate">{{ toques(s) }} · {{ date(s.dateAdded) }}</div>
@@ -118,7 +118,7 @@ export class StudioSongsComponent {
   markClass(ok: boolean): string { return 'font-extrabold ' + (ok ? 'text-[var(--n-ok)]' : 'text-[var(--n-warn)]'); }
   toques(s: Song): string { return s.toque.map(id => this.studio.toqueName(id)).join(', ') || 'No toque'; }
   date(d: string): string { return shortDate(d); }
-  open(s: Song): void { this.router.navigate(['/admin/new/songs', s.id]); }
+  open(s: Song): void { this.router.navigate(['/admin/songs', s.id]); }
 
   setFilter(filter: Filter): void {
     this.router.navigate([], { queryParams: { filter: filter === 'all' ? null : filter }, queryParamsHandling: 'merge', replaceUrl: true });

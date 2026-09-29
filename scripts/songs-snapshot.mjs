@@ -1,4 +1,4 @@
-// Saves the admin's song data (edits, deletions and added songs) from Firestore into
+// Saves the admin's song data (edits, deletions, added songs, toque patterns) from Firestore into
 // src/assets/data/songs-remote.json before each build.
 //
 // The build prerenders ~70 pages and every one needs this data. Reading it once here, instead
@@ -37,16 +37,30 @@ async function list(collection) {
   }
 }
 
+const previous = JSON.parse(readFileSync(OUT, 'utf8'));
+
+// Toque patterns are read on their own: until the Firestore rules allow reading
+// "toque_patterns", this fails and the previous patterns are kept, songs unaffected.
+async function patterns() {
+  try {
+    const docs = await list('toque_patterns');
+    return Object.fromEntries(docs.map(d => [docId(d), fields(d.fields ?? {})]));
+  } catch (err) {
+    console.warn(`songs-remote.json: toque patterns unavailable (${err.message}); keeping the previous ones`);
+    return previous.patterns ?? {};
+  }
+}
+
 try {
-  const [overrides, extra] = await Promise.all([list('song_overrides'), list('songs_extra')]);
+  const [overrides, extra, pats] = await Promise.all([list('song_overrides'), list('songs_extra'), patterns()]);
   const snapshot = {
     fetchedAt: new Date().toISOString(),
     overrides: Object.fromEntries(overrides.map(d => [docId(d), fields(d.fields ?? {})])),
     extra: extra.map(d => fields(d.fields ?? {})),
+    patterns: pats,
   };
   writeFileSync(OUT, JSON.stringify(snapshot, null, 1) + '\n');
-  console.log(`songs-remote.json: ${overrides.length} edits, ${extra.length} added songs`);
+  console.log(`songs-remote.json: ${overrides.length} edits, ${extra.length} added songs, ${Object.keys(pats).length} toque patterns`);
 } catch (err) {
-  const kept = JSON.parse(readFileSync(OUT, 'utf8')).fetchedAt;
-  console.warn(`songs-remote.json: Firestore unavailable (${err.message}); keeping the snapshot from ${kept}`);
+  console.warn(`songs-remote.json: Firestore unavailable (${err.message}); keeping the snapshot from ${previous.fetchedAt}`);
 }

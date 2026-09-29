@@ -20,3 +20,13 @@ export interface Toque {
   videoLinks: VideoLink[];
   relatedToques: string[];
 }
+
+/** Berimbau strokes: chiado (the buzz, stone resting on the wire), dom (open, low), dim (stone pressed, high). */
+export type Stroke = 'tch' | 'dom' | 'dim';
+
+/** A toque's berimbau pattern as saved in the admin. An empty list means "no pattern". */
+export interface ToquePattern {
+  strokes: Stroke[];
+  updatedBy?: string | null;
+  updatedAt?: string | null;
+}

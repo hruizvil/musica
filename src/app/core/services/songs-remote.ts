@@ -1,6 +1,7 @@
 import { InjectionToken, makeStateKey } from '@angular/core';
 import { Song } from '../models/song.model';
 import { SongOverride } from './firebase.service';
+import { ToquePattern } from '../models/toque.model';
 
 /**
  * The admin's song data (edits, deletions, added songs) as saved by scripts/songs-snapshot.mjs
@@ -15,6 +16,8 @@ export interface SongSnapshot {
   fetchedAt: string;
   overrides: Record<string, SongOverride>;
   extra: Song[];
+  /** Berimbau patterns saved in the admin, by toque id. Older snapshots don't have it. */
+  patterns?: Record<string, ToquePattern>;
 }
 export interface SongCollections { overrides: Map<string, SongOverride>; extra: Song[]; }
 

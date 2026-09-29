@@ -2,6 +2,14 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { DataService } from '../../core/services/data.service';
 import { FirebaseService, SongOverride } from '../../core/services/firebase.service';
 import { AudioLinks, Song } from '../../core/models/song.model';
+import { Stroke } from '../../core/models/toque.model';
+
+/** The strokes as the admin names them, with the Portuguese word the group uses. */
+export const STROKE_NAME: Record<Stroke, { en: string; pt: string; hint: string }> = {
+  tch: { en: 'Buzz', pt: 'chiado', hint: 'Stone resting on the wire' },
+  dom: { en: 'Low', pt: 'dom', hint: 'Open string' },
+  dim: { en: 'High', pt: 'dim', hint: 'Stone pressed on the wire' },
+};
 
 /** What a song can be missing, in the order the admin lists them. */
 export type Gap = 'video' | 'translation' | 'chorusEn' | 'about' | 'aboutEn';
@@ -166,6 +174,16 @@ export class StudioService {
     }
     await this.data.refreshOverrides();
     return song.id;
+  }
+
+  /** Saves a toque's pattern. An empty list is kept as "no pattern" so it also hides a built-in one. */
+  async savePattern(toqueId: string, strokes: Stroke[]): Promise<void> {
+    await this.fb.saveToquePattern(toqueId, { strokes, updatedBy: this.editor() || null, updatedAt: new Date().toISOString() });
+    await this.data.refreshPatterns();
+  }
+
+  patternMeta(toqueId: string) {
+    return this.data.patternMeta().get(toqueId) ?? null;
   }
 
   async remove(song: Song): Promise<void> {

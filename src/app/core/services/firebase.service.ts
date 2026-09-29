@@ -6,6 +6,7 @@ import type { Auth } from 'firebase/auth';
 import type { Firestore } from 'firebase/firestore';
 import { environment } from '../../../environments/environment';
 import { Song } from '../models/song.model';
+import { ToquePattern } from '../models/toque.model';
 
 type AuthModule = typeof import('firebase/auth');
 type FirestoreModule = typeof import('firebase/firestore');
@@ -256,6 +257,18 @@ export class FirebaseService {
   async saveExtraSong(song: Song): Promise<void> {
     const { db, f } = await this.ready();
     await f.setDoc(f.doc(db, 'songs_extra', song.id), song);
+  }
+
+  async getToquePatterns(): Promise<Record<string, ToquePattern>> {
+    const { db, f } = await this.ready();
+    const snap = await f.getDocs(f.collection(db, 'toque_patterns'));
+    return Object.fromEntries(snap.docs.map(d => [d.id, d.data() as ToquePattern]));
+  }
+
+  /** An empty stroke list is saved on purpose: it means "no pattern", even for a built-in one. */
+  async saveToquePattern(toqueId: string, pattern: ToquePattern): Promise<void> {
+    const { db, f } = await this.ready();
+    await f.setDoc(f.doc(db, 'toque_patterns', toqueId), pattern);
   }
 
   async deleteExtraSong(songId: string): Promise<void> {

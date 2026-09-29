@@ -16,7 +16,7 @@ import { GAP_LABEL, Gap, StudioService, shortDate } from './studio.service';
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-3.5">
         @for (t of tiles(); track t.label) {
-          <a [routerLink]="'/admin/new/songs'" [queryParams]="t.filter ? { filter: t.filter } : {}"
+          <a [routerLink]="'/admin/songs'" [queryParams]="t.filter ? { filter: t.filter } : {}"
              class="rounded-2xl border border-[var(--n-line)] bg-[var(--n-surf)] p-3.5 md:p-4 hover:border-[var(--n-acc)]">
             <div class="text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-tx3)]">{{ t.label }}</div>
             <div class="n-disp text-[26px] md:text-[30px] font-semibold tabular-nums leading-tight mt-1" [class]="numColor(t.filter, t.value)">{{ t.value }}</div>
@@ -29,7 +29,7 @@ import { GAP_LABEL, Gap, StudioService, shortDate } from './studio.service';
         <section class="rounded-2xl border border-[var(--n-line)] bg-[var(--n-surf)] overflow-hidden">
           <div class="flex items-center px-4 py-3"><h2 class="font-bold text-[15px] flex-1">Needs attention</h2><span class="text-[12px] text-[var(--n-tx3)]">newest first</span></div>
           @for (s of attention(); track s.id) {
-            <a [routerLink]="['/admin/new/songs', s.id]" class="flex items-center gap-3 px-4 py-2.5 border-t border-[var(--n-line)] hover:bg-[var(--n-bg)]">
+            <a [routerLink]="['/admin/songs', s.id]" class="flex items-center gap-3 px-4 py-2.5 border-t border-[var(--n-line)] hover:bg-[var(--n-bg)]">
               <div class="flex-1 min-w-0">
                 <div class="font-bold truncate">{{ s.title }}</div>
                 <div class="text-[12.5px] text-[var(--n-tx3)] truncate">{{ toques(s.toque) }}</div>
@@ -42,13 +42,13 @@ import { GAP_LABEL, Gap, StudioService, shortDate } from './studio.service';
           } @empty {
             <div class="px-4 py-6 border-t border-[var(--n-line)] text-[var(--n-tx2)]">Nothing missing. Every song is complete.</div>
           }
-          <a routerLink="/admin/new/songs" class="block px-4 py-3 border-t border-[var(--n-line)] font-bold text-[14px] text-[var(--n-tx2)] hover:text-[var(--n-tx)]">See all songs →</a>
+          <a routerLink="/admin/songs" class="block px-4 py-3 border-t border-[var(--n-line)] font-bold text-[14px] text-[var(--n-tx2)] hover:text-[var(--n-tx)]">See all songs →</a>
         </section>
 
         <section class="rounded-2xl border border-[var(--n-line)] bg-[var(--n-surf)] overflow-hidden">
           <div class="px-4 py-3"><h2 class="font-bold text-[15px]">Recently added</h2></div>
           @for (s of recent(); track s.id) {
-            <a [routerLink]="['/admin/new/songs', s.id]" class="flex items-center gap-3 px-4 py-2.5 border-t border-[var(--n-line)] hover:bg-[var(--n-bg)]">
+            <a [routerLink]="['/admin/songs', s.id]" class="flex items-center gap-3 px-4 py-2.5 border-t border-[var(--n-line)] hover:bg-[var(--n-bg)]">
               <span class="w-9 h-9 rounded-lg grid place-items-center shrink-0 bg-[linear-gradient(135deg,#2a2c33,#4a3b14)] text-[var(--n-acc)] font-extrabold">♪</span>
               <div class="flex-1 min-w-0">
                 <div class="font-bold truncate">{{ s.title }}</div>

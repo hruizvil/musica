@@ -1,20 +1,12 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
 import { NOVO_ROUTES } from './features/novo-design/novo.routes';
 
 /** Titles for the classic design's pages. The main site sets its own, per language. */
 const SITE = 'Abadá Música';
 
 export const routes: Routes = [
-  // Admin stays at the top level, outside both designs.
-  {
-    path: 'admin',
-    title: `Admin · ${SITE}`,
-    loadComponent: () => import('./features/admin/admin.component').then(m => m.AdminComponent),
-    canActivate: [authGuard],
-  },
-  // The new admin, beside the old one until it replaces it.
-  { path: 'admin/new', loadChildren: () => import('./features/studio/studio.routes').then(m => m.STUDIO_ROUTES) },
+  // Admin stays at the top level, outside both designs. Sign-in first, so /admin/login
+  // isn't taken for a page inside the admin.
   {
     path: 'admin/login',
     loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),
@@ -22,6 +14,7 @@ export const routes: Routes = [
       { path: '', title: `Admin · ${SITE}`, loadComponent: () => import('./features/admin/admin-login.component').then(m => m.AdminLoginComponent) },
     ],
   },
+  { path: 'admin', loadChildren: () => import('./features/studio/studio.routes').then(m => m.STUDIO_ROUTES) },
 
   // The classic design, kept at /classico during the move to the new design.
   {

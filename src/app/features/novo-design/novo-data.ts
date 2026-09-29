@@ -1,5 +1,7 @@
 import { Song } from '../../core/models/song.model';
 import { ToqueCategory } from '../../core/models/toque.model';
+import type { Stroke } from '../../core/models/toque.model';
+export type { Stroke };
 
 /** One colour per toque. Every one carries white text at 4.5:1 or better. */
 export const TOQUE_COLOR: Record<string, string> = {
@@ -24,18 +26,6 @@ export const CATEGORY_LABEL: Record<ToqueCategory, string> = {
   angola: 'Angola', regional: 'Regional', abada: 'Abadá', other: 'Outros ritmos',
 };
 export const CATEGORY_ORDER: ToqueCategory[] = ['abada', 'angola', 'regional', 'other'];
-
-/** Berimbau strokes: chiado (the buzz, stone resting on the wire), dom (open, low), dim (stone pressed, high). */
-export type Stroke = 'tch' | 'dom' | 'dim';
-
-/**
- * Patterns the group has confirmed. A toque not listed here has no pattern yet, and every
- * screen says so instead of guessing one. Add a toque by adding its row.
- */
-export const PATTERNS: Record<string, Stroke[]> = {
-  'benguela': ['tch', 'tch', 'dom', 'dom', 'dim'],
-  'sao-bento-abada': ['tch', 'dom', 'dim', 'dim', 'dom'],
-};
 
 export const STROKE_LABEL: Record<Stroke, string> = { tch: 'chiado', dom: 'grave', dim: 'agudo' };
 

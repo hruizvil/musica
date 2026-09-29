@@ -15,6 +15,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    // Berimbau patterns per toque, edited in the admin
+    match /toque_patterns/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
 
     // User docs: owner can read/write their own
     match /users/{userId} {

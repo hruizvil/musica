@@ -4,7 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { Song } from '../models/song.model';
-import { Toque } from '../models/toque.model';
+import { Stroke, Toque, ToquePattern } from '../models/toque.model';
+import { DEFAULT_PATTERNS } from '../data/toque-patterns';
 import { Video } from '../models/video.model';
 import { FirebaseService, SongOverride } from './firebase.service';
 import { SONG_SNAPSHOT, SONG_SNAPSHOT_STATE, SONG_SNAPSHOT_URL, SongCollections, SongSnapshot, fromSnapshot } from './songs-remote';
@@ -13,6 +14,7 @@ import { SONG_SNAPSHOT, SONG_SNAPSHOT_STATE, SONG_SNAPSHOT_URL, SongCollections,
 // the very first paint instead of showing them until Firestore answers.
 const OVERRIDES_CACHE_KEY = 'capoeira-overrides-cache';
 const EXTRA_CACHE_KEY = 'capoeira-extra-cache';
+const PATTERNS_CACHE_KEY = 'capoeira-patterns-cache';
 
 /** Old toque id -> the id that replaced it. "Banguela" was a misspelling of the
  *  Benguela this school actually plays; the two were separate entries for a while,
@@ -142,6 +144,25 @@ export class DataService {
 
   /** Set once Firestore has answered; a late snapshot fallback must not overwrite it. */
   private live = false;
+  private livePatterns = false;
+
+  /** Patterns saved in the admin, by toque id (Firestore "toque_patterns"). */
+  private patternDocs = signal<Record<string, ToquePattern>>({});
+
+  /** Each toque's berimbau pattern: the admin's if saved (an empty one removes it), else the built-in one. */
+  readonly patterns = computed(() => {
+    const merged: Record<string, Stroke[]> = { ...DEFAULT_PATTERNS };
+    for (const [id, doc] of Object.entries(this.patternDocs())) {
+      if (doc?.strokes?.length) merged[id] = doc.strokes; else delete merged[id];
+    }
+    return merged;
+  });
+
+  readonly patternMeta = computed(() => {
+    const meta = new Map<string, { by: string | null; at: string | null }>();
+    for (const [id, doc] of Object.entries(this.patternDocs())) if (doc?.updatedAt) meta.set(id, { by: doc.updatedBy ?? null, at: doc.updatedAt });
+    return meta;
+  });
 
   constructor() {
     const state = inject(TransferState);
@@ -151,6 +172,7 @@ export class DataService {
       const snapshot = inject(SONG_SNAPSHOT, { optional: true });
       if (snapshot) {
         this.apply(fromSnapshot(snapshot));
+        this.patternDocs.set(snapshot.patterns ?? {});
         state.set(SONG_SNAPSHOT_STATE, snapshot);
       }
       return;
@@ -158,15 +180,32 @@ export class DataService {
     const carried = state.get(SONG_SNAPSHOT_STATE, null);
     if (carried) {
       this.apply(fromSnapshot(carried));
+      this.patternDocs.set(carried.patterns ?? {});
     } else if (!this.seedFromCache()) {
       // A page rendered in the browser on a first visit: nothing cached yet, so fetch
       // the build snapshot in case Firestore is slow or unreachable.
       this.http.get<SongSnapshot>(SONG_SNAPSHOT_URL).subscribe({
-        next: s => { if (!this.live) this.apply(fromSnapshot(s)); },
+        next: s => {
+          if (!this.live) this.apply(fromSnapshot(s));
+          if (!this.livePatterns) this.patternDocs.set(s.patterns ?? {});
+        },
         error: () => { /* Firestore or the bundled songs cover it */ },
       });
     }
     this.refreshOverrides();
+    this.refreshPatterns();
+  }
+
+  /** Separate from the songs, so a problem reading patterns never holds the songs back. */
+  async refreshPatterns(): Promise<void> {
+    try {
+      const docs = await this.fb.getToquePatterns();
+      this.livePatterns = true;
+      this.patternDocs.set(docs);
+      try { localStorage.setItem(PATTERNS_CACHE_KEY, JSON.stringify(docs)); } catch { /* best-effort */ }
+    } catch {
+      // Not readable (rules not published yet, offline): keep the snapshot's patterns.
+    }
   }
 
   private apply({ overrides, extra }: SongCollections): void {
@@ -198,6 +237,8 @@ export class DataService {
         this.overrides.set(new Map(JSON.parse(rawOverrides) as [string, SongOverride][]));
         seeded = true;
       }
+      const rawPatterns = localStorage.getItem(PATTERNS_CACHE_KEY);
+      if (rawPatterns) this.patternDocs.set(JSON.parse(rawPatterns) as Record<string, ToquePattern>);
       const rawExtra = localStorage.getItem(EXTRA_CACHE_KEY);
       if (rawExtra) {
         this.extraSongs.set(JSON.parse(rawExtra) as Song[]);

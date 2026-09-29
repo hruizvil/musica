@@ -27,8 +27,8 @@ const PAIRS: { pt: TextKey; en: TextKey; ptLabel: string; enLabel: string; rows:
       <!-- Top bar -->
       <div class="sticky top-14 md:top-0 z-20 bg-[var(--n-surf)] border-b border-[var(--n-line)]">
         <div class="h-14 flex items-center gap-2 md:gap-3 px-2 md:px-6">
-          <a routerLink="/admin/new/songs" class="md:hidden w-10 h-10 grid place-items-center rounded-full" aria-label="Back to songs"><app-novo-icon name="back" [size]="21" /></a>
-          <a routerLink="/admin/new/songs" class="hidden md:inline text-[var(--n-tx3)] hover:text-[var(--n-tx)]">Songs</a>
+          <a routerLink="/admin/songs" class="md:hidden w-10 h-10 grid place-items-center rounded-full" aria-label="Back to songs"><app-novo-icon name="back" [size]="21" /></a>
+          <a routerLink="/admin/songs" class="hidden md:inline text-[var(--n-tx3)] hover:text-[var(--n-tx)]">Songs</a>
           <span class="hidden md:inline text-[var(--n-tx3)]">/</span>
           <b class="truncate min-w-0 flex-1 md:flex-none md:max-w-[360px]">{{ d.title || (isNew() ? 'New song' : 'Untitled') }}</b>
           @if (dirty()) {
@@ -38,7 +38,7 @@ const PAIRS: { pt: TextKey; en: TextKey; ptLabel: string; enLabel: string; rows:
           @if (!isNew()) {
             <a [href]="'/cantigas/' + song()!.id" target="_blank" rel="noopener" class="hidden md:inline-flex items-center gap-1.5 rounded-full border border-[var(--n-line)] px-4 py-2 text-[13px] font-bold hover:border-[var(--n-tx3)]">View on site <app-novo-icon name="external" [size]="14" /></a>
           }
-          <a routerLink="/admin/new/songs" class="hidden md:inline-flex rounded-full border border-[var(--n-line)] px-4 py-2 text-[13px] font-bold hover:border-[var(--n-tx3)]">Cancel</a>
+          <a routerLink="/admin/songs" class="hidden md:inline-flex rounded-full border border-[var(--n-line)] px-4 py-2 text-[13px] font-bold hover:border-[var(--n-tx3)]">Cancel</a>
           <button type="button" (click)="save()" [disabled]="saving()"
             class="rounded-full bg-[var(--n-acc)] text-[#101114] px-5 py-2 text-[14px] font-bold disabled:opacity-60 shrink-0 hover:brightness-105">
             {{ saving() ? 'Saving…' : isNew() ? 'Add song' : 'Save' }}
@@ -84,7 +84,7 @@ const PAIRS: { pt: TextKey; en: TextKey; ptLabel: string; enLabel: string; rows:
           </div>
 
           <label class="flex flex-col gap-2">
-            <span class="text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-tx3)]">Composer or mestre</span>
+            <span class="text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-tx3)]">Composer</span>
             <input class="s-field" [class.s-empty]="!d.composer" [value]="d.composer" (input)="set('composer', $any($event.target).value)" placeholder="Unknown" />
           </label>
 
@@ -145,7 +145,7 @@ const PAIRS: { pt: TextKey; en: TextKey; ptLabel: string; enLabel: string; rows:
       <div class="px-6 py-16 text-center flex flex-col items-center gap-3">
         <h1 class="n-disp text-[20px] font-semibold">Song not found</h1>
         <p class="m-0 text-[var(--n-tx2)]">It may have been deleted.</p>
-        <a routerLink="/admin/new/songs" class="rounded-full bg-[var(--n-acc)] text-[#101114] px-5 py-2 font-bold">Back to songs</a>
+        <a routerLink="/admin/songs" class="rounded-full bg-[var(--n-acc)] text-[#101114] px-5 py-2 font-bold">Back to songs</a>
       </div>
     } @else {
       <div class="px-6 py-16 text-center text-[var(--n-tx2)]">Loading…</div>
@@ -241,7 +241,7 @@ export class StudioEditorComponent {
         this.studio.flash(`Added "${d.title.trim()}". It's on the site now`);
         this.loadedFor = null;
         this.draft.set(null);
-        this.router.navigate(['/admin/new/songs', id], { replaceUrl: true });
+        this.router.navigate(['/admin/songs', id], { replaceUrl: true });
       } else {
         this.studio.flash('Saved');
       }
@@ -259,7 +259,7 @@ export class StudioEditorComponent {
       await this.studio.remove(s);
       this.initial.set(JSON.stringify(this.draft()));
       this.studio.flash(`Deleted "${s.title}"`);
-      this.router.navigate(['/admin/new/songs']);
+      this.router.navigate(['/admin/songs']);
     } catch (e) {
       this.studio.flash(this.studio.errorText(e, 'delete'));
     } finally {

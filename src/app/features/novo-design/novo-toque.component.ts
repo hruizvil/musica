@@ -5,7 +5,7 @@ import { NovoPlayerService } from './novo-player.service';
 import { NovoIconComponent, NovoPatternComponent } from './novo-ui';
 import { NovoSongRowComponent } from './novo-parts';
 import { BerimbauSynth } from './novo-berimbau';
-import { PATTERNS, TextRun, byTitle, emphasis, plainText, toqueColor, youTubeId } from './novo-data';
+import { TextRun, byTitle, emphasis, plainText, toqueColor, youTubeId } from './novo-data';
 import { NovoLangService } from './novo-lang.service';
 import { NovoContentService } from './novo-content.service';
 import { NovoSeoService, SITE_ORIGIN } from './novo-seo.service';
@@ -118,7 +118,7 @@ export class NovoToqueComponent implements OnDestroy {
   readonly category = computed(() => this.content.category(this.toque()?.category ?? 'other'));
   readonly songs = computed(() => [...(this.data.songsByToque().get(this.id()) ?? [])].sort(byTitle));
   readonly songIds = computed(() => this.songs().map(s => s.id));
-  readonly hasPattern = computed(() => !!PATTERNS[this.id()]);
+  readonly hasPattern = computed(() => !!this.data.patterns()[this.id()]);
   readonly hasVideo = computed(() => !!youTubeId(this.data.videosByToque().get(this.id())?.[0]?.youtubeId ?? this.toque()?.videoLinks[0]?.url));
   readonly related = computed(() => (this.toque()?.relatedToques ?? []).map(r => this.data.toqueById().get(r)).filter(t => !!t));
 
@@ -167,7 +167,7 @@ export class NovoToqueComponent implements OnDestroy {
 
   async togglePattern(): Promise<void> {
     if (this.patternPlaying()) { this.stopPattern(); return; }
-    const seq = PATTERNS[this.id()];
+    const seq = this.data.patterns()[this.id()];
     if (!seq) return;
     // The video would play over the synth; one sound at a time.
     if (this.player.playing()) this.player.toggle();

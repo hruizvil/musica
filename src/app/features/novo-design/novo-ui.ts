@@ -1,7 +1,8 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { FavoritesService } from '../../core/services/favorites.service';
-import { PATTERNS, Stroke } from './novo-data';
+import { Stroke } from './novo-data';
+import { DataService } from '../../core/services/data.service';
 import { NovoLangService } from './novo-lang.service';
 
 /** Stroke icons for the new design, by name. */
@@ -146,7 +147,15 @@ export class NovoPatternComponent {
   onColor = input<boolean>(false);
   active = input<number | null>(null);
 
-  readonly strokes = computed<Stroke[] | null>(() => PATTERNS[this.toqueId()] ?? null);
+  /** Draws this pattern instead of the toque's saved one (the admin's live preview). */
+  pattern = input<Stroke[] | null>(null);
+
+  private data = inject(DataService);
+  readonly strokes = computed<Stroke[] | null>(() => {
+    const given = this.pattern();
+    if (given) return given.length ? given : null;
+    return this.data.patterns()[this.toqueId()] ?? null;
+  });
   readonly L = inject(NovoLangService);
   readonly spoken = computed(() => {
     const d = this.L.s();

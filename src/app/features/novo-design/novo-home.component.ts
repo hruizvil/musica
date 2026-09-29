@@ -8,7 +8,7 @@ import { NovoLangService } from './novo-lang.service';
 import { NovoSeoService, SITE_ORIGIN } from './novo-seo.service';
 import { NovoCoverComponent, NovoIconComponent } from './novo-ui';
 import { NovoSongRowComponent, NovoToqueCardComponent } from './novo-parts';
-import { LEARNED_COLOR, LIKED_COLOR, PATTERNS, lyricLines, plainText, seedOf, songColor } from './novo-data';
+import { LEARNED_COLOR, LIKED_COLOR, lyricLines, plainText, seedOf, songColor } from './novo-data';
 
 /** Início: pick up where you were, your two lists, the toques by their pattern, what's new. */
 @Component({
@@ -144,8 +144,9 @@ export class NovoHomeComponent {
   /** Toques with a confirmed pattern first, then the ones with the most songs. */
   readonly featuredToques = computed(() => {
     const count = (id: string) => this.data.songsByToque().get(id)?.length ?? 0;
+    const patterns = this.data.patterns();
     return [...this.data.toques()]
-      .sort((a, b) => (PATTERNS[b.id] ? 1 : 0) - (PATTERNS[a.id] ? 1 : 0) || count(b.id) - count(a.id))
+      .sort((a, b) => (patterns[b.id] ? 1 : 0) - (patterns[a.id] ? 1 : 0) || count(b.id) - count(a.id))
       .slice(0, 6);
   });
 

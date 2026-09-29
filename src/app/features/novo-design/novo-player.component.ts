@@ -31,7 +31,7 @@ import { plainText, seedOf } from './novo-data';
     <!-- The YouTube frame. Always mounted so playback survives navigation; moved off screen
          (never shrunk) when there is nothing to show, and paused whenever it is off screen. -->
     <section #card [attr.aria-label]="L.s().playerAndVideo" class="no-print fixed z-40 overflow-hidden rounded-t-2xl rounded-b-2xl md:rounded-b-none bg-[var(--n-raise)] border border-[var(--n-line)] shadow-[0_18px_50px_rgba(0,0,0,0.28)]"
-      [class]="cardClass()" [style.left.px]="player.videoShown() && pos() ? pos()!.x : null" [style.top.px]="player.videoShown() && pos() ? pos()!.y : null"
+      [class]="cardClass()" [class.opacity-60]="!!tuckIntent()" [style.left.px]="player.videoShown() && pos() ? pos()!.x : null" [style.top.px]="player.videoShown() && pos() ? pos()!.y : null"
       [attr.aria-hidden]="!player.videoShown()">
       <!-- Desktop grip: drag the video anywhere on screen. Double-tap (or Enter) puts it back.
            Phones drag by the controls strip under the video instead, which saves this bar's height. -->
@@ -45,7 +45,7 @@ import { plainText, seedOf } from './novo-data';
         <div #ytHost class="absolute inset-0 w-full h-full"></div>
       </div>
       @if (player.current(); as item) {
-        <div class="md:hidden relative pt-1 touch-none select-none"
+        <div class="md:hidden relative pt-1 touch-none select-none [-webkit-touch-callout:none] [-webkit-user-drag:none]"
           (pointerdown)="rowDown($event)" (pointermove)="rowMove($event)" (pointerup)="rowUp($event)" (pointercancel)="rowUp($event)">
           <span aria-hidden="true" class="absolute left-1/2 -translate-x-1/2 top-[5px] w-8 h-1 rounded-full bg-[var(--n-tx3)] opacity-40"></span>
           <ng-container [ngTemplateOutlet]="phoneControls" [ngTemplateOutletContext]="{ $implicit: item }" />
@@ -127,7 +127,7 @@ import { plainText, seedOf } from './novo-data';
     <ng-template #phoneControls let-item>
       <span class="absolute left-0 top-0 h-[3px] bg-[var(--n-acc)] transition-[width] duration-500 ease-linear" [style.width.%]="player.progress() * 100" aria-hidden="true"></span>
       <div class="flex items-center gap-2 pl-3 pr-1.5 py-1.5">
-        <a [routerLink]="L.to(item.songId ? '/cantigas/' + item.songId : '/toques/' + item.toqueId)" class="flex-1 min-w-0 flex flex-col hover:no-underline">
+        <a [routerLink]="L.to(item.songId ? '/cantigas/' + item.songId : '/toques/' + item.toqueId)" draggable="false" class="flex-1 min-w-0 flex flex-col hover:no-underline [-webkit-user-drag:none]">
           <span class="text-xs font-bold text-[var(--n-tx3)] truncate">{{ item.title }}</span>
           @if (player.currentLine(); as line) {
             <span class="text-[15px] font-extrabold text-[var(--n-tx)] truncate">{{ line.pt }}</span>
@@ -136,24 +136,31 @@ import { plainText, seedOf } from './novo-data';
             <span class="text-[13px] text-[var(--n-tx2)] truncate">{{ subtitle(item) }}</span>
           }
         </a>
-        <button type="button" (click)="expanded.set(!expanded())" [attr.aria-expanded]="expanded()" [attr.aria-label]="L.s().moreControls" class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon [name]="expanded() ? 'down' : 'up'" [size]="20" /></button>
+        <!-- Repeat stays in sight: tucked away under "more", people didn't find it. -->
+        <button type="button" (click)="player.toggleLoop()" [attr.aria-pressed]="player.loop()" [attr.aria-label]="L.s().repeat" [attr.title]="L.s().repeat"
+          class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center"
+          [style.color]="player.loop() ? 'var(--n-acc-tx)' : 'var(--n-tx2)'" [style.background]="player.loop() ? 'rgba(255,194,26,0.22)' : null"><app-novo-icon name="loop" [size]="18" /></button>
         <button type="button" (click)="player.toggle()" [disabled]="!item.videoId" [attr.aria-label]="player.playing() ? L.s().pause : L.s().play"
           class="w-10 h-10 shrink-0 rounded-[12px] bg-[var(--n-acc)] text-[#1a1400] flex items-center justify-center disabled:opacity-40"><app-novo-icon [name]="player.playing() ? 'pause' : 'play'" [size]="18" /></button>
+        <button type="button" (click)="expanded.set(!expanded())" [attr.aria-expanded]="expanded()" [attr.aria-label]="L.s().moreControls" [attr.title]="L.s().moreControls"
+          class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-[var(--n-tx2)]" [style.background]="expanded() ? 'var(--n-line)' : null"><app-novo-icon name="more" [size]="20" /></button>
       </div>
       @if (expanded()) {
-        <div class="flex items-center justify-between px-1.5 pb-2">
-          <button type="button" (click)="player.prev()" [disabled]="!player.hasPrev()" [attr.aria-label]="L.s().previous" class="w-11 h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="prev" [size]="20" /></button>
-          <button type="button" (click)="player.next()" [disabled]="!player.hasNext()" [attr.aria-label]="L.s().next" class="w-11 h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="next" [size]="20" /></button>
-          <button type="button" (click)="player.stepLine(-1)" [disabled]="!player.currentLine()" [attr.aria-label]="L.s().prevLine" class="w-11 h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="up" [size]="20" /></button>
-          <button type="button" (click)="player.stepLine(1)" [disabled]="!player.currentLine()" [attr.aria-label]="L.s().nextLine" class="w-11 h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="down" [size]="20" /></button>
-          <button type="button" (click)="player.toggleLoop()" [attr.aria-pressed]="player.loop()" [attr.aria-label]="L.s().repeat" class="w-11 h-11 rounded-full flex items-center justify-center" [style.color]="player.loop() ? 'var(--n-acc-tx)' : 'var(--n-tx2)'"><app-novo-icon name="loop" [size]="18" /></button>
-          <button type="button" (click)="player.cycleRate()" [attr.aria-label]="L.s().speed" class="h-9 px-2 rounded-lg border border-[var(--n-line)] text-xs font-extrabold tabular-nums">{{ rateLabel() }}</button>
+        <!-- Equal columns, so the row fits the card at any phone width (it used to run past the edge). -->
+        <div class="grid grid-cols-7 items-center px-1 pb-2">
+          <button type="button" (click)="player.prev()" [disabled]="!player.hasPrev()" [attr.aria-label]="L.s().previous" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="prev" [size]="20" /></button>
+          <button type="button" (click)="player.next()" [disabled]="!player.hasNext()" [attr.aria-label]="L.s().next" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="next" [size]="20" /></button>
+          <button type="button" (click)="player.stepLine(-1)" [disabled]="!player.currentLine()" [attr.aria-label]="L.s().prevLine" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="up" [size]="20" /></button>
+          <button type="button" (click)="player.stepLine(1)" [disabled]="!player.currentLine()" [attr.aria-label]="L.s().nextLine" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="down" [size]="20" /></button>
+          <button type="button" (click)="player.cycleRate()" [attr.aria-label]="L.s().speed" class="h-9 mx-auto px-2 rounded-lg border border-[var(--n-line)] text-xs font-extrabold tabular-nums">{{ rateLabel() }}</button>
           @if (item.videoId && player.minimized()) {
-            <button type="button" (click)="player.restore()" [attr.aria-label]="L.s().showVideo" class="w-11 h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="video" [size]="20" /></button>
+            <button type="button" (click)="player.restore()" [attr.aria-label]="L.s().showVideo" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="video" [size]="20" /></button>
           } @else if (item.videoId) {
-            <button type="button" (click)="tuckAside()" [attr.aria-label]="L.s().tuckVideo" class="w-11 h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="min" [size]="20" /></button>
+            <button type="button" (click)="tuckAside()" [attr.aria-label]="L.s().tuckVideo" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="min" [size]="20" /></button>
+          } @else {
+            <span></span>
           }
-          <button type="button" (click)="player.close()" [attr.aria-label]="L.s().closePlayer" class="w-11 h-11 rounded-full flex items-center justify-center text-[var(--n-tx3)]"><app-novo-icon name="close" [size]="18" /></button>
+          <button type="button" (click)="player.close()" [attr.aria-label]="L.s().closePlayer" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx3)]"><app-novo-icon name="close" [size]="18" /></button>
         </div>
       }
     </ng-template>
@@ -177,6 +184,8 @@ export class NovoPlayerComponent implements OnDestroy {
    *  and a plain flag would then eat the next real tap. */
   private suppressClickUntil = 0;
   private drag: { dx: number; dy: number; id: number; moved: boolean; startLeft: number; width: number } | null = null;
+  /** Set while the card is pushed against an edge far enough that letting go tucks it. */
+  readonly tuckIntent = signal<'left' | 'right' | null>(null);
 
   readonly cardClass = computed(() => {
     if (!this.player.videoShown()) return '-left-[9999px] bottom-0 w-[356px] opacity-0 pointer-events-none';
@@ -221,31 +230,30 @@ export class NovoPlayerComponent implements OnDestroy {
   dragMove(e: PointerEvent): void {
     if (!this.drag || e.pointerId !== this.drag.id) return;
     this.drag.moved = true;
-    // Up and down stay on screen; sideways follows the finger freely, so the card can be swiped off to an edge.
-    const y = this.clamp(0, e.clientY - this.drag.dy).y;
-    this.pos.set({ x: Math.round(e.clientX - this.drag.dx), y });
+    // The card never leaves the screen: on phones anything past the edge widens the page
+    // (the white column on the right). Where the finger would have taken it decides the
+    // tuck instead: a third of the card past an edge means "tuck", and the card fades to say so.
+    const x = e.clientX - this.drag.dx, w = this.drag.width;
+    const offLeft = -x, offRight = x + w - window.innerWidth;
+    this.tuckIntent.set(offLeft > w * 0.33 ? 'left' : offRight > w * 0.33 ? 'right' : null);
+    this.pos.set(this.clamp(x, e.clientY - this.drag.dy));
   }
 
   dragEnd(e: PointerEvent): void {
     if (!this.drag || e.pointerId !== this.drag.id) return;
+    const edge = this.tuckIntent();
     if (this.drag.moved) {
       const p = this.pos()!;
-      // Tuck only when pushed past a screen edge (a third of the card off-screen). Anywhere
-      // inside the screen it stays where it was dropped; measuring the distance dragged
-      // instead tucked the small desktop card whenever it moved toward the middle.
-      const offLeft = -p.x;
-      const offRight = p.x + this.drag.width - window.innerWidth;
-      const edge = offLeft > this.drag.width * 0.33 ? 'left' : offRight > this.drag.width * 0.33 ? 'right' : null;
       if (edge) {
         const home = this.clamp(this.drag.startLeft, p.y);
         this.pos.set(home);
         this.savePos();
         this.player.tuck(edge, this.tabY(home.y));
       } else {
-        this.pos.set(this.clamp(p.x, p.y));
         this.savePos();
       }
     }
+    this.tuckIntent.set(null);
     this.drag = null;
   }
 

@@ -54,25 +54,27 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
     <div class="novo min-h-screen flex flex-col" [class.novo-dark]="theme.dark()">
 
       <header class="no-print sticky top-0 z-30 bg-[var(--n-surf)] border-b border-[var(--n-line)]">
-        <div class="max-w-[1440px] mx-auto h-[60px] md:h-[72px] flex items-center gap-2 md:gap-9 pl-4 pr-2 md:px-10">
+        <!-- The full header (search box, labelled theme and language switches) needs ~1150px, so it
+             arrives in steps: icons on tablets, the search box from 1024px, the labels from 1280px. -->
+        <div class="max-w-[1440px] mx-auto h-[60px] md:h-[72px] flex items-center gap-2 md:gap-5 xl:gap-6 2xl:gap-9 pl-4 pr-2 md:px-6 xl:px-8 2xl:px-10">
           <a [routerLink]="L.to('/')" class="min-h-11 inline-flex items-center n-disp font-bold text-[15px] min-[380px]:text-[17px] md:text-xl tracking-[-0.03em] hover:no-underline">abadá<span class="text-[var(--n-acc-tx)]">.</span>música</a>
 
-          <nav [attr.aria-label]="L.s().navMain" class="hidden md:flex gap-7 h-full">
+          <nav [attr.aria-label]="L.s().navMain" class="hidden md:flex gap-4 lg:gap-7 h-full">
             @for (item of nav(); track item.link) {
               <a [routerLink]="item.link" routerLinkActive="!text-[var(--n-tx)] !border-[var(--n-acc)]" [routerLinkActiveOptions]="{ exact: item.exact }"
-                 class="h-full inline-flex items-center text-[15px] font-bold text-[var(--n-tx2)] border-b-[3px] border-transparent box-border hover:no-underline hover:text-[var(--n-tx)]">{{ item.label }}</a>
+                 class="h-full inline-flex items-center text-[14px] lg:text-[15px] font-bold text-[var(--n-tx2)] border-b-[3px] border-transparent box-border hover:no-underline hover:text-[var(--n-tx)]">{{ item.label }}</a>
             }
           </nav>
 
-          <form role="search" (submit)="search($event, q.value)" class="hidden md:flex ml-auto">
-            <label class="w-[300px] h-[42px] px-3.5 rounded-[10px] bg-[var(--n-raise)] flex items-center gap-2.5 text-[var(--n-tx3)]">
+          <form role="search" (submit)="search($event, q.value)" class="hidden lg:flex ml-auto">
+            <label class="w-[220px] xl:w-[300px] h-[42px] px-3.5 rounded-[10px] bg-[var(--n-raise)] flex items-center gap-2.5 text-[var(--n-tx3)]">
               <app-novo-icon name="search" [size]="17" />
               <span class="sr-only">{{ L.s().searchLabel }}</span>
               <input #q id="novo-search" type="search" [placeholder]="L.s().searchPlaceholder" class="flex-1 min-w-0 bg-transparent border-0 outline-none text-[15px] text-[var(--n-tx)] placeholder:text-[var(--n-tx3)]" />
             </label>
           </form>
 
-          <div class="hidden md:flex items-center gap-2 text-[13px] font-semibold text-[var(--n-tx2)]">
+          <div class="hidden xl:flex items-center gap-2 text-[13px] font-semibold text-[var(--n-tx2)]">
             <span id="novo-theme-label">{{ L.s().themeDark }}</span>
             <button type="button" role="switch" (click)="theme.toggle()" [attr.aria-checked]="theme.dark()" aria-labelledby="novo-theme-label"
               class="relative w-11 h-[26px] rounded-full transition-colors" [style.background]="theme.dark() ? 'var(--n-acc)' : 'var(--n-line)'">
@@ -81,20 +83,20 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
           </div>
 
           <a [href]="L.otherUrl()" [attr.hreflang]="L.lang() === 'en' ? 'pt-BR' : 'en'" (click)="switchLang($event)"
-             class="hidden md:flex items-center gap-2 text-[13px] font-semibold text-[var(--n-tx2)] hover:no-underline" [attr.aria-label]="L.s().switchHint">
+             class="hidden xl:flex items-center gap-2 text-[13px] font-semibold text-[var(--n-tx2)] hover:no-underline" [attr.aria-label]="L.s().switchHint">
             <span lang="pt-BR">Português</span>
             <span aria-hidden="true" class="relative w-11 h-[26px] rounded-full transition-colors" [style.background]="L.lang() === 'pt' ? 'var(--n-acc)' : 'var(--n-line)'">
               <span class="absolute top-[3px] w-5 h-5 rounded-full transition-[left]" [style.left.px]="L.lang() === 'pt' ? 21 : 3" [style.background]="L.lang() === 'pt' ? '#1a1400' : '#ffffff'"></span>
             </span>
           </a>
 
-          <div class="relative ml-auto md:ml-0 flex items-center gap-0.5 min-[380px]:gap-1">
-            <button type="button" (click)="theme.toggle()" class="md:hidden w-10 h-10 rounded-full flex items-center justify-center text-[var(--n-tx)]" [attr.aria-label]="theme.dark() ? L.s().useLight : L.s().useDark">
+          <div class="relative ml-auto lg:ml-0 flex items-center gap-0.5 min-[380px]:gap-1">
+            <button type="button" (click)="theme.toggle()" class="xl:hidden w-10 h-10 rounded-full flex items-center justify-center text-[var(--n-tx)]" [attr.aria-label]="theme.dark() ? L.s().useLight : L.s().useDark">
               <app-novo-icon [name]="theme.dark() ? 'sun' : 'moon'" [size]="20" />
             </button>
             <a [href]="L.otherUrl()" (click)="switchLang($event)" [attr.hreflang]="L.lang() === 'en' ? 'pt-BR' : 'en'" [attr.aria-label]="L.s().switchHint"
-               class="md:hidden h-10 min-w-10 px-2 rounded-full border border-[var(--n-line)] flex items-center justify-center text-[13px] font-extrabold text-[var(--n-tx)] hover:no-underline">{{ L.s().switchToShort }}</a>
-            <a [routerLink]="L.to('/cantigas')" [queryParams]="{ buscar: 1 }" class="md:hidden w-10 h-10 rounded-full flex items-center justify-center text-[var(--n-tx)]" [attr.aria-label]="L.s().searchLabel"><app-novo-icon name="search" [size]="21" /></a>
+               class="xl:hidden h-10 min-w-10 px-2 rounded-full border border-[var(--n-line)] flex items-center justify-center text-[13px] font-extrabold text-[var(--n-tx)] hover:no-underline">{{ L.s().switchToShort }}</a>
+            <a [routerLink]="L.to('/cantigas')" [queryParams]="{ buscar: 1 }" class="lg:hidden w-10 h-10 rounded-full flex items-center justify-center text-[var(--n-tx)]" [attr.aria-label]="L.s().searchLabel"><app-novo-icon name="search" [size]="21" /></a>
             @if (firebase.currentUser(); as user) {
               <button type="button" (click)="accountOpen.set(!accountOpen())" [attr.aria-expanded]="accountOpen()" [attr.aria-label]="L.s().account + ': ' + (user.displayName || user.email)"
                 class="w-[38px] h-[38px] rounded-full bg-[var(--n-acc)] text-[#1a1400] font-extrabold flex items-center justify-center">{{ initial() }}</button>

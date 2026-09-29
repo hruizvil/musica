@@ -46,10 +46,12 @@ const PAIRS: { pt: TextKey; en: TextKey; ptLabel: string; enLabel: string; rows:
         </div>
       </div>
 
-      <div class="grid md:grid-cols-[minmax(0,1fr)_300px] md:grid-rows-[auto_1fr] md:min-h-[calc(100vh-56px)]">
+      <!-- Details beside the text from 1024px, Portuguese and English side by side from 1280px:
+           with the 232px sidebar, anything sooner squeezes each text box to a sliver on tablets. -->
+      <div class="grid lg:grid-cols-[minmax(0,1fr)_300px] lg:grid-rows-[auto_1fr] md:min-h-[calc(100vh-56px)]">
 
         <!-- Title -->
-        <div class="md:col-start-1 md:row-start-1 px-4 md:px-6 pt-4 md:pt-5">
+        <div class="lg:col-start-1 lg:row-start-1 px-4 md:px-6 pt-4 md:pt-5">
           <label class="flex flex-col gap-1">
             <span class="text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-tx3)]">Title</span>
             <input class="s-field !text-[17px] font-bold" [value]="d.title" (input)="set('title', $any($event.target).value)" placeholder="First line or name of the song" />
@@ -57,7 +59,7 @@ const PAIRS: { pt: TextKey; en: TextKey; ptLabel: string; enLabel: string; rows:
         </div>
 
         <!-- Details: on a phone these come before the text -->
-        <aside class="md:col-start-2 md:row-start-1 md:row-span-2 md:border-l border-[var(--n-line)] md:bg-[var(--n-surf)] px-4 md:px-5 py-4 md:py-5 flex flex-col gap-5">
+        <aside class="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:border-l border-[var(--n-line)] lg:bg-[var(--n-surf)] px-4 md:px-6 lg:px-5 py-4 md:py-5 flex flex-col gap-5">
           <div class="flex flex-col gap-2">
             <span class="text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-tx3)]">Video</span>
             <input class="s-field" [class.s-empty]="!d.youtube" [value]="d.youtube" (input)="setVideo($any($event.target).value)" placeholder="Paste a YouTube link" inputmode="url" />
@@ -89,7 +91,7 @@ const PAIRS: { pt: TextKey; en: TextKey; ptLabel: string; enLabel: string; rows:
           </label>
 
           @if (!isNew()) {
-            <div class="md:mt-auto flex flex-col gap-2 text-[12.5px] text-[var(--n-tx3)]">
+            <div class="lg:mt-auto flex flex-col gap-2 text-[12.5px] text-[var(--n-tx3)]">
               <span>{{ savedLine() }}</span>
               <a [href]="'/cantigas/' + song()!.id" target="_blank" rel="noopener" class="md:hidden font-bold text-[var(--n-tx2)]">View on site ↗</a>
               <button type="button" (click)="confirmDelete.set(true)" class="self-start inline-flex items-center gap-1.5 font-bold text-[var(--n-bad)]"><app-novo-icon name="trash" [size]="15" /> Delete song</button>
@@ -98,23 +100,23 @@ const PAIRS: { pt: TextKey; en: TextKey; ptLabel: string; enLabel: string; rows:
         </aside>
 
         <!-- Portuguese | English -->
-        <div class="md:col-start-1 md:row-start-2 px-4 md:px-6 pt-2 pb-10 md:pb-8 flex flex-col gap-3">
-          <div class="md:hidden flex items-center gap-2 sticky top-28 z-10 py-2 bg-[var(--n-bg)]">
+        <div class="lg:col-start-1 lg:row-start-2 px-4 md:px-6 pt-2 pb-10 md:pb-8 flex flex-col gap-3">
+          <div class="xl:hidden flex items-center gap-2 sticky top-28 md:top-14 z-10 py-2 bg-[var(--n-bg)]">
             <div class="inline-flex rounded-full bg-[var(--n-raise)] p-1" role="group" aria-label="Language">
               <button type="button" (click)="lang.set('pt')" [attr.aria-pressed]="lang() === 'pt'" class="rounded-full px-4 py-1.5 text-[13px] font-bold" [class]="lang() === 'pt' ? 'bg-[var(--n-surf)] text-[var(--n-tx)] shadow-sm' : 'text-[var(--n-tx2)]'">Portuguese</button>
               <button type="button" (click)="lang.set('en')" [attr.aria-pressed]="lang() === 'en'" class="rounded-full px-4 py-1.5 text-[13px] font-bold" [class]="lang() === 'en' ? 'bg-[var(--n-surf)] text-[var(--n-tx)] shadow-sm' : 'text-[var(--n-tx2)]'">English @if (enMissing()) { <span class="text-[var(--n-warn)]">●</span> }</button>
             </div>
           </div>
 
-          <div class="grid md:grid-cols-2 gap-x-4 gap-y-3">
-            <div class="hidden md:flex items-baseline gap-2"><span class="text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-tx3)]">Portuguese</span><span class="text-[12px] text-[var(--n-tx3)]">what's sung</span></div>
-            <div class="hidden md:flex items-baseline gap-2"><span class="text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-tx3)]">English</span><span class="text-[12px] text-[var(--n-tx3)]">for the English site · keep capoeira words in *asterisks*</span></div>
+          <div class="grid xl:grid-cols-2 gap-x-4 gap-y-3">
+            <div class="hidden xl:flex items-baseline gap-2"><span class="text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-tx3)]">Portuguese</span><span class="text-[12px] text-[var(--n-tx3)]">what's sung</span></div>
+            <div class="hidden xl:flex items-baseline gap-2"><span class="text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-tx3)]">English</span><span class="text-[12px] text-[var(--n-tx3)]">for the English site · keep capoeira words in *asterisks*</span></div>
             @for (p of pairs; track p.pt) {
-              <label class="flex-col gap-1" [class]="lang() === 'pt' ? 'flex' : 'hidden md:flex'">
+              <label class="flex-col gap-1" [class]="lang() === 'pt' ? 'flex' : 'hidden xl:flex'">
                 <span class="text-[12.5px] font-bold text-[var(--n-tx2)]">{{ p.ptLabel }}</span>
                 <textarea class="s-field resize-y" [class.s-empty]="!d[p.pt]" [rows]="p.rows" [value]="d[p.pt]" (input)="set(p.pt, $any($event.target).value)" [placeholder]="p.ptHint"></textarea>
               </label>
-              <label class="flex-col gap-1" [class]="lang() === 'en' ? 'flex' : 'hidden md:flex'">
+              <label class="flex-col gap-1" [class]="lang() === 'en' ? 'flex' : 'hidden xl:flex'">
                 <span class="text-[12.5px] font-bold text-[var(--n-tx2)] flex items-center gap-2 min-h-[19px]">
                   {{ p.enLabel }}
                   @if (d[p.pt].trim() && !d[p.en].trim()) {

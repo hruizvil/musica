@@ -7,13 +7,6 @@
     font-family: theme('fontFamily.sans');
   }
 
-  /* Nothing may widen the page. On phones one element poking past the edge makes the
-     browser zoom out or scroll sideways, leaving a white column on the right. clip (not
-     hidden) keeps position: sticky working. */
-  html, body {
-    overflow-x: clip;
-  }
-
   /* One focus ring for the whole app. Nothing defined focus styles before, so keyboard
      and switch users navigated on whatever the browser happened to draw — and Tailwind's
      preflight removes even that on some controls. :focus-visible keeps the ring off

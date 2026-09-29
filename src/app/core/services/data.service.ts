@@ -96,6 +96,14 @@ export class DataService {
   }
 
   readonly songsLoaded = computed(() => this.baseSongs().length > 0);
+
+  /** Who last saved each song in the admin, and when (only songs saved since this was added). */
+  readonly songMeta = computed(() => {
+    const meta = new Map<string, { by: string | null; at: string | null }>();
+    for (const [id, ov] of this.overrides()) if (ov.updatedAt) meta.set(id, { by: ov.updatedBy ?? null, at: ov.updatedAt });
+    for (const s of this.extraSongs()) if (s.updatedAt) meta.set(s.id, { by: s.updatedBy ?? null, at: s.updatedAt });
+    return meta;
+  });
   readonly extraSongIds = computed(() => new Set(this.extraSongs().map(s => s.id)));
   readonly songById = computed(() => new Map(this.songs().map(s => [s.id, s])));
   readonly toqueById = computed(() => new Map(this.toques().map(t => [t.id, t])));

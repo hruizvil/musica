@@ -43,17 +43,19 @@ function writeSignedInHint(signedIn: boolean): void {
 export interface SongOverride {
   title?: string;
   toque?: string[];
-  composer?: string;
-  youtube?: string;
+  composer?: string | null;
+  youtube?: string | null;
   spotify?: string;
-  lyrics?: string;
-  translation?: string;
+  lyrics?: string | null;
+  translation?: string | null;
   notes?: string | null;
   notesEn?: string | null;
   refrao?: string | null;
   refraoTranslation?: string | null;
   deleted?: boolean;
   preview?: boolean;
+  updatedBy?: string | null;
+  updatedAt?: string | null;
 }
 
 /**

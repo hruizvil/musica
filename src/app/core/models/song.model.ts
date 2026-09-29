@@ -20,4 +20,8 @@ export interface Song {
   refraoTranslation?: string | null;
   dateAdded: string;
   preview?: boolean;
+  /** Who last saved the song in the admin (a name typed on that device; the login is shared). */
+  updatedBy?: string | null;
+  /** When it was last saved in the admin, as an ISO timestamp. */
+  updatedAt?: string | null;
 }

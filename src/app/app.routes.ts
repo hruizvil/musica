@@ -13,6 +13,8 @@ export const routes: Routes = [
     loadComponent: () => import('./features/admin/admin.component').then(m => m.AdminComponent),
     canActivate: [authGuard],
   },
+  // The new admin, beside the old one until it replaces it.
+  { path: 'admin/new', loadChildren: () => import('./features/studio/studio.routes').then(m => m.STUDIO_ROUTES) },
   {
     path: 'admin/login',
     loadComponent: () => import('./layout/shell/shell.component').then(m => m.ShellComponent),

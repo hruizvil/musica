@@ -122,7 +122,7 @@ export class StudioToqueEditorComponent implements OnDestroy {
 
   readonly savedLine = computed(() => {
     const m = this.studio.patternMeta(this.id());
-    return m ? `Last saved ${shortDate(m.at)}${m.by ? ' by ' + m.by : ''}` : this.initialLength() ? 'Built-in pattern' : 'Nothing saved yet';
+    return m ? `Last saved ${shortDate(m.at)}` : this.initialLength() ? 'Built-in pattern' : 'Nothing saved yet';
   });
 
   readonly playing = signal(false);

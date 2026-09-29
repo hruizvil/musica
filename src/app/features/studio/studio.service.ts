@@ -36,8 +36,6 @@ export interface Draft {
   notesEn: string;
 }
 
-const EDITOR_KEY = 'studio-editor-name';
-
 // Includes shorts/ and live/: a clip filmed on a phone gets shared as a Shorts link.
 const YOUTUBE_RE = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/;
 
@@ -72,11 +70,6 @@ export class StudioService {
   private data = inject(DataService);
   private fb = inject(FirebaseService);
 
-  /** The name this device saves under. Everyone shares one login, so it's asked per device. */
-  readonly editor = signal<string>(this.readEditor());
-  /** Set once the "who's editing" question has been answered or skipped on this visit. */
-  readonly askedEditor = signal<boolean>(!!this.readEditor());
-
   readonly toast = signal('');
   private toastTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -107,13 +100,6 @@ export class StudioService {
     return this.data.songMeta().get(id) ?? null;
   }
 
-  setEditor(name: string): void {
-    const n = name.trim();
-    this.editor.set(n);
-    this.askedEditor.set(true);
-    try { n ? localStorage.setItem(EDITOR_KEY, n) : localStorage.removeItem(EDITOR_KEY); } catch { /* storage blocked */ }
-  }
-
   flash(message: string): void {
     this.toast.set(message);
     clearTimeout(this.toastTimer);
@@ -132,7 +118,7 @@ export class StudioService {
 
   /** Saves an existing song, or adds a new one when `song` is null. Returns the song's id. */
   async save(song: Song | null, d: Draft): Promise<string> {
-    const stamp = { updatedBy: this.editor() || null, updatedAt: new Date().toISOString() };
+    const stamp = { updatedAt: new Date().toISOString() };
     const yt = youtubeId(d.youtube);
     const fields = {
       title: d.title.trim(), toque: d.toque, composer: orNull(d.composer),
@@ -178,7 +164,7 @@ export class StudioService {
 
   /** Saves a toque's pattern. An empty list is kept as "no pattern" so it also hides a built-in one. */
   async savePattern(toqueId: string, strokes: Stroke[]): Promise<void> {
-    await this.fb.saveToquePattern(toqueId, { strokes, updatedBy: this.editor() || null, updatedAt: new Date().toISOString() });
+    await this.fb.saveToquePattern(toqueId, { strokes, updatedAt: new Date().toISOString() });
     await this.data.refreshPatterns();
   }
 
@@ -213,9 +199,6 @@ export class StudioService {
     }
   }
 
-  private readEditor(): string {
-    try { return localStorage.getItem(EDITOR_KEY) ?? ''; } catch { return ''; }
-  }
 }
 
 /** "Sep 24" from "2026-09-24" or an ISO timestamp. */

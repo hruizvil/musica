@@ -180,7 +180,7 @@ export class StudioEditorComponent {
   readonly savedLine = computed(() => {
     const s = this.song(); if (!s) return '';
     const m = this.studio.meta(s.id);
-    return m ? `Last saved ${shortDate(m.at)}${m.by ? ' by ' + m.by : ''}` : `Added ${shortDate(s.dateAdded)}`;
+    return m ? `Last saved ${shortDate(m.at)}` : `Added ${shortDate(s.dateAdded)}`;
   });
 
   constructor() {

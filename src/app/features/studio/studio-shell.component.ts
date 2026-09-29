@@ -64,13 +64,6 @@ import { StudioService } from './studio.service';
           <app-novo-icon name="plus" [size]="17" /> Add song
         </a>
         <div class="flex-1"></div>
-        <div class="rounded-xl border border-[var(--n-line)] bg-[var(--n-bg)] px-3 py-2.5">
-          <div class="text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-tx3)]">Editing as</div>
-          <div class="flex items-center mt-0.5">
-            <span class="font-bold flex-1 truncate">{{ studio.editor() || 'No name set' }}</span>
-            <button type="button" (click)="askName()" class="text-[12.5px] text-[var(--n-tx2)] underline underline-offset-2">change</button>
-          </div>
-        </div>
         <a href="/" target="_blank" rel="noopener" class="flex items-center gap-2 px-2.5 py-2 text-[13px] text-[var(--n-tx2)] hover:text-[var(--n-tx)]"><app-novo-icon name="external" [size]="15" /> View site</a>
         <button type="button" (click)="signOut()" class="flex items-center gap-2 px-2.5 py-2 text-[13px] text-[var(--n-tx2)] hover:text-[var(--n-bad)] text-left"><app-novo-icon name="logout" [size]="15" /> Sign out</button>
       </aside>
@@ -79,7 +72,6 @@ import { StudioService } from './studio.service';
       <header class="md:hidden sticky top-0 z-30 bg-[var(--n-surf)] border-b border-[var(--n-line)]">
         <div class="h-14 flex items-center gap-2 pl-4 pr-2">
           <a routerLink="/admin" class="n-disp font-bold text-[16px] tracking-[-0.02em] flex-1">abadá<span class="text-[var(--n-acc-tx)]">.</span>admin</a>
-          <button type="button" (click)="askName()" class="h-10 px-3 rounded-full text-[13px] font-bold text-[var(--n-tx2)] max-w-[40vw] truncate">{{ studio.editor() || 'Set name' }}</button>
           <button type="button" (click)="menu.set(!menu())" [attr.aria-expanded]="menu()" aria-label="Menu" class="w-11 h-11 grid place-items-center rounded-full hover:bg-[var(--n-raise)]">
             <app-novo-icon [name]="menu() ? 'close' : 'menu'" [size]="22" />
           </button>
@@ -110,20 +102,6 @@ import { StudioService } from './studio.service';
         <div role="status" class="fixed left-1/2 -translate-x-1/2 bottom-[calc(24px+env(safe-area-inset-bottom,0px))] z-50 max-w-[90vw] rounded-xl bg-[#15161a] text-white px-4 py-2.5 text-[14px] font-semibold shadow-lg text-center">{{ studio.toast() }}</div>
       }
 
-      <!-- Who's editing on this device (the login is shared) -->
-      @if (nameOpen()) {
-        <div class="fixed inset-0 z-40 bg-black/40 grid place-items-center p-4" (click)="closeName()">
-          <form class="w-full max-w-[380px] rounded-2xl bg-[var(--n-surf)] p-5 flex flex-col gap-3" (click)="$event.stopPropagation()" (submit)="saveName($event, nameInput.value)">
-            <h2 class="n-disp text-[19px] font-semibold">Who's editing?</h2>
-            <p class="text-[14px] text-[var(--n-tx2)] m-0">Everyone shares one login, so this device remembers a name. Songs you save will show "Last saved by" that name.</p>
-            <input #nameInput class="s-field" [value]="studio.editor()" placeholder="Your name, e.g. Hugo" autocomplete="name" maxlength="40" />
-            <div class="flex gap-2 justify-end">
-              <button type="button" (click)="closeName()" class="rounded-full px-4 py-2 font-bold text-[14px] text-[var(--n-tx2)]">Not now</button>
-              <button type="submit" class="rounded-full px-5 py-2 font-bold text-[14px] bg-[var(--n-acc)] text-[#101114]">Save</button>
-            </div>
-          </form>
-        </div>
-      }
     </div>
   `,
 })
@@ -135,9 +113,6 @@ export class StudioShellComponent {
   private router = inject(Router);
 
   readonly menu = signal(false);
-  /** Opens by itself on a device that has no name yet; "Not now" hides it for this visit. */
-  private nameManual = signal(false);
-  readonly nameOpen = computed(() => this.nameManual() || !this.studio.askedEditor());
 
   readonly nav = [
     { link: '/admin', label: 'Overview', icon: 'home', exact: true, count: null },
@@ -154,15 +129,6 @@ export class StudioShellComponent {
     meta.updateTag({ name: 'robots', content: 'noindex, nofollow' });
     inject(DestroyRef).onDestroy(() => meta.removeTag('name="robots"'));
     this.router.events.pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed()).subscribe(() => this.menu.set(false));
-  }
-
-  askName(): void { this.menu.set(false); this.nameManual.set(true); }
-  closeName(): void { this.nameManual.set(false); this.studio.askedEditor.set(true); }
-  saveName(e: Event, value: string): void {
-    e.preventDefault();
-    this.studio.setEditor(value);
-    this.nameManual.set(false);
-    if (value.trim()) this.studio.flash(`Saving as ${value.trim()} on this device`);
   }
 
   async signOut(): Promise<void> {

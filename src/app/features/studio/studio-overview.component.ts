@@ -68,8 +68,7 @@ export class StudioOverviewComponent {
   readonly greeting = computed(() => {
     const h = new Date().getHours();
     const part = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-    const name = this.studio.editor();
-    return name ? `${part}, ${name}` : part;
+    return part;
   });
 
   readonly tiles = computed(() => {
@@ -89,7 +88,7 @@ export class StudioOverviewComponent {
 
   added(id: string, date: string): string {
     const m = this.studio.meta(id);
-    return m?.by ? `${shortDate(date)} · last saved by ${m.by}` : shortDate(date);
+    return m?.at && m.at.slice(0, 10) !== date ? `Added ${shortDate(date)} · edited ${shortDate(m.at)}` : `Added ${shortDate(date)}`;
   }
 
   numColor(filter: string, value: number): string {

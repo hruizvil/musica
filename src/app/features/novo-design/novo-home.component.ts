@@ -20,7 +20,9 @@ import { LEARNED_COLOR, LIKED_COLOR, lyricLines, plainText, seedOf, songColor } 
 
       <h1 class="m-0 max-w-3xl n-disp text-[26px] md:text-[40px] font-bold tracking-[-0.04em] leading-[1.05] text-balance">{{ L.s().tagline }}</h1>
 
-      <div class="grid lg:grid-cols-[1.6fr_1fr_1fr] gap-3.5 md:gap-4">
+      <!-- minmax(0, …) on every track: a plain column grows to its content's longest line, and a
+           one-line (truncated) song title in Liked/Learned then widened the whole page on phones. -->
+      <div class="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)] gap-3.5 md:gap-4">
         @if (feature(); as f) {
           <div class="grid grid-cols-[96px_minmax(0,1fr)] md:grid-cols-[168px_minmax(0,1fr)] gap-4 md:gap-6 p-3.5 md:p-5 rounded-[20px] bg-[var(--n-surf)] border border-[var(--n-line)]">
             <app-novo-cover [color]="color(f.song)" [size]="96" [radius]="14" [seed]="seed(f.song)" class="md:hidden" />
@@ -40,7 +42,7 @@ import { LEARNED_COLOR, LIKED_COLOR, lyricLines, plainText, seedOf, songColor } 
         }
 
         @for (list of lists(); track list.key) {
-          <div class="p-4 md:p-5 rounded-[20px] bg-[var(--n-surf)] border border-[var(--n-line)] flex flex-col gap-2.5">
+          <div class="p-4 md:p-5 rounded-[20px] bg-[var(--n-surf)] border border-[var(--n-line)] min-w-0 flex flex-col gap-2.5">
             <div class="flex items-center gap-2.5">
               <span class="w-8 h-8 rounded-lg flex items-center justify-center text-white" [style.background]="list.color"><app-novo-icon [name]="list.icon" [size]="16" [filled]="list.icon === 'heart'" /></span>
               <a [routerLink]="L.to('/curtidas')" [queryParams]="list.params" class="min-h-10 inline-flex items-center text-[17px] font-extrabold">{{ list.title }}</a>

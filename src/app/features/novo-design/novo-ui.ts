@@ -35,6 +35,8 @@ import { NovoLangService } from './novo-lang.service';
         @case ('close') { <path d="M6 6l12 12M18 6L6 18"/> }
         @case ('sun') { <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/> }
         @case ('user') { <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/> }
+        @case ('shrink') { <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/> }
+        @case ('grow') { <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/> }
         @case ('more') { <circle cx="5" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.8" fill="currentColor" stroke="none"/> }
         @case ('plus') { <path d="M12 5v14M5 12h14"/> }
         @case ('list') { <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/> }

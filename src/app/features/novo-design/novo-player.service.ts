@@ -14,6 +14,11 @@ interface YtFull extends YtPlayer {
 const YT_PLAYING = 1;
 const YT_PAUSED = 2;
 const RATE_KEY = 'novo-rate';
+/** A song's chosen part, remembered per video on this device. */
+const PART_KEY = 'novo-part-';
+
+export type RepeatMode = 'off' | 'all' | 'part';
+export interface RepeatPart { a: number | null; b: number | null; }
 
 export interface PlayItem {
   key: string;
@@ -45,7 +50,17 @@ export class NovoPlayerService {
   readonly queue = signal<PlayItem[]>([]);
   readonly index = signal(0);
   readonly playing = signal(false);
-  readonly loop = signal(false);
+  /** Off, the whole video, or a part of it (from `part.a` to `part.b`). */
+  readonly repeat = signal<RepeatMode>('off');
+  readonly part = signal<RepeatPart>({ a: null, b: null });
+  /** Kept for the controls that only need on/off. */
+  readonly loop = computed(() => this.repeat() !== 'off');
+  readonly partReady = computed(() => this.repeat() === 'part' && this.part().a !== null && this.part().b !== null);
+  /** The small 200×200 video (YouTube's minimum). Still visible, so it keeps playing. */
+  readonly mini = signal(false);
+  /** Seconds into the current video, and its length. Read from the player while it plays. */
+  readonly time = signal(0);
+  readonly duration = signal(0);
   readonly rate = signal<number>(this.storedRate());
   readonly line = signal(0);
   readonly minimized = signal(false);
@@ -125,7 +140,60 @@ export class NovoPlayerService {
     this.setRate(order[(order.indexOf(this.rate()) + 1) % order.length]);
   }
 
-  toggleLoop(): void { this.loop.update(v => !v); }
+  toggleLoop(): void { this.setRepeat(this.repeat() === 'off' ? 'all' : 'off'); }
+
+  setRepeat(mode: RepeatMode): void { this.repeat.set(mode); }
+
+  /** "Start here": the part starts at the moment the student heard it. */
+  markStart(): void {
+    const t = Math.floor(this.now());
+    const b = this.part().b;
+    this.setPart({ a: t, b: b !== null && b > t + 1 ? b : null });
+    this.repeat.set('part');
+  }
+
+  /** "End here": closes the part and jumps back to its start, so the repeat is heard straight away. */
+  markEnd(): 'ok' | 'no-start' | 'too-early' {
+    const a = this.part().a;
+    if (a === null) return 'no-start';
+    const t = Math.floor(this.now());
+    if (t <= a + 1) return 'too-early';
+    this.setPart({ a, b: t });
+    this.repeat.set('part');
+    this.player?.seekTo(a, true);
+    return 'ok';
+  }
+
+  clearPart(): void {
+    this.setPart({ a: null, b: null });
+    this.repeat.set('off');
+  }
+
+  setMini(on: boolean): void { this.mini.set(on); }
+
+  private now(): number { return this.player?.getCurrentTime() ?? this.time(); }
+
+  private setPart(p: RepeatPart): void {
+    this.part.set(p);
+    const id = this.current()?.videoId;
+    if (!id) return;
+    try {
+      if (p.a === null && p.b === null) localStorage.removeItem(PART_KEY + id);
+      else localStorage.setItem(PART_KEY + id, JSON.stringify(p));
+    } catch { /* storage blocked: still works for this visit */ }
+  }
+
+  /** The part saved for this video, if any. Repeat "a part" only carries over to a video that has one. */
+  private loadPart(): void {
+    let p: RepeatPart = { a: null, b: null };
+    const id = this.current()?.videoId;
+    try {
+      const raw = id ? localStorage.getItem(PART_KEY + id) : null;
+      if (raw) { const v = JSON.parse(raw) as RepeatPart; if (typeof v.a === 'number') p = { a: v.a, b: typeof v.b === 'number' ? v.b : null }; }
+    } catch { /* ignore */ }
+    this.part.set(p);
+    if (this.repeat() === 'part' && (p.a === null || p.b === null)) this.repeat.set('off');
+  }
 
   setLine(i: number): void {
     const n = this.lines().length;
@@ -190,6 +258,8 @@ export class NovoPlayerService {
   private go(index: number): void {
     this.index.set(index);
     this.progress.set(0);
+    this.time.set(0);
+    this.loadPart();
     this.tucked.set(null);
     this.line.set(0);
     this.minimized.set(false);
@@ -246,15 +316,23 @@ export class NovoPlayerService {
       this.playing.set(true);
       this.player?.setPlaybackRate(this.rate());
       clearInterval(this.ticker);
+      // A quarter second is fine enough for a part to end where it was marked.
       this.ticker = setInterval(() => {
         const d = this.player?.getDuration() ?? 0;
-        this.progress.set(d ? (this.player!.getCurrentTime() / d) : 0);
-      }, 500);
+        const t = this.player?.getCurrentTime() ?? 0;
+        this.time.set(t);
+        this.duration.set(d);
+        this.progress.set(d ? t / d : 0);
+        const { a, b } = this.part();
+        if (this.repeat() === 'part' && a !== null && b !== null && t >= b) this.player?.seekTo(a, true);
+      }, 250);
     } else if (state === YT_PAUSED) {
       this.playing.set(false);
       clearInterval(this.ticker);
     } else if (state === YT_ENDED) {
-      if (this.loop()) { this.player?.seekTo(0, true); this.player?.playVideo(); }
+      const a = this.part().a;
+      if (this.repeat() === 'part' && a !== null) { this.player?.seekTo(a, true); this.player?.playVideo(); }
+      else if (this.repeat() !== 'off') { this.player?.seekTo(0, true); this.player?.playVideo(); }
       else if (this.hasNext()) this.next();
       else this.playing.set(false);
     }

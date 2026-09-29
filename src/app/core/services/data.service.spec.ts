@@ -41,6 +41,7 @@ describe('DataService — deleted-song flash', () => {
   const fakeFb = {
     getSongOverrides: () => new Promise<Map<string, SongOverride>>(r => { resolveOverrides = r; }),
     getExtraSongs: () => new Promise<Song[]>(r => { resolveExtra = r; }),
+    getToquePatterns: () => Promise.resolve({}),
   };
 
   beforeEach(() => localStorage.clear());
@@ -60,6 +61,8 @@ describe('DataService — deleted-song flash', () => {
     http.expectOne('assets/data/songs.json').flush({ songs: BASE_SONGS });
     http.expectOne('assets/data/toques.json').flush({ toques: [] });
     http.expectOne('assets/data/videos.json').flush({ videos: [] });
+    // A first visit with nothing cached also fetches the build snapshot; an empty one keeps these tests about Firestore.
+    http.match('assets/data/songs-remote.json').forEach(r => r.flush({ fetchedAt: '', overrides: {}, extra: [] }));
     return service;
   }
 
@@ -119,6 +122,7 @@ describe('DataService — Banguela is corrected to Benguela on load', () => {
   const fakeFb = {
     getSongOverrides: () => new Promise<Map<string, SongOverride>>(r => { resolveOverrides = r; }),
     getExtraSongs: () => new Promise<Song[]>(r => { resolveExtra = r; }),
+    getToquePatterns: () => Promise.resolve({}),
   };
 
   beforeEach(() => localStorage.clear());
@@ -137,6 +141,8 @@ describe('DataService — Banguela is corrected to Benguela on load', () => {
     http.expectOne('assets/data/songs.json').flush({ songs: baseSongs });
     http.expectOne('assets/data/toques.json').flush({ toques: [] });
     http.expectOne('assets/data/videos.json').flush({ videos: [] });
+    // A first visit with nothing cached also fetches the build snapshot; an empty one keeps these tests about Firestore.
+    http.match('assets/data/songs-remote.json').forEach(r => r.flush({ fetchedAt: '', overrides: {}, extra: [] }));
     return service;
   }
 

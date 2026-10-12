@@ -6,7 +6,7 @@ import { FavoritesService } from '../../core/services/favorites.service';
 import { Song } from '../../core/models/song.model';
 import { NovoPlayerService } from './novo-player.service';
 import { NovoCoverComponent, NovoIconComponent } from './novo-ui';
-import { TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, plainText, seedOf, songColor } from './novo-data';
+import { LyricLine, TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, plainText, seedOf, songColor } from './novo-data';
 import { NovoLangService } from './novo-lang.service';
 import { NovoContentService } from './novo-content.service';
 import { NovoSeoService, SITE_ORIGIN } from './novo-seo.service';
@@ -83,22 +83,39 @@ import { NovoSeoService, SITE_ORIGIN } from './novo-seo.service';
           @if (lines().length) {
             <p class="m-0 text-[13px] text-[var(--n-tx3)]">{{ coroOnly() ? L.s().coroOnlyHint : '' }}{{ L.s().tapHint }}</p>
           }
-          <ol class="m-0 p-0 list-none flex flex-col">
-            @for (line of lines(); track $index; let i = $index) {
-              <li [class.mt-4]="line.stanzaStart">
-                <button type="button" (click)="pick(i)" [attr.aria-current]="current() === i ? 'true' : null"
-                  class="w-full text-left py-2 md:py-1.5 px-3 -mx-3 rounded-lg transition-colors hover:bg-[var(--n-raise)] grid gap-x-8 gap-y-0.5 items-baseline"
-                  [class.md:grid-cols-2]="showEn() && !!line.en"
-                  [style.background]="current() === i ? 'var(--n-raise)' : ''"
-                  [style.box-shadow]="current() === i ? 'inset 3px 0 0 var(--n-acc)' : ''">
-                  <span class="block text-[17px] md:text-[19px] font-bold leading-snug text-[var(--n-tx)]">{{ line.pt }}</span>
-                  @if (showEn() && line.en) {
-                    <span class="block text-[15px] md:text-[17px] leading-snug" [style.color]="current() === i ? 'var(--n-acc-tx)' : 'var(--n-tx2)'">@for (r of runs(line.en); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</span>
-                  }
-                </button>
-              </li>
+          <div class="flex flex-col">
+            @for (stanza of stanzas(); track $index; let si = $index) {
+              <ol class="m-0 p-0 list-none flex flex-col" [class.mt-4]="si > 0">
+                @for (item of stanza; track item.i) {
+                  <li>
+                    <button type="button" (click)="pick(item.i)" [attr.aria-current]="current() === item.i ? 'true' : null"
+                      class="w-full text-left py-2 md:py-1.5 px-3 -mx-3 rounded-lg transition-colors hover:bg-[var(--n-raise)] grid gap-x-8 gap-y-0.5 items-baseline"
+                      [class.md:grid-cols-2]="showEn() && !!item.line.en"
+                      [style.background]="current() === item.i ? 'var(--n-raise)' : ''"
+                      [style.box-shadow]="current() === item.i ? 'inset 3px 0 0 var(--n-acc)' : ''">
+                      <span class="block text-[17px] md:text-[19px] font-bold leading-snug text-[var(--n-tx)]">{{ item.line.pt }}</span>
+                      @if (showEn() && item.line.en) {
+                        <span class="block text-[15px] md:text-[17px] leading-snug" [style.color]="current() === item.i ? 'var(--n-acc-tx)' : 'var(--n-tx2)'">@for (r of runs(item.line.en); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</span>
+                      }
+                    </button>
+                  </li>
+                }
+              </ol>
+              @if (weaveCoro()) {
+                <!-- The coro returns here — everyone sings it back after the verse. Shown where it is
+                     actually sung, so the call-and-response reads straight down the page. -->
+                <div class="mt-3 py-2 px-3.5 rounded-xl bg-[color-mix(in_srgb,var(--n-acc)_15%,transparent)] shadow-[inset_3px_0_0_var(--n-acc-tx)]">
+                  <span class="flex items-center gap-1.5 text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-acc-tx)]"><app-novo-icon name="loop" [size]="13" />{{ L.s().coroReturns }}</span>
+                  <div class="grid gap-x-6 gap-y-0.5 mt-1" [class.md:grid-cols-2]="showEn() && !!s.refraoTranslation">
+                    <p class="m-0 text-[15px] md:text-base font-bold leading-snug whitespace-pre-line text-[var(--n-tx)]">{{ s.refrao }}</p>
+                    @if (showEn() && s.refraoTranslation) {
+                      <p class="m-0 text-[13px] md:text-sm leading-snug whitespace-pre-line text-[var(--n-acc-tx)]">@for (r of runs(s.refraoTranslation); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</p>
+                    }
+                  </div>
+                </div>
+              }
             }
-          </ol>
+          </div>
         </section>
 
         <aside class="flex flex-col gap-3.5 min-w-0 lg:col-start-1 lg:row-start-2">
@@ -151,6 +168,17 @@ export class NovoCantigaComponent implements OnDestroy {
   readonly song = computed(() => this.data.songById().get(this.id()));
   readonly lines = computed(() => (this.song() ? lyricLines(this.song()!) : []));
   readonly coroOnly = computed(() => !!this.song() && coroIsLyrics(this.song()!));
+  /** Lyric lines grouped into verses, each line keeping its position so tapping still works. */
+  readonly stanzas = computed(() => {
+    const groups: { line: LyricLine; i: number }[][] = [];
+    this.lines().forEach((line, i) => {
+      if (i === 0 || line.stanzaStart) groups.push([]);
+      groups[groups.length - 1].push({ line, i });
+    });
+    return groups;
+  });
+  /** Weave the coro in after each verse, where it is sung back — when the song has both a coro and verses. */
+  readonly weaveCoro = computed(() => !!this.song()?.refrao?.trim() && !this.coroOnly() && this.stanzas().length > 0);
   readonly translated = computed(() => !!this.song() && hasTranslation(this.song()!));
   readonly color = computed(() => (this.song() ? songColor(this.song()!) : '#374151'));
   readonly seed = computed(() => seedOf('song:' + this.id()));

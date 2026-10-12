@@ -64,7 +64,7 @@ const EN = {
   noMatch: (q: string) => `No songs match “${q}”.`, noFilterMatch: 'No songs match these filters.',
 
   // Song page
-  lyrics: 'Lyrics', translation: 'Translation', coro: 'Chorus',
+  lyrics: 'Lyrics', translation: 'Translation', coro: 'Chorus', coroReturns: 'Chorus · all sing',
   tapHint: 'Tap a line to follow along: it shows in the player while the music plays.',
   coroOnlyHint: 'This song only has its chorus. ',
   noRecordingToque: 'No recording yet: plays the toque video.', noRecordingAtAll: 'No recording of this song or its toque yet.',
@@ -166,7 +166,7 @@ const PT: Dict = {
   listsNeedSignIn: 'Suas curtidas e aprendidas ficam salvas na sua conta.',
   noMatch: (q: string) => `Nenhuma cantiga com “${q}”.`, noFilterMatch: 'Nenhuma cantiga com esses filtros.',
 
-  lyrics: 'Letra', translation: 'Tradução', coro: 'Coro',
+  lyrics: 'Letra', translation: 'Tradução', coro: 'Coro', coroReturns: 'Coro · todos cantam',
   tapHint: 'Toque numa linha para acompanhar: ela aparece no player enquanto a música toca.',
   coroOnlyHint: 'Esta cantiga tem só o coro. ',
   noRecordingToque: 'Ainda sem gravação: toca o vídeo do toque.', noRecordingAtAll: 'Ainda sem gravação desta cantiga nem do toque.',

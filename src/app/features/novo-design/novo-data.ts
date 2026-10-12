@@ -52,6 +52,14 @@ export function lyricLines(song: Song): LyricLine[] {
   return pt.flatMap((stanza, si) => stanza.map((line, li) => ({ pt: line, en: en[si]?.[li] ?? '', stanzaStart: li === 0 && si > 0 })));
 }
 
+/** The coro split into lines, each paired with its translation — the same shape as the verses,
+ *  so the page can show a line and its translation together instead of all PT then all EN. */
+export function coroLines(song: Song): LyricLine[] {
+  const pt = stanzas(song.refrao ?? '');
+  const en = stanzas(song.refraoTranslation ?? '');
+  return pt.flatMap((stanza, si) => stanza.map((line, li) => ({ pt: line, en: en[si]?.[li] ?? '', stanzaStart: li === 0 && si > 0 })));
+}
+
 /** True when the coro stands in for the lyrics, so pages don't show it twice. */
 export function coroIsLyrics(song: Song): boolean {
   return !song.lyrics.trim() && !!song.refrao?.trim();

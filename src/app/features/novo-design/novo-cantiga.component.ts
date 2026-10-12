@@ -6,7 +6,7 @@ import { FavoritesService } from '../../core/services/favorites.service';
 import { Song } from '../../core/models/song.model';
 import { NovoPlayerService } from './novo-player.service';
 import { NovoCoverComponent, NovoIconComponent } from './novo-ui';
-import { LyricLine, TextRun, byTitle, coroIsLyrics, emphasis, hasTranslation, lyricLines, plainText, seedOf, songColor } from './novo-data';
+import { LyricLine, TextRun, byTitle, coroIsLyrics, coroLines, emphasis, hasTranslation, lyricLines, plainText, seedOf, songColor } from './novo-data';
 import { NovoLangService } from './novo-lang.service';
 import { NovoContentService } from './novo-content.service';
 import { NovoSeoService, SITE_ORIGIN } from './novo-seo.service';
@@ -72,12 +72,16 @@ import { NovoSeoService, SITE_ORIGIN } from './novo-seo.service';
           @if (s.refrao && !coroOnly()) {
             <div class="p-4 rounded-2xl bg-[var(--n-raise)] flex flex-col gap-2">
               <span class="text-xs font-extrabold tracking-[0.1em] uppercase text-[var(--n-acc-tx)]">{{ L.s().coro }}</span>
-              <div class="grid gap-x-8 gap-y-1" [class.md:grid-cols-2]="showEn() && !!s.refraoTranslation">
-                <p class="m-0 text-lg md:text-[19px] font-bold leading-snug whitespace-pre-line">{{ s.refrao }}</p>
-                @if (showEn() && s.refraoTranslation) {
-                  <p class="m-0 text-[15px] md:text-base leading-snug whitespace-pre-line text-[var(--n-tx2)]">@for (r of runs(s.refraoTranslation); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</p>
+              <ol class="m-0 p-0 list-none flex flex-col gap-1.5">
+                @for (ln of chorus(); track $index) {
+                  <li class="grid gap-x-8 gap-y-0.5 items-baseline" [class.md:grid-cols-2]="showEn() && !!ln.en">
+                    <span class="text-lg md:text-[19px] font-bold leading-snug text-[var(--n-tx)]">{{ ln.pt }}</span>
+                    @if (showEn() && ln.en) {
+                      <span class="text-[15px] md:text-base leading-snug text-[var(--n-tx2)]">@for (r of runs(ln.en); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</span>
+                    }
+                  </li>
                 }
-              </div>
+              </ol>
             </div>
           }
           @if (lines().length) {
@@ -106,12 +110,16 @@ import { NovoSeoService, SITE_ORIGIN } from './novo-seo.service';
                      actually sung, so the call-and-response reads straight down the page. -->
                 <div class="mt-3 py-2 px-3.5 rounded-xl bg-[color-mix(in_srgb,var(--n-acc)_15%,transparent)] shadow-[inset_3px_0_0_var(--n-acc-tx)]">
                   <span class="flex items-center gap-1.5 text-[11px] font-extrabold tracking-[0.08em] uppercase text-[var(--n-acc-tx)]"><app-novo-icon name="loop" [size]="13" />{{ L.s().coroReturns }}</span>
-                  <div class="grid gap-x-6 gap-y-0.5 mt-1" [class.md:grid-cols-2]="showEn() && !!s.refraoTranslation">
-                    <p class="m-0 text-[15px] md:text-base font-bold leading-snug whitespace-pre-line text-[var(--n-tx)]">{{ s.refrao }}</p>
-                    @if (showEn() && s.refraoTranslation) {
-                      <p class="m-0 text-[13px] md:text-sm leading-snug whitespace-pre-line text-[var(--n-acc-tx)]">@for (r of runs(s.refraoTranslation); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</p>
+                  <ol class="m-0 p-0 list-none flex flex-col gap-1 mt-1">
+                    @for (ln of chorus(); track $index) {
+                      <li class="grid gap-x-6 gap-y-0 items-baseline" [class.md:grid-cols-2]="showEn() && !!ln.en">
+                        <span class="text-[15px] md:text-base font-bold leading-snug text-[var(--n-tx)]">{{ ln.pt }}</span>
+                        @if (showEn() && ln.en) {
+                          <span class="text-[13px] md:text-sm leading-snug text-[var(--n-acc-tx)]">@for (r of runs(ln.en); track $index) {@if (r.em) {<em>{{ r.text }}</em>} @else {{{ r.text }}}}</span>
+                        }
+                      </li>
                     }
-                  </div>
+                  </ol>
                 </div>
               }
             }
@@ -168,6 +176,8 @@ export class NovoCantigaComponent implements OnDestroy {
   readonly song = computed(() => this.data.songById().get(this.id()));
   readonly lines = computed(() => (this.song() ? lyricLines(this.song()!) : []));
   readonly coroOnly = computed(() => !!this.song() && coroIsLyrics(this.song()!));
+  /** The coro as lines, each with its translation, so it reads like the verses. */
+  readonly chorus = computed(() => (this.song() ? coroLines(this.song()!) : []));
   /** Lyric lines grouped into verses, each line keeping its position so tapping still works. */
   readonly stanzas = computed(() => {
     const groups: { line: LyricLine; i: number }[][] = [];

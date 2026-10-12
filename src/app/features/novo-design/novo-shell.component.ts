@@ -11,7 +11,7 @@ import { NovoIconComponent } from './novo-ui';
 import { NovoLangService } from './novo-lang.service';
 
 const FONTS_ID = 'novo-design-fonts';
-const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Figtree:wght@400;500;600;700;800&display=swap';
+const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap';
 
 /**
  * The frame for the main site ("Abadá" design), in English at / and Portuguese at /pt. It sits beside the classic shell (/classico),
@@ -39,7 +39,7 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Unbounded:wght@500;
       --n-tx: #f4f3ef; --n-tx2: #b4b6bd; --n-tx3: #8f929b; --n-acc: #ffc21a; --n-acc-tx: #ffc21a; --n-ok: #3fcf8e;
       color-scheme: dark;
     }
-    .novo .n-disp { font-family: 'Unbounded', system-ui, sans-serif; }
+    .novo .n-disp { font-family: 'Figtree', system-ui, sans-serif; font-weight: 800; }
     /* :where() keeps these at zero specificity, so a link's own colour class (white text on
        a toque card, the selected tab) always wins over "inherit". */
     :where(.novo) a { color: inherit; }

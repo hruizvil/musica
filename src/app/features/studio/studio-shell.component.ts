@@ -33,7 +33,7 @@ import { StudioService } from './studio.service';
       --n-low: #a9bdf5; --n-low-bg: #1c2540;
       color-scheme: dark;
     }
-    .studio .n-disp { font-family: 'Unbounded', system-ui, sans-serif; }
+    .studio .n-disp { font-family: 'Figtree', system-ui, sans-serif; font-weight: 800; }
     :where(.studio) a { color: inherit; text-decoration: none; }
     .studio a:focus-visible, .studio button:focus-visible, .studio input:focus-visible, .studio textarea:focus-visible {
       outline: 2px solid var(--n-acc); outline-offset: 2px;

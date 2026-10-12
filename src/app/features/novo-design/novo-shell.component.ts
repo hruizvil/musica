@@ -230,8 +230,8 @@ export class NovoShellComponent {
   /** Space for the player at the bottom of every page, so the end of a page can scroll clear of it. */
   readonly bottomRoom = computed(() => {
     if (!this.player.current()) return 'pb-24 md:pb-10';
-    if (this.player.tucked()) return 'pb-24 md:pb-28';
-    return this.player.videoShown() ? 'pb-[300px] md:pb-[330px]' : 'pb-[180px] md:pb-28';
+    if (this.player.tucked()) return 'pb-[150px] md:pb-28';
+    return this.player.videoShown() ? 'pb-[352px] md:pb-[330px]' : 'pb-[150px] md:pb-28';
   });
 
   /** Space bar plays and pauses, as in music apps, unless the visitor is typing or on a control. */

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, OnDestroy, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, OnDestroy, afterNextRender, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { fromEvent } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
@@ -43,14 +43,17 @@ import { plainText, seedOf } from './novo-data';
       </button>
       <div class="relative w-full h-[200px] bg-black">
         <div #ytHost class="absolute inset-0 w-full h-full"></div>
-      </div>
-      @if (player.current(); as item) {
-        <div class="md:hidden relative pt-1 touch-none select-none [-webkit-touch-callout:none] [-webkit-user-drag:none]"
-          (pointerdown)="rowDown($event)" (pointermove)="rowMove($event)" (pointerup)="rowUp($event)" (pointercancel)="rowUp($event)">
-          <span aria-hidden="true" class="absolute left-1/2 -translate-x-1/2 top-[5px] w-8 h-1 rounded-full bg-[var(--n-tx3)] opacity-40"></span>
-          <ng-container [ngTemplateOutlet]="phoneControls" [ngTemplateOutletContext]="{ $implicit: item }" />
+        <!-- Phone: the video carries no controls of its own now — they live in the bar below, so the
+             title and line are not repeated here. Drag it by the strip on top; the button tucks it aside. -->
+        <div class="md:hidden absolute inset-x-0 top-0 h-7 flex items-center justify-center touch-none select-none [-webkit-touch-callout:none] [-webkit-user-drag:none] bg-gradient-to-b from-black/45 to-transparent"
+          (pointerdown)="rowDown($event)" (pointermove)="rowMove($event)" (pointerup)="rowUp($event)" (pointercancel)="rowUp($event)" [attr.aria-label]="L.s().moveVideo" [attr.title]="L.s().moveVideo">
+          <span aria-hidden="true" class="w-9 h-1.5 rounded-full bg-white/70"></span>
         </div>
-      }
+        @if (player.videoShown()) {
+          <button type="button" (click)="tuckAside()" [attr.aria-label]="L.s().tuckVideo" [attr.title]="L.s().tuckVideo"
+            class="md:hidden absolute top-1 right-1 w-8 h-8 rounded-full bg-black/45 text-white flex items-center justify-center"><app-novo-icon name="min" [size]="18" /></button>
+        }
+      </div>
     </section>
 
     <!-- Tucked against an edge: a small tab that brings the player back (and resumes). -->
@@ -128,78 +131,49 @@ import { plainText, seedOf } from './novo-data';
         </div>
       </footer>
 
-      <!-- Phone card without a video (hidden, or nothing to show): the same controls on their own. -->
-      @if (!player.videoShown() && !player.tucked()) {
-        <section [attr.aria-label]="L.s().player" class="no-print md:hidden fixed inset-x-2.5 bottom-[84px] z-40 rounded-2xl bg-[var(--n-raise)] border border-[var(--n-line)] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
-          <ng-container [ngTemplateOutlet]="phoneControls" [ngTemplateOutletContext]="{ $implicit: item }" />
-        </section>
-      }
+      <!-- Phone: the controls are a persistent bar, always in the same place, icons only — the page
+           already shows the title and the lyric line, so they are not repeated here. -->
+      <section [attr.aria-label]="L.s().player" class="no-print md:hidden fixed inset-x-2.5 bottom-[80px] z-40 rounded-2xl bg-[var(--n-raise)] border border-[var(--n-line)] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
+        <ng-container [ngTemplateOutlet]="phoneBar" [ngTemplateOutletContext]="{ $implicit: item }" />
+      </section>
     }
 
-    <ng-template #phoneControls let-item>
+    <ng-template #phoneBar let-item>
       <span class="absolute left-0 top-0 h-[3px] bg-[var(--n-acc)] transition-[width] duration-500 ease-linear" [style.width.%]="player.progress() * 100" aria-hidden="true"></span>
       @if (partSpan(); as ps) { <span class="absolute top-0 h-[4px] bg-[var(--n-acc-tx)] opacity-50 rounded-full" [style.left.%]="ps.left" [style.width.%]="ps.width" aria-hidden="true"></span> }
-      @if (player.mini() && player.videoShown()) {
-        <!-- Mini: the 200×200 video with just the essentials; it keeps playing. -->
-        <div class="flex items-center justify-between px-1.5 py-1">
-          <button type="button" (click)="setMini(false)" [attr.aria-label]="L.s().fullVideo" [attr.title]="L.s().fullVideo" class="w-10 h-10 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="grow" [size]="19" /></button>
-          <button type="button" (click)="setMini(false); repeatOpen.set(true)" [attr.aria-label]="L.s().repeat" class="relative w-10 h-10 rounded-full flex items-center justify-center"
-            [style.color]="player.loop() ? 'var(--n-acc-tx)' : 'var(--n-tx2)'" [style.background]="player.loop() ? 'rgba(255,194,26,0.22)' : null"><app-novo-icon name="loop" [size]="18" /></button>
-          <button type="button" (click)="player.toggle()" [attr.aria-label]="player.playing() ? L.s().pause : L.s().play"
-            class="w-10 h-10 rounded-[12px] bg-[var(--n-acc)] text-[#1a1400] flex items-center justify-center"><app-novo-icon [name]="player.playing() ? 'pause' : 'play'" [size]="18" /></button>
-        </div>
-      } @else {
-      <div class="flex items-center gap-1.5 pl-3 pr-1.5 py-1.5">
-        <a [routerLink]="L.to(item.songId ? '/cantigas/' + item.songId : '/toques/' + item.toqueId)" draggable="false" class="flex-1 min-w-0 flex flex-col hover:no-underline [-webkit-user-drag:none]">
-          <span class="text-xs font-bold text-[var(--n-tx3)] truncate">{{ item.title }}</span>
-          @if (player.currentLine(); as line) {
-            <span class="text-[15px] font-extrabold text-[var(--n-tx)] truncate">{{ line.pt }}</span>
-            @if (line.en) { <span class="text-[12px] text-[var(--n-acc-tx)] truncate">{{ plain(line.en) }}</span> }
-          } @else {
-            <span class="text-[13px] text-[var(--n-tx2)] truncate">{{ subtitle(item) }}</span>
-          }
-        </a>
-        @if (item.videoId && player.videoShown()) {
-          <button type="button" (click)="setMini(true)" [attr.aria-label]="L.s().miniVideo" [attr.title]="L.s().miniVideo" class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="shrink" [size]="18" /></button>
-        }
-        <!-- Repeat stays in sight: tucked away under "more", people didn't find it. It opens
-             the repeat menu (off / whole song / a part). -->
+      <div class="grid grid-cols-5 items-center px-1 py-1.5">
+        <button type="button" (click)="player.prev()" [disabled]="!player.hasPrev()" [attr.aria-label]="L.s().previous" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="prev" [size]="20" /></button>
+        <button type="button" (click)="barPlay()" [attr.aria-label]="player.playing() ? L.s().pause : L.s().play"
+          class="h-11 mx-auto w-14 rounded-[14px] bg-[var(--n-acc)] text-[#1a1400] flex items-center justify-center"><app-novo-icon [name]="player.playing() ? 'pause' : 'play'" [size]="20" /></button>
+        <button type="button" (click)="player.next()" [disabled]="!player.hasNext()" [attr.aria-label]="L.s().next" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="next" [size]="20" /></button>
         <button type="button" (click)="repeatOpen.set(!repeatOpen())" [disabled]="!item.videoId" [attr.aria-expanded]="repeatOpen()" [attr.aria-label]="L.s().repeat" [attr.title]="L.s().repeat"
-          class="relative w-10 h-10 shrink-0 rounded-full flex items-center justify-center disabled:opacity-35"
-          [style.color]="player.loop() ? 'var(--n-acc-tx)' : 'var(--n-tx2)'" [style.background]="player.loop() ? 'rgba(255,194,26,0.22)' : null">
+          class="relative h-11 rounded-full flex items-center justify-center disabled:opacity-35" [style.color]="player.loop() ? 'var(--n-acc-tx)' : 'var(--n-tx2)'" [style.background]="player.loop() ? 'rgba(255,194,26,0.22)' : null">
           <app-novo-icon name="loop" [size]="18" />
-          @if (badge(); as b) { <span class="absolute -top-0.5 -right-1 rounded-md px-1 text-[9px] leading-[14px] font-extrabold bg-[var(--n-acc-tx)] text-[var(--n-surf)]">{{ b }}</span> }
+          @if (badge(); as b) { <span class="absolute top-1 right-1.5 rounded-md px-1 text-[9px] leading-[14px] font-extrabold bg-[var(--n-acc-tx)] text-[var(--n-surf)]">{{ b }}</span> }
         </button>
-        <button type="button" (click)="player.toggle()" [disabled]="!item.videoId" [attr.aria-label]="player.playing() ? L.s().pause : L.s().play"
-          class="w-10 h-10 shrink-0 rounded-[12px] bg-[var(--n-acc)] text-[#1a1400] flex items-center justify-center disabled:opacity-40"><app-novo-icon [name]="player.playing() ? 'pause' : 'play'" [size]="18" /></button>
         <button type="button" (click)="expanded.set(!expanded())" [attr.aria-expanded]="expanded()" [attr.aria-label]="L.s().moreControls" [attr.title]="L.s().moreControls"
-          class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-[var(--n-tx2)]" [style.background]="expanded() ? 'var(--n-line)' : null"><app-novo-icon name="more" [size]="20" /></button>
+          class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]" [style.background]="expanded() ? 'var(--n-line)' : null"><app-novo-icon name="more" [size]="20" /></button>
       </div>
       @if (repeatOpen()) {
-        <div class="border-t border-[var(--n-line)] bg-[var(--n-surf)] px-3 pt-2.5 pb-3">
-          <ng-container [ngTemplateOutlet]="repeatPanel" />
-        </div>
+        <div class="border-t border-[var(--n-line)] bg-[var(--n-surf)] px-3 pt-2.5 pb-3"><ng-container [ngTemplateOutlet]="repeatPanel" /></div>
       } @else if (player.loop()) {
         <div class="px-3 pb-2"><ng-container [ngTemplateOutlet]="repeatStatus" /></div>
       }
       @if (expanded()) {
-        <!-- Equal columns, so the row fits the card at any phone width (it used to run past the edge). -->
-        <div class="grid grid-cols-7 items-center px-1 pb-2">
-          <button type="button" (click)="player.prev()" [disabled]="!player.hasPrev()" [attr.aria-label]="L.s().previous" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="prev" [size]="20" /></button>
-          <button type="button" (click)="player.next()" [disabled]="!player.hasNext()" [attr.aria-label]="L.s().next" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="next" [size]="20" /></button>
+        <div class="grid grid-cols-6 items-center px-1 pb-2 border-t border-[var(--n-line)]">
           <button type="button" (click)="player.stepLine(-1)" [disabled]="!player.currentLine()" [attr.aria-label]="L.s().prevLine" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="up" [size]="20" /></button>
           <button type="button" (click)="player.stepLine(1)" [disabled]="!player.currentLine()" [attr.aria-label]="L.s().nextLine" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="down" [size]="20" /></button>
           <button type="button" (click)="player.cycleRate()" [attr.aria-label]="L.s().speed" class="h-9 mx-auto px-2 rounded-lg border border-[var(--n-line)] text-xs font-extrabold tabular-nums">{{ rateLabel() }}</button>
-          @if (item.videoId && player.minimized()) {
-            <button type="button" (click)="player.restore()" [attr.aria-label]="L.s().showVideo" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="video" [size]="20" /></button>
+          @if (item.videoId && player.videoShown()) {
+            <button type="button" (click)="setMini(!player.mini())" [attr.aria-label]="player.mini() ? L.s().fullVideo : L.s().miniVideo" [attr.title]="player.mini() ? L.s().fullVideo : L.s().miniVideo" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon [name]="player.mini() ? 'grow' : 'shrink'" [size]="19" /></button>
+          } @else { <span></span> }
+          @if (player.tucked() || (item.videoId && !player.videoShown())) {
+            <button type="button" (click)="player.restore()" [attr.aria-label]="L.s().showVideo" [attr.title]="L.s().showVideo" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="video" [size]="20" /></button>
           } @else if (item.videoId) {
-            <button type="button" (click)="tuckAside()" [attr.aria-label]="L.s().tuckVideo" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="min" [size]="20" /></button>
-          } @else {
-            <span></span>
-          }
+            <button type="button" (click)="tuckAside()" [attr.aria-label]="L.s().tuckVideo" [attr.title]="L.s().tuckVideo" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="min" [size]="20" /></button>
+          } @else { <span></span> }
           <button type="button" (click)="player.close()" [attr.aria-label]="L.s().closePlayer" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx3)]"><app-novo-icon name="close" [size]="18" /></button>
         </div>
-      }
       }
     </ng-template>
 
@@ -277,8 +251,8 @@ export class NovoPlayerComponent implements OnDestroy {
     // 202px wide because the card's 1px border sits inside it; the video itself must be the 200.
     const mini = this.player.mini();
     if (this.pos()) return mini ? 'w-[202px]' : 'w-[min(356px,calc(100vw-20px))] md:w-[356px]';
-    if (mini) return 'right-3 bottom-[84px] w-[202px] md:right-auto md:left-6 md:bottom-[112px]';
-    return 'left-1/2 -translate-x-1/2 bottom-[84px] w-[min(356px,calc(100vw-20px))] md:translate-x-0 md:left-6 md:bottom-[112px] md:w-[356px]';
+    if (mini) return 'right-3 bottom-[144px] w-[202px] md:right-auto md:left-6 md:bottom-[112px]';
+    return 'left-1/2 -translate-x-1/2 bottom-[144px] w-[min(356px,calc(100vw-20px))] md:translate-x-0 md:left-6 md:bottom-[112px] md:w-[356px]';
   });
 
   readonly expanded = signal(false);
@@ -295,6 +269,8 @@ export class NovoPlayerComponent implements OnDestroy {
     return { left: (a / d) * 100, width: ((b - a) / d) * 100 };
   });
   private destroyRef = inject(DestroyRef);
+  /** The song whose video we already shrank to the phone default, so we only do it once each. */
+  private sizedKey: string | null = null;
   readonly liked = computed(() => !!this.player.current()?.songId && this.firebase.favorites().has(this.player.current()!.songId!));
   readonly rateLabel = computed(() => String(this.player.rate()).replace('.', ',') + '×');
 
@@ -315,6 +291,17 @@ export class NovoPlayerComponent implements OnDestroy {
       fromEvent(window, 'resize').pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
         const p = this.readPos();
         this.pos.set(p ? this.clamp(p.x, p.y) : null);
+      });
+    });
+    // On phones the video opens as the small square, so the controls bar is the main thing on screen.
+    effect(() => {
+      const shown = this.player.videoShown();
+      const key = this.player.current()?.key ?? null;
+      untracked(() => {
+        if (shown && key && key !== this.sizedKey && typeof window !== 'undefined' && window.innerWidth < 768) {
+          this.sizedKey = key;
+          this.player.setMini(true);
+        }
       });
     });
   }
@@ -414,7 +401,7 @@ export class NovoPlayerComponent implements OnDestroy {
     const r = this.card().nativeElement.getBoundingClientRect();
     const phone = window.innerWidth < 768;
     const top = phone ? 64 : 80;
-    const bottom = window.innerHeight - (phone ? 84 : 104) - r.height;
+    const bottom = window.innerHeight - (phone ? 144 : 104) - r.height;
     const right = window.innerWidth - r.width - 10;
     return { x: Math.round(Math.min(Math.max(10, x), Math.max(10, right))), y: Math.round(Math.min(Math.max(top, y), Math.max(top, bottom))) };
   }
@@ -461,6 +448,13 @@ export class NovoPlayerComponent implements OnDestroy {
     this.repeatMsg.set(msg);
     clearTimeout(this.msgTimer);
     if (msg) this.msgTimer = setTimeout(() => this.repeatMsg.set(''), 2600);
+  }
+
+  /** The bar's play button. If the video was tucked away (hidden, paused), bring it back first —
+   *  YouTube can't play while it is off screen, so play has to show it again. */
+  barPlay(): void {
+    if (this.player.tucked()) this.player.restore();
+    this.player.toggle();
   }
 
   /** Switching size keeps a moved card on screen (the mini one is narrower, the full one wider). */

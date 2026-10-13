@@ -8,7 +8,7 @@ import { FirebaseService } from '../../core/services/firebase.service';
   standalone: true,
   imports: [FormsModule],
   template: `
-    <div class="min-h-[60vh] flex items-center justify-center">
+    <div class="min-h-screen flex items-center justify-center px-4 bg-stone-50 dark:bg-stone-900">
       <div class="w-full max-w-sm">
         <div class="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-8 space-y-6">
           <div>

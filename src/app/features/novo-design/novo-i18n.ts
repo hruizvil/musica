@@ -20,7 +20,6 @@ const EN = {
   themeDark: 'Dark', useLight: 'Use light theme', useDark: 'Use dark theme',
   language: 'Language', switchTo: 'Português', switchToShort: 'PT', switchHint: 'Ver em português',
   signIn: 'Sign in', signInGoogle: 'Sign in with Google', signOut: 'Sign out', yourAccount: 'Your account', account: 'Account',
-  classic: 'Classic site', classicLong: 'See this page on the classic site',
   footerNote: 'Capoeira songs with lyrics and translations',
 
   // Berimbau
@@ -129,7 +128,6 @@ const PT: Dict = {
   themeDark: 'Escuro', useLight: 'Usar tema claro', useDark: 'Usar tema escuro',
   language: 'Idioma', switchTo: 'English', switchToShort: 'EN', switchHint: 'View in English',
   signIn: 'Entrar', signInGoogle: 'Entrar com Google', signOut: 'Sair', yourAccount: 'Sua conta', account: 'Conta',
-  classic: 'Site clássico', classicLong: 'Ver esta página no site clássico',
   footerNote: 'Cantigas de capoeira com letra e tradução',
 
   patternTitle: 'Padrão do berimbau', patternNone: 'Padrão do berimbau ainda não cadastrado',

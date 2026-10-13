@@ -14,9 +14,7 @@ const FONTS_ID = 'novo-design-fonts';
 const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap';
 
 /**
- * The frame for the main site ("Abadá" design), in English at / and Portuguese at /pt. It sits beside the classic shell (/classico),
- * never inside it, and reuses the site's data and account services as they are, so
- * Curtidas and Aprendidas are the same lists on both designs.
+ * The frame for the site, in English at / and Portuguese at /pt.
  *
  * Colours are CSS variables set on the root for light or dark. Styles are unencapsulated
  * but every rule is scoped under .novo, so nothing leaks into the current site.
@@ -103,7 +101,6 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Figtree:wght@400;50
               @if (accountOpen()) {
                 <div class="absolute right-0 top-12 w-64 p-4 rounded-2xl bg-[var(--n-surf)] border border-[var(--n-line)] shadow-lg flex flex-col gap-3 z-50">
                   <div class="min-w-0"><p class="m-0 font-bold truncate">{{ user.displayName || L.s().yourAccount }}</p><p class="m-0 text-sm text-[var(--n-tx2)] truncate">{{ user.email }}</p></div>
-                  <a [href]="classicUrl()" class="text-sm font-semibold">{{ L.s().classicLong }} ↗</a>
                   <button type="button" (click)="signOut()" class="h-10 rounded-xl border border-[var(--n-line)] font-bold text-sm">{{ L.s().signOut }}</button>
                 </div>
               }
@@ -128,7 +125,6 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Figtree:wght@400;50
           <span><span class="n-disp font-bold text-[var(--n-tx)]">abadá.música</span> · {{ L.s().footerNote }}</span>
           <span class="flex items-center gap-5">
             <a [href]="L.otherUrl()" (click)="switchLang($event)" [attr.hreflang]="L.lang() === 'en' ? 'pt-BR' : 'en'" class="font-semibold">{{ L.s().switchHint }}</a>
-            <a [href]="classicUrl()" class="font-semibold text-[var(--n-acc-tx)]">{{ L.s().classicLong }}</a>
           </span>
         </div>
       </footer>
@@ -200,11 +196,6 @@ export class NovoShellComponent {
 
   readonly accountOpen = signal(false);
 
-  /** The same page on the classic design, which lives at /classico during the transition. */
-  readonly classicUrl = computed(() => {
-    const path = this.L.bare().replace(/^\/cantigas/, '/musicas').replace(/^\/curtidas/, '/minhas').replace(/^\/login$/, '/');
-    return path === '/' ? '/classico' : '/classico' + path;
-  });
 
   readonly initial = computed(() => {
     const u = this.firebase.currentUser();

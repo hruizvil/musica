@@ -20,7 +20,7 @@ const EN = {
   themeDark: 'Dark', useLight: 'Use light theme', useDark: 'Use dark theme',
   language: 'Language', switchTo: 'Português', switchToShort: 'PT', switchHint: 'Ver em português',
   signIn: 'Sign in', signInGoogle: 'Sign in with Google', signOut: 'Sign out', yourAccount: 'Your account', account: 'Account',
-  footerNote: 'Capoeira songs with lyrics and translations',
+  footerNote: 'Capoeira songs with lyrics and translations', siteBy: 'Website by',
 
   // Berimbau
   patternTitle: 'Berimbau pattern', patternNone: 'Berimbau pattern not added yet',
@@ -128,7 +128,7 @@ const PT: Dict = {
   themeDark: 'Escuro', useLight: 'Usar tema claro', useDark: 'Usar tema escuro',
   language: 'Idioma', switchTo: 'English', switchToShort: 'EN', switchHint: 'View in English',
   signIn: 'Entrar', signInGoogle: 'Entrar com Google', signOut: 'Sair', yourAccount: 'Sua conta', account: 'Conta',
-  footerNote: 'Cantigas de capoeira com letra e tradução',
+  footerNote: 'Cantigas de capoeira com letra e tradução', siteBy: 'Site por',
 
   patternTitle: 'Padrão do berimbau', patternNone: 'Padrão do berimbau ainda não cadastrado',
   strokeDim: 'agudo', strokeTch: 'chiado', strokeDom: 'grave',

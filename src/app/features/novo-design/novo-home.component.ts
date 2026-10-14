@@ -18,7 +18,7 @@ import { LEARNED_COLOR, LIKED_COLOR, lyricLines, plainText, seedOf, songColor } 
   template: `
     <div class="max-w-[1360px] mx-auto px-4 md:px-10 py-5 md:py-8 flex flex-col gap-7 md:gap-9">
 
-      <h1 class="m-0 max-w-3xl n-disp text-[26px] md:text-[40px] font-bold tracking-[-0.04em] leading-[1.05] text-balance">{{ L.s().tagline }}</h1>
+      <h1 class="m-0 n-disp text-[22px] md:text-[28px] lg:text-[30px] lg:whitespace-nowrap font-bold tracking-[-0.03em] leading-tight">{{ L.s().tagline }}</h1>
 
       <!-- minmax(0, …) on every track: a plain column grows to its content's longest line, and a
            one-line (truncated) song title in Liked/Learned then widened the whole page on phones. -->

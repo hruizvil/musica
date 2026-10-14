@@ -55,7 +55,14 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Figtree:wght@400;50
         <!-- The full header (search box, labelled theme and language switches) needs ~1150px, so it
              arrives in steps: icons on tablets, the search box from 1024px, the labels from 1280px. -->
         <div class="max-w-[1440px] mx-auto h-[60px] md:h-[72px] flex items-center gap-2 md:gap-5 xl:gap-6 2xl:gap-9 pl-4 pr-2 md:px-6 xl:px-8 2xl:px-10">
-          <a [routerLink]="L.to('/')" class="min-h-11 inline-flex items-center n-disp font-bold text-[15px] min-[380px]:text-[17px] md:text-xl tracking-[-0.03em] hover:no-underline">abadá<span class="text-[var(--n-acc-tx)]">.</span>música</a>
+          <a [routerLink]="L.to('/')" class="min-h-11 inline-flex items-center gap-2 md:gap-2.5 hover:no-underline">
+            <svg viewBox="0 0 40 56" class="h-[26px] md:h-8 w-auto shrink-0" aria-hidden="true">
+              <path d="M28 4 C 10 17, 10 39, 28 52" fill="none" stroke="var(--n-tx)" stroke-width="3.2" stroke-linecap="round"/>
+              <line x1="28" y1="4" x2="28" y2="52" stroke="var(--n-tx)" stroke-width="1.9" stroke-linecap="round"/>
+              <circle cx="28" cy="42" r="7" fill="var(--n-acc)" stroke="var(--n-tx)" stroke-width="1.5"/>
+            </svg>
+            <span class="n-disp text-[15px] min-[380px]:text-[17px] md:text-xl tracking-[-0.03em] leading-none"><span class="font-extrabold text-[var(--n-tx)] mr-[0.3em]">abadá</span><span class="font-semibold text-[var(--n-tx2)]">música</span></span>
+          </a>
 
           <nav [attr.aria-label]="L.s().navMain" class="hidden md:flex gap-4 lg:gap-7 h-full">
             @for (item of nav(); track item.link) {
@@ -122,8 +129,9 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Figtree:wght@400;50
 
       <footer class="no-print hidden md:block border-t border-[var(--n-line)]" [class.md:mb-24]="!!player.current()">
         <div class="max-w-[1440px] mx-auto px-10 py-6 flex items-center justify-between text-sm text-[var(--n-tx2)]">
-          <span><span class="n-disp font-bold text-[var(--n-tx)]">abadá.música</span> · {{ L.s().footerNote }}</span>
+          <span><span class="n-disp text-[var(--n-tx)]"><span class="font-extrabold mr-[0.3em]">abadá</span><span class="font-semibold text-[var(--n-tx2)]">música</span></span> · {{ L.s().footerNote }}</span>
           <span class="flex items-center gap-5">
+            <span>{{ L.s().siteBy }} <a href="https://www.linkedin.com/in/hruizvil/" target="_blank" rel="noopener noreferrer" class="font-semibold text-[var(--n-tx)] hover:text-[var(--n-acc-tx)]">Hugo Ruiz (Bom Menino)</a></span>
             <a [href]="L.otherUrl()" (click)="switchLang($event)" [attr.hreflang]="L.lang() === 'en' ? 'pt-BR' : 'en'" class="font-semibold">{{ L.s().switchHint }}</a>
           </span>
         </div>

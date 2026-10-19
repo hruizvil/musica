@@ -21,7 +21,13 @@
         "reco-reco"
       ],
       "gameCharacter": "Lento, rasteiro, malicioso, filosófico",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/64jTQU5kzjc",
+          "label": "Angola — toque no berimbau",
+          "thumbnailId": "64jTQU5kzjc"
+        }
+      ],
       "relatedToques": [
         "sao-bento-grande-angola",
         "sao-bento-pequeno"
@@ -46,7 +52,13 @@
         "atabaque"
       ],
       "gameCharacter": "Próximo, fechado, atento, microscópico",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/ce3rQkUhxN8",
+          "label": "São Bento Pequeno da Angola — toque no berimbau",
+          "thumbnailId": "ce3rQkUhxN8"
+        }
+      ],
       "relatedToques": [
         "angola"
       ]
@@ -72,7 +84,13 @@
         "reco-reco"
       ],
       "gameCharacter": "Rápido, expansivo, movimentos amplos",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/DPBdQEmA1wU",
+          "label": "São Bento Grande da Angola — toque no berimbau",
+          "thumbnailId": "DPBdQEmA1wU"
+        }
+      ],
       "relatedToques": [
         "angola",
         "sao-bento-grande-regional"
@@ -95,7 +113,13 @@
         "pandeiro"
       ],
       "gameCharacter": "Explosivo, atlético, distância ampla, golpes diretos",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/5tH0AsLstcQ",
+          "label": "São Bento Grande da Regional — toque no berimbau",
+          "thumbnailId": "5tH0AsLstcQ"
+        }
+      ],
       "relatedToques": [
         "benguela",
         "iuna"
@@ -118,7 +142,13 @@
         "pandeiro"
       ],
       "gameCharacter": "Gracioso, elegante, técnico, reservado aos graduados",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/Qh2HDQkGbhY",
+          "label": "Iúna — toque no berimbau",
+          "thumbnailId": "Qh2HDQkGbhY"
+        }
+      ],
       "relatedToques": [
         "benguela",
         "sao-bento-grande-regional"
@@ -141,7 +171,13 @@
         "pandeiro"
       ],
       "gameCharacter": "Marcante, preciso, solene, técnico",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/h-hCuOP9dqw",
+          "label": "Santa Maria — toque no berimbau",
+          "thumbnailId": "h-hCuOP9dqw"
+        }
+      ],
       "relatedToques": [
         "sao-bento-grande-regional",
         "idalina"
@@ -164,7 +200,13 @@
         "pandeiro"
       ],
       "gameCharacter": "Delicado, fluido, expressivo, elegante",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/zNS3W-nf0ng",
+          "label": "Idalina — toque no berimbau",
+          "thumbnailId": "zNS3W-nf0ng"
+        }
+      ],
       "relatedToques": [
         "santa-maria",
         "benguela"
@@ -187,7 +229,13 @@
         "pandeiro"
       ],
       "gameCharacter": "Amplo, dinâmico, criativo, expansivo",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/A105pUrgbB8",
+          "label": "Amazonas — toque no berimbau",
+          "thumbnailId": "A105pUrgbB8"
+        }
+      ],
       "relatedToques": [
         "sao-bento-grande-regional",
         "santa-maria"
@@ -204,7 +252,13 @@
         "berimbau"
       ],
       "gameCharacter": "Histórico, alerta, sinal de perigo",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/fSHagKo5O9g",
+          "label": "Cavalaria — toque no berimbau",
+          "thumbnailId": "fSHagKo5O9g"
+        }
+      ],
       "relatedToques": [
         "sao-bento-grande-regional"
       ]
@@ -227,7 +281,13 @@
         "atabaque"
       ],
       "gameCharacter": "Rápido, potente, técnico, identidade Abadá",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/watch?v=LBkLfe9lMhI",
+          "label": "São Bento da Abadá — toque no berimbau",
+          "thumbnailId": "LBkLfe9lMhI"
+        }
+      ],
       "relatedToques": [
         "benguela",
         "siriunha"
@@ -252,7 +312,13 @@
         "atabaque"
       ],
       "gameCharacter": "Fluido, cooperativo, bonito, expressivo, próximo ao chão",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/watch?v=K42vE2vX8uc",
+          "label": "Benguela — toque no berimbau",
+          "thumbnailId": "K42vE2vX8uc"
+        }
+      ],
       "relatedToques": [
         "sao-bento-abada",
         "siriunha"
@@ -276,7 +342,13 @@
         "atabaque"
       ],
       "gameCharacter": "Animado, ágil, alegre, energético",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/2M5SEDgXKo4",
+          "label": "Siriúna — toque no berimbau",
+          "thumbnailId": "2M5SEDgXKo4"
+        }
+      ],
       "relatedToques": [
         "sao-bento-abada",
         "jogo-dos-bichos"
@@ -295,7 +367,13 @@
         "atabaque"
       ],
       "gameCharacter": "Lúdico, criativo, teatral, imitação de animais",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/u1a0Iknml8g",
+          "label": "Jogo dos Bichos — toque no berimbau",
+          "thumbnailId": "u1a0Iknml8g"
+        }
+      ],
       "relatedToques": [
         "siriunha",
         "capopasso"
@@ -343,7 +421,13 @@
         "pandeiro"
       ],
       "gameCharacter": "Contemplativo, reverencial, musical, reflexivo",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/CCylWpv8zyU",
+          "label": "Toque do Berimbau — toque no berimbau",
+          "thumbnailId": "CCylWpv8zyU"
+        }
+      ],
       "relatedToques": [
         "benguela",
         "capuxadama"
@@ -391,14 +475,20 @@
         "agogô"
       ],
       "gameCharacter": "Festivo, celebratório, dança coletiva",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/FpuVM9p4krM",
+          "label": "Samba de Roda — toque no berimbau",
+          "thumbnailId": "FpuVM9p4krM"
+        }
+      ],
       "relatedToques": [
         "angola"
       ]
     },
     {
       "id": "maculele",
-      "name": "Maculelê",
+      "name": "Congo (Maculele)",
       "category": "other",
       "description": "Ritmo da dança guerreira do Maculelê, originária de Santo Amaro da Purificação na Bahia. Usa paus (bastões de biriba) ou facões que se chocam no ritmo da música.",
       "tempo": "fast",
@@ -413,7 +503,13 @@
         "pandeiro"
       ],
       "gameCharacter": "Guerreiro, percussivo, teatral, ritmo marcado",
-      "videoLinks": [],
+      "videoLinks": [
+        {
+          "url": "https://www.youtube.com/shorts/z92au-IgO2c",
+          "label": "Congo (Maculele) — toque no berimbau",
+          "thumbnailId": "z92au-IgO2c"
+        }
+      ],
       "relatedToques": []
     }
   ]

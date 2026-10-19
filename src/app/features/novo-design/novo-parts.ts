@@ -8,7 +8,7 @@ import { NovoPlayerService } from './novo-player.service';
 import { NovoLangService } from './novo-lang.service';
 import { NovoContentService } from './novo-content.service';
 import { NovoCoverComponent, NovoHeartComponent, NovoIconComponent, NovoPatternComponent } from './novo-ui';
-import { firstLine, seedOf, songColor, toqueColor } from './novo-data';
+import { firstLine, seedOf, songColor, toqueColor, youTubeId } from './novo-data';
 
 /**
  * One song in a list: number (or the playing mark), cover, title with its first line,
@@ -74,7 +74,7 @@ export class NovoSongRowComponent {
 @Component({
   selector: 'app-novo-toque-card',
   standalone: true,
-  imports: [RouterLink, NovoPatternComponent],
+  imports: [RouterLink, NovoPatternComponent, NovoIconComponent],
   template: `
     <a [routerLink]="L.to('/toques/' + toque().id)" class="flex flex-col gap-3.5 p-5 min-h-[190px] h-full box-border rounded-[18px] text-white hover:no-underline transition-transform hover:-translate-y-0.5"
        [style.background]="color()">
@@ -83,7 +83,16 @@ export class NovoSongRowComponent {
         <span class="text-[13px] font-bold text-white/90">{{ count() === 0 ? L.s().noSongsYet : L.s().songCount(count()) }}</span>
       </span>
       <span class="n-disp text-[22px] md:text-2xl font-bold tracking-[-0.03em] leading-[1.05]">{{ toque().name }}</span>
-      <span class="mt-auto"><app-novo-pattern [toqueId]="toque().id" size="s" [onColor]="true" /></span>
+      <span class="mt-auto flex items-end gap-2.5">
+        <app-novo-pattern [toqueId]="toque().id" size="s" [onColor]="true" />
+        @if (hasVideo()) {
+          <span role="button" tabindex="0" [attr.aria-label]="L.s().watchToque"
+                (click)="watch($event)" (keydown.enter)="watch($event)" (keydown.space)="watch($event)"
+                class="ml-auto self-center shrink-0 inline-flex items-center gap-1.5 pl-2.5 pr-3 py-1.5 rounded-full bg-black/25 text-[12px] font-extrabold cursor-pointer">
+            <app-novo-icon name="play" [size]="11" />{{ L.s().watchShort }}
+          </span>
+        }
+      </span>
     </a>
   `,
 })
@@ -95,4 +104,14 @@ export class NovoToqueCardComponent {
   readonly color = computed(() => toqueColor(this.toque().id));
   readonly category = computed(() => this.content.category(this.toque().category));
   readonly count = computed(() => this.data.songsByToque().get(this.toque().id)?.length ?? 0);
+  readonly hasVideo = computed(() => !!youTubeId(this.data.videosByToque().get(this.toque().id)?.[0]?.youtubeId ?? this.toque().videoLinks[0]?.url));
+  private player = inject(NovoPlayerService);
+
+  /** Play the toque video from the card. The chip lives inside the card's link, so block the
+   *  link's navigation and its default follow before opening the player. */
+  watch(e: Event): void {
+    e.preventDefault();
+    e.stopPropagation();
+    this.player.playToque(this.toque().id);
+  }
 }

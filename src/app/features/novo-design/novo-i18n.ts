@@ -23,7 +23,7 @@ const EN = {
   footerNote: 'Capoeira songs with lyrics and translations', siteBy: 'Website by',
 
   // Berimbau
-  patternTitle: 'Berimbau pattern', patternNone: 'Berimbau pattern not added yet',
+  patternTitle: 'Berimbau pattern', patternNone: 'Pattern not added yet',
   strokeDim: 'high', strokeTch: 'buzz', strokeDom: 'low',
   hearPattern: 'Hear the pattern', stop: 'Stop',
   patternSynthNote: 'The button plays a synthesized approximation. For the real berimbau, watch the toque video.',
@@ -48,7 +48,7 @@ const EN = {
 
   // Toque page
   playSongs: (n: number) => (n === 1 ? 'Play the song' : `Play the ${n} songs`),
-  watchToque: 'Watch the toque video',
+  watchToque: 'Watch the toque video', watchShort: 'Watch',
   songsInToque: 'Songs in this toque',
   toqueNoSongs: 'No songs have been added for this toque yet.',
   toqueNoSongsVideo: ' The video and the pattern already help you recognize it in the roda.',
@@ -130,7 +130,7 @@ const PT: Dict = {
   signIn: 'Entrar', signInGoogle: 'Entrar com Google', signOut: 'Sair', yourAccount: 'Sua conta', account: 'Conta',
   footerNote: 'Cantigas de capoeira com letra e tradução', siteBy: 'Site por',
 
-  patternTitle: 'Padrão do berimbau', patternNone: 'Padrão do berimbau ainda não cadastrado',
+  patternTitle: 'Padrão do berimbau', patternNone: 'Padrão ainda não cadastrado',
   strokeDim: 'agudo', strokeTch: 'chiado', strokeDom: 'grave',
   hearPattern: 'Ouvir o padrão', stop: 'Parar',
   patternSynthNote: 'O som do botão é uma aproximação sintetizada. Para o berimbau de verdade, veja o vídeo do toque.',
@@ -151,7 +151,7 @@ const PT: Dict = {
   toqueLabel: 'Toque', noSongsYet: 'Sem cantigas ainda', songCount: (n: number) => `${n} ${plural(n, 'cantiga', 'cantigas')}`,
 
   playSongs: (n: number) => (n === 1 ? 'Tocar a cantiga' : `Tocar as ${n} cantigas`),
-  watchToque: 'Ver o vídeo do toque',
+  watchToque: 'Ver o vídeo do toque', watchShort: 'Ver',
   songsInToque: 'Cantigas neste toque',
   toqueNoSongs: 'Ainda não há cantigas cadastradas neste toque.',
   toqueNoSongsVideo: ' O vídeo e o padrão já ajudam a reconhecê-lo na roda.',

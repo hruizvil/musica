@@ -39,9 +39,9 @@ import { NovoSeoService } from './novo-seo.service';
         </div>
       </div>
 
-      @if (!firebase.currentUser() && firebase.pendingSignedIn()) {
+      @if (firebase.loadingUserData()) {
         <div aria-hidden="true" class="h-40 rounded-2xl bg-[var(--n-raise)] animate-pulse"></div>
-      } @else if (!firebase.currentUser()) {
+      } @else if (!firebase.currentUser() && !firebase.pendingSignedIn()) {
         <div class="p-6 rounded-2xl border border-dashed border-[var(--n-line)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <p class="m-0 text-[15px] text-[var(--n-tx2)]">{{ L.s().listsSignedOut }}</p>
           <a [routerLink]="L.to('/login')" [queryParams]="{ returnUrl: router.url }" class="h-11 px-5 rounded-xl bg-[var(--n-acc)] text-[#1a1400] font-extrabold inline-flex items-center justify-center hover:no-underline">{{ L.s().signInGoogle }}</a>

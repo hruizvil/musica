@@ -60,7 +60,7 @@ import { LEARNED_COLOR, LIKED_COLOR, lyricLines, plainText, seedOf, songColor } 
                 </div>
               }
               <div class="self-start mt-1 h-10 w-28 rounded-xl bg-[var(--n-raise)] animate-pulse" aria-hidden="true"></div>
-            } @else if (!firebase.currentUser()) {
+            } @else if (!firebase.currentUser() && !firebase.pendingSignedIn()) {
               <p class="m-0 text-sm text-[var(--n-tx2)] leading-relaxed">{{ list.empty }}</p>
               <a [routerLink]="L.to('/login')" [queryParams]="{ returnUrl: L.to('/') }" class="self-start h-10 px-4 rounded-xl border border-[var(--n-line)] inline-flex items-center text-sm font-bold hover:no-underline">{{ L.s().signInGoogle }}</a>
             } @else if (list.songs.length) {

@@ -41,6 +41,36 @@ function writeSignedInHint(signedIn: boolean): void {
   }
 }
 
+/** The signed-in user's lists from last time. They are a handful of song ids, so keeping a
+ *  copy on the device lets the home show them the moment the app starts, instead of after
+ *  the SDK download, the auth check and the Firestore read have all finished in a row. */
+const USER_CACHE = 'capoeira-user-data';
+
+interface UserCache {
+  uid: string;
+  favorites: string[];
+  learnedSongs: string[];
+  membershipActive: boolean;
+}
+
+function readUserCache(): UserCache | null {
+  try {
+    const raw = localStorage.getItem(USER_CACHE);
+    return raw ? (JSON.parse(raw) as UserCache) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeUserCache(cache: UserCache | null): void {
+  try {
+    if (cache) localStorage.setItem(USER_CACHE, JSON.stringify(cache));
+    else localStorage.removeItem(USER_CACHE);
+  } catch {
+    // storage unavailable — the lists just arrive from Firestore as before
+  }
+}
+
 export interface SongOverride {
   title?: string;
   toque?: string[];
@@ -98,6 +128,16 @@ export class FirebaseService {
     // Warm it once the first paint is out of the way, so a signed-in user's header and
     // favourites appear on their own rather than waiting for something to touch them.
     afterNextRender(() => {
+      // Show last visit's lists straight away. This runs once the page has hydrated (so it
+      // can't disagree with the prerendered markup) but before any network: the skeleton only
+      // lasts as long as the app takes to start. Firebase confirms or replaces them below.
+      const cache = this.likelySignedIn() ? readUserCache() : null;
+      if (cache) {
+        this.membershipActive.set(cache.membershipActive);
+        this.favorites.set(new Set(cache.favorites));
+        this.learnedSongs.set(new Set(cache.learnedSongs));
+        this.userDataReady.set(true);
+      }
       void this.ready();
       // Safety net: if the SDK never loads or auth never resolves (flaky network), stop waiting
       // after a few seconds so the home falls through to its real state (signed out, or content)
@@ -135,8 +175,9 @@ export class FirebaseService {
       writeSignedInHint(!!user);
       // Every signed-in account keeps favourites, admin included — admin used to be
       // skipped here, which is why its heart never showed.
+      // No reset to "loading" here: if the cached lists are already on screen they stay put
+      // and the fresh copy replaces them in place, with no second trip through the skeleton.
       if (user) {
-        this.userDataReady.set(false);
         await this.loadUserData(sdk, user.uid);
       } else {
         this.clearUserData();
@@ -195,8 +236,11 @@ export class FirebaseService {
       this.membershipActive.set(data['membershipActive'] === true);
       this.favorites.set(new Set(data['favorites'] ?? []));
       this.learnedSongs.set(new Set(data['learnedSongs'] ?? []));
+      this.saveUserCache(uid);
     } catch {
-      this.clearUserData();
+      // Offline or a failed read: keep this user's cached lists rather than blanking them.
+      // Only someone else's cache (a shared phone) gets cleared.
+      if (readUserCache()?.uid !== uid) this.clearUserData();
     }
   }
 
@@ -204,6 +248,16 @@ export class FirebaseService {
     this.membershipActive.set(false);
     this.favorites.set(new Set());
     this.learnedSongs.set(new Set());
+    writeUserCache(null);
+  }
+
+  private saveUserCache(uid: string): void {
+    writeUserCache({
+      uid,
+      favorites: [...this.favorites()],
+      learnedSongs: [...this.learnedSongs()],
+      membershipActive: this.membershipActive(),
+    });
   }
 
   // ── Favorites & learned ───────────────────────────────────────────────────
@@ -233,6 +287,7 @@ export class FirebaseService {
     // Optimistic: the heart fills on the tap, not after a round trip on a phone at a
     // roda. A failed write puts it back and rethrows so the caller can say so.
     local.set(next);
+    this.saveUserCache(uid);
     try {
       const { db, f } = await this.ready();
       // merge rather than updateDoc: an account that never went through the public
@@ -245,6 +300,7 @@ export class FirebaseService {
       );
     } catch (error) {
       local.set(previous);
+      this.saveUserCache(uid);
       throw error;
     }
   }

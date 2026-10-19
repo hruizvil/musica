@@ -89,13 +89,26 @@ export class FirebaseService {
    *  signed-out one). Lets the home hold stable skeletons instead of flashing an empty state
    *  and then reflowing the lists right under a tap. */
   readonly userDataReady = signal(false);
-  /** Signed in (or strongly suspected) but the favourites/learned lists are not loaded yet. */
-  readonly loadingUserData = computed(() => (this.pendingSignedIn() || !!this.currentUser()) && !this.userDataReady());
+  /** Auth and (if signed in) the favourites/learned lists are not resolved yet — including the
+   *  prerendered page, so the home can show a neutral skeleton to everyone instead of flashing
+   *  the signed-out view before the client learns who you are. */
+  readonly loadingUserData = computed(() => !this.userDataReady());
 
   constructor() {
     // Warm it once the first paint is out of the way, so a signed-in user's header and
     // favourites appear on their own rather than waiting for something to touch them.
-    afterNextRender(() => void this.ready());
+    afterNextRender(() => {
+      void this.ready();
+      // Safety net: if the SDK never loads or auth never resolves (flaky network), stop waiting
+      // after a few seconds so the home falls through to its real state (signed out, or content)
+      // instead of holding the loading skeletons forever.
+      setTimeout(() => {
+        if (!this.userDataReady()) {
+          this.authReady.set(true);
+          this.userDataReady.set(true);
+        }
+      }, 6000);
+    });
   }
 
   /** Loads and initialises the SDK, once, however many callers race for it. */

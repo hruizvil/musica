@@ -48,12 +48,11 @@ import { LEARNED_COLOR, LIKED_COLOR, lyricLines, plainText, seedOf, songColor } 
               <a [routerLink]="L.to('/curtidas')" [queryParams]="list.params" class="min-h-10 inline-flex items-center text-[17px] font-extrabold">{{ list.title }}</a>
               <span class="ml-auto text-sm text-[var(--n-tx3)] tabular-nums">{{ list.songs.length }}</span>
             </div>
-            @if (!firebase.currentUser() && !firebase.pendingSignedIn()) {
-              <p class="m-0 text-sm text-[var(--n-tx2)] leading-relaxed">{{ list.empty }}</p>
-              <a [routerLink]="L.to('/login')" [queryParams]="{ returnUrl: L.to('/') }" class="self-start h-10 px-4 rounded-xl border border-[var(--n-line)] inline-flex items-center text-sm font-bold hover:no-underline">{{ L.s().signInGoogle }}</a>
-            } @else if (firebase.loadingUserData()) {
-              <!-- Signed in, favourites still loading: hold the row heights so the real list
-                   drops in without reflowing the page under the reader's tap. -->
+            @if (firebase.loadingUserData()) {
+              <!-- Auth/favourites not resolved yet (this is also what the server prerenders), so
+                   everyone sees the same neutral skeleton: a signed-in visitor never gets the
+                   signed-out view flashing first, and the real list drops into these exact
+                   heights without reflowing the page under a tap. -->
               @for (i of skeletonRows; track i) {
                 <div class="flex items-center gap-3 py-1.5 border-t border-[var(--n-line)]" aria-hidden="true">
                   <div class="w-10 h-10 rounded-lg bg-[var(--n-raise)] animate-pulse"></div>
@@ -61,6 +60,9 @@ import { LEARNED_COLOR, LIKED_COLOR, lyricLines, plainText, seedOf, songColor } 
                 </div>
               }
               <div class="self-start mt-1 h-10 w-28 rounded-xl bg-[var(--n-raise)] animate-pulse" aria-hidden="true"></div>
+            } @else if (!firebase.currentUser()) {
+              <p class="m-0 text-sm text-[var(--n-tx2)] leading-relaxed">{{ list.empty }}</p>
+              <a [routerLink]="L.to('/login')" [queryParams]="{ returnUrl: L.to('/') }" class="self-start h-10 px-4 rounded-xl border border-[var(--n-line)] inline-flex items-center text-sm font-bold hover:no-underline">{{ L.s().signInGoogle }}</a>
             } @else if (list.songs.length) {
               @for (s of list.songs.slice(0, 3); track s.id) {
                 <a [routerLink]="L.to('/cantigas/' + s.id)" class="flex items-center gap-3 py-1.5 border-t border-[var(--n-line)] hover:no-underline">

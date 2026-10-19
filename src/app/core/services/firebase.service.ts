@@ -85,6 +85,12 @@ export class FirebaseService {
   readonly likelySignedIn = signal(readSignedInHint());
   /** Signed in as far as anyone can tell yet: known, or strongly suspected. */
   readonly pendingSignedIn = computed(() => !this.authReady() && this.likelySignedIn());
+  /** False until the signed-in user's favourites/learned have been read (or cleared for a
+   *  signed-out one). Lets the home hold stable skeletons instead of flashing an empty state
+   *  and then reflowing the lists right under a tap. */
+  readonly userDataReady = signal(false);
+  /** Signed in (or strongly suspected) but the favourites/learned lists are not loaded yet. */
+  readonly loadingUserData = computed(() => (this.pendingSignedIn() || !!this.currentUser()) && !this.userDataReady());
 
   constructor() {
     // Warm it once the first paint is out of the way, so a signed-in user's header and
@@ -117,10 +123,12 @@ export class FirebaseService {
       // Every signed-in account keeps favourites, admin included — admin used to be
       // skipped here, which is why its heart never showed.
       if (user) {
+        this.userDataReady.set(false);
         await this.loadUserData(sdk, user.uid);
       } else {
         this.clearUserData();
       }
+      this.userDataReady.set(true);
     });
 
     return sdk;

@@ -51,6 +51,16 @@ import { LEARNED_COLOR, LIKED_COLOR, lyricLines, plainText, seedOf, songColor } 
             @if (!firebase.currentUser() && !firebase.pendingSignedIn()) {
               <p class="m-0 text-sm text-[var(--n-tx2)] leading-relaxed">{{ list.empty }}</p>
               <a [routerLink]="L.to('/login')" [queryParams]="{ returnUrl: L.to('/') }" class="self-start h-10 px-4 rounded-xl border border-[var(--n-line)] inline-flex items-center text-sm font-bold hover:no-underline">{{ L.s().signInGoogle }}</a>
+            } @else if (firebase.loadingUserData()) {
+              <!-- Signed in, favourites still loading: hold the row heights so the real list
+                   drops in without reflowing the page under the reader's tap. -->
+              @for (i of skeletonRows; track i) {
+                <div class="flex items-center gap-3 py-1.5 border-t border-[var(--n-line)]" aria-hidden="true">
+                  <div class="w-10 h-10 rounded-lg bg-[var(--n-raise)] animate-pulse"></div>
+                  <div class="flex-1 max-w-[65%] h-3.5 rounded bg-[var(--n-raise)] animate-pulse"></div>
+                </div>
+              }
+              <div class="self-start mt-1 h-10 w-28 rounded-xl bg-[var(--n-raise)] animate-pulse" aria-hidden="true"></div>
             } @else if (list.songs.length) {
               @for (s of list.songs.slice(0, 3); track s.id) {
                 <a [routerLink]="L.to('/cantigas/' + s.id)" class="flex items-center gap-3 py-1.5 border-t border-[var(--n-line)] hover:no-underline">
@@ -154,6 +164,9 @@ export class NovoHomeComponent {
 
   readonly recent = computed(() => [...this.data.songs()].sort((a, b) => b.dateAdded.localeCompare(a.dateAdded)).slice(0, 5));
   readonly recentIds = computed(() => this.recent().map(s => s.id));
+
+  /** Placeholder rows shown while a signed-in visitor's lists load, to keep heights stable. */
+  readonly skeletonRows = [0, 1, 2];
 
   plain(text: string): string { return plainText(text); }
   color(s: Song): string { return songColor(s); }

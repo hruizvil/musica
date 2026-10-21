@@ -72,15 +72,12 @@ import { StudioService } from './studio.service';
       <header class="md:hidden sticky top-0 z-30 bg-[var(--n-surf)] border-b border-[var(--n-line)]">
         <div class="h-14 flex items-center gap-2 pl-4 pr-2">
           <a routerLink="/admin" class="n-disp font-bold text-[16px] tracking-[-0.02em] flex-1">abadá<span class="text-[var(--n-acc-tx)]">.</span>admin</a>
-          <button type="button" (click)="menu.set(!menu())" [attr.aria-expanded]="menu()" aria-label="Menu" class="w-11 h-11 grid place-items-center rounded-full hover:bg-[var(--n-raise)]">
-            <app-novo-icon [name]="menu() ? 'close' : 'menu'" [size]="22" />
+          <button type="button" (click)="menu.set(!menu())" [attr.aria-expanded]="menu()" aria-label="Account" class="w-11 h-11 grid place-items-center">
+            <span class="w-8 h-8 rounded-full bg-[var(--n-acc)] text-[#101114] font-extrabold grid place-items-center text-[14px]">{{ initial() }}</span>
           </button>
         </div>
         @if (menu()) {
           <nav class="border-t border-[var(--n-line)] px-2 py-2 flex flex-col" (click)="menu.set(false)">
-            @for (item of nav; track item.link) {
-              <a [routerLink]="item.link" class="flex items-center gap-3 px-3 py-3 rounded-lg font-semibold"><app-novo-icon [name]="item.icon" [size]="19" />{{ item.label }}</a>
-            }
             <a href="/" target="_blank" rel="noopener" class="flex items-center gap-3 px-3 py-3 rounded-lg font-semibold"><app-novo-icon name="external" [size]="19" />View site</a>
             <button type="button" (click)="signOut()" class="flex items-center gap-3 px-3 py-3 rounded-lg font-semibold text-left text-[var(--n-bad)]"><app-novo-icon name="logout" [size]="19" />Sign out</button>
           </nav>
@@ -91,12 +88,22 @@ import { StudioService } from './studio.service';
         <router-outlet />
       </main>
 
-      <!-- Phone: quick way to add a song from the lists -->
+      <!-- Phone: quick way to add a song, floating just above the tab bar -->
       @if (showFab()) {
-        <a routerLink="/admin/add" class="md:hidden fixed right-4 bottom-[calc(20px+env(safe-area-inset-bottom,0px))] z-20 inline-flex items-center gap-1.5 rounded-full bg-[var(--n-acc)] text-[#101114] font-bold text-[16px] px-5 py-3.5 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.35)]">
+        <a routerLink="/admin/add" class="md:hidden fixed right-4 bottom-[calc(76px+env(safe-area-inset-bottom,0px))] z-20 inline-flex items-center gap-1.5 rounded-full bg-[var(--n-acc)] text-[#101114] font-bold text-[16px] px-5 py-3.5 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.35)]">
           <app-novo-icon name="plus" [size]="19" /> Add song
         </a>
       }
+
+      <!-- Phone: bottom tab bar (desktop uses the sidebar) -->
+      <nav class="md:hidden fixed inset-x-0 bottom-0 z-30 flex bg-[var(--n-surf)] border-t border-[var(--n-line)] pt-1.5 pb-[max(env(safe-area-inset-bottom),6px)]">
+        @for (item of nav; track item.link) {
+          <a [routerLink]="item.link" routerLinkActive="!text-[var(--n-acc-tx)]" [routerLinkActiveOptions]="{ exact: item.exact }"
+             class="flex-1 flex flex-col items-center justify-center gap-1 py-1 text-[11px] font-bold text-[var(--n-tx3)]">
+            <app-novo-icon [name]="item.icon" [size]="21" />{{ item.label }}
+          </a>
+        }
+      </nav>
 
       @if (studio.toast()) {
         <div role="status" class="fixed left-1/2 -translate-x-1/2 bottom-[calc(24px+env(safe-area-inset-bottom,0px))] z-50 max-w-[90vw] rounded-xl bg-[#15161a] text-white px-4 py-2.5 text-[14px] font-semibold shadow-lg text-center">{{ studio.toast() }}</div>
@@ -113,6 +120,11 @@ export class StudioShellComponent {
   private router = inject(Router);
 
   readonly menu = signal(false);
+  readonly initial = computed(() => {
+    const u = this.fb.currentUser();
+    const s = (u?.displayName || u?.email || '').trim();
+    return s ? s.charAt(0).toUpperCase() : 'A';
+  });
 
   readonly nav = [
     { link: '/admin', label: 'Overview', icon: 'home', exact: true, count: null },

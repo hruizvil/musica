@@ -5,7 +5,6 @@ import { FirebaseService } from '../services/firebase.service';
 export const authGuard = async () => {
   const firebase = inject(FirebaseService);
   const router = inject(Router);
-  await firebase.waitForAuthReady();
-  if (firebase.isAdmin()) return true;
+  if (await firebase.ensureAdminChecked()) return true;
   return router.createUrlTree(['/admin/login']);
 };

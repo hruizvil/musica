@@ -105,7 +105,14 @@ export class FirebaseService {
   readonly membershipActive = signal<boolean>(false);
   readonly favorites = signal<Set<string>>(new Set());
   readonly learnedSongs = signal<Set<string>>(new Set());
-  readonly isAdmin = computed(() => this.currentUser()?.email === environment.adminEmail);
+  /** Allow-listed admins have an `admins/{email}` doc in Firestore (added in the console), read
+   *  after sign-in. The legacy admin@abada.app password account stays admin without an entry. */
+  readonly adminAllowed = signal(false);
+  readonly isAdmin = computed(() => {
+    const email = this.currentUser()?.email;
+    if (!email) return false;
+    return email === environment.adminEmail || this.adminAllowed();
+  });
 
   /** True once Firebase has reported who is signed in, if anyone. Until then currentUser()
    *  is null for everyone, which is not the same as signed out. */
@@ -178,9 +185,13 @@ export class FirebaseService {
       // No reset to "loading" here: if the cached lists are already on screen they stay put
       // and the fresh copy replaces them in place, with no second trip through the skeleton.
       if (user) {
-        await this.loadUserData(sdk, user.uid);
+        await Promise.all([
+          this.loadUserData(sdk, user.uid),
+          this.checkAdmin(sdk, user.email),
+        ]);
       } else {
         this.clearUserData();
+        this.adminAllowed.set(false);
       }
       this.userDataReady.set(true);
     });
@@ -191,6 +202,29 @@ export class FirebaseService {
   async waitForAuthReady(): Promise<void> {
     const { auth } = await this.ready();
     await auth.authStateReady();
+  }
+
+  /** Resolve admin status, then report it. The route guard awaits this so it never decides
+   *  before the allow-list has been read. Safe to call repeatedly. */
+  async ensureAdminChecked(): Promise<boolean> {
+    const sdk = await this.ready();
+    await sdk.auth.authStateReady();
+    await this.checkAdmin(sdk, this.currentUser()?.email ?? null);
+    return this.isAdmin();
+  }
+
+  /** Admin = the legacy password account, or any email with an `admins/{email}` doc. Each
+   *  signed-in user may read only their own entry (see firestore.rules), so the list can't
+   *  be enumerated and a normal user's check just comes back empty. */
+  private async checkAdmin({ db, f }: Sdk, email: string | null): Promise<void> {
+    if (!email) { this.adminAllowed.set(false); return; }
+    if (email === environment.adminEmail) { this.adminAllowed.set(true); return; }
+    try {
+      const snap = await f.getDoc(f.doc(db, 'admins', email));
+      this.adminAllowed.set(snap.exists());
+    } catch {
+      this.adminAllowed.set(false);
+    }
   }
 
   // ── Admin auth ────────────────────────────────────────────────────────────

@@ -19,7 +19,7 @@ const EN = {
   navMain: 'Main', searchLabel: 'Search', searchPlaceholder: 'Song, verse or toque',
   themeDark: 'Dark', useLight: 'Use light theme', useDark: 'Use dark theme',
   language: 'Language', switchTo: 'Português', switchToShort: 'PT', switchHint: 'Ver em português',
-  signIn: 'Sign in', signInGoogle: 'Sign in with Google', signOut: 'Sign out', yourAccount: 'Your account', account: 'Account',
+  signIn: 'Sign in', signInGoogle: 'Sign in with Google', signOut: 'Sign out', yourAccount: 'Your account', account: 'Account', adminArea: 'Admin',
   footerNote: 'Capoeira songs with lyrics and translations', siteBy: 'Website by',
 
   // Berimbau
@@ -127,7 +127,7 @@ const PT: Dict = {
   navMain: 'Principal', searchLabel: 'Buscar', searchPlaceholder: 'Cantiga, verso ou toque',
   themeDark: 'Escuro', useLight: 'Usar tema claro', useDark: 'Usar tema escuro',
   language: 'Idioma', switchTo: 'English', switchToShort: 'EN', switchHint: 'View in English',
-  signIn: 'Entrar', signInGoogle: 'Entrar com Google', signOut: 'Sair', yourAccount: 'Sua conta', account: 'Conta',
+  signIn: 'Entrar', signInGoogle: 'Entrar com Google', signOut: 'Sair', yourAccount: 'Sua conta', account: 'Conta', adminArea: 'Admin',
   footerNote: 'Cantigas de capoeira com letra e tradução', siteBy: 'Site por',
 
   patternTitle: 'Padrão do berimbau', patternNone: 'Padrão ainda não cadastrado',

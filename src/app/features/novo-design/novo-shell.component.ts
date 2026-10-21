@@ -108,6 +108,9 @@ const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Figtree:wght@400;50
               @if (accountOpen()) {
                 <div class="absolute right-0 top-12 w-64 p-4 rounded-2xl bg-[var(--n-surf)] border border-[var(--n-line)] shadow-lg flex flex-col gap-3 z-50">
                   <div class="min-w-0"><p class="m-0 font-bold truncate">{{ user.displayName || L.s().yourAccount }}</p><p class="m-0 text-sm text-[var(--n-tx2)] truncate">{{ user.email }}</p></div>
+                  @if (firebase.isAdmin()) {
+                    <a routerLink="/admin" (click)="accountOpen.set(false)" class="h-10 rounded-xl bg-[var(--n-acc)] text-[#1a1400] font-extrabold text-sm flex items-center justify-center hover:no-underline">{{ L.s().adminArea }}</a>
+                  }
                   <button type="button" (click)="signOut()" class="h-10 rounded-xl border border-[var(--n-line)] font-bold text-sm">{{ L.s().signOut }}</button>
                 </div>
               }

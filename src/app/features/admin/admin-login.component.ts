@@ -13,7 +13,16 @@ import { FirebaseService } from '../../core/services/firebase.service';
         <div class="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-8 space-y-6">
           <div>
             <h1 class="font-display text-2xl font-bold text-capoeira-brown dark:text-capoeira-cream">Área Admin</h1>
-            <p class="text-sm text-stone-400 mt-1">Digite a senha para continuar</p>
+            <p class="text-sm text-stone-400 mt-1">Entre para continuar</p>
+          </div>
+
+          <button type="button" (click)="loginGoogle()" [disabled]="loading()"
+            class="w-full py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-800 dark:text-stone-100 font-medium text-sm hover:bg-stone-50 dark:hover:bg-stone-700 disabled:opacity-50 transition-colors">
+            Continuar com Google
+          </button>
+
+          <div class="flex items-center gap-3 text-xs text-stone-400">
+            <span class="flex-1 h-px bg-stone-200 dark:bg-stone-700"></span>ou<span class="flex-1 h-px bg-stone-200 dark:bg-stone-700"></span>
           </div>
 
           <form (ngSubmit)="login()" class="space-y-4">
@@ -66,6 +75,23 @@ export class AdminLoginComponent {
   showPassword = signal(false);
   loading = signal(false);
   error = signal('');
+
+  async loginGoogle() {
+    this.loading.set(true);
+    this.error.set('');
+    try {
+      await this.fb.signInWithGoogle();
+      if (await this.fb.ensureAdminChecked()) {
+        this.router.navigate(['/admin']);
+      } else {
+        this.error.set('Esta conta Google não tem acesso de administrador.');
+      }
+    } catch {
+      this.error.set('Não foi possível entrar com o Google.');
+    } finally {
+      this.loading.set(false);
+    }
+  }
 
   async login() {
     if (!this.password) return;

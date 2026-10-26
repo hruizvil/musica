@@ -12,7 +12,7 @@ const EN = {
   htmlLang: 'en',
   locale: 'en_US',
   site: 'Abadá Música',
-  tagline: 'The music of the capoeira roda, with English translations',
+  tagline: 'Capoeira songs, lyrics & translations',
 
   // Navigation and chrome
   navHome: 'Home', navToques: 'Toques', navSongs: 'Songs', navLiked: 'Liked',
@@ -121,7 +121,7 @@ const PT: Dict = {
   htmlLang: 'pt-BR',
   locale: 'pt_BR',
   site: 'Abadá Música',
-  tagline: 'As cantigas da roda de capoeira, com tradução em inglês',
+  tagline: 'Cantigas de capoeira, letra e tradução',
 
   navHome: 'Início', navToques: 'Toques', navSongs: 'Cantigas', navLiked: 'Curtidas',
   navMain: 'Principal', searchLabel: 'Buscar', searchPlaceholder: 'Cantiga, verso ou toque',

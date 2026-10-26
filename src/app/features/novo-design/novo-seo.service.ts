@@ -4,7 +4,7 @@ import { NovoLangService } from './novo-lang.service';
 
 /** The public address the site is served from. Canonical and hreflang links must be absolute. */
 export const SITE_ORIGIN = 'https://abada-musica.vercel.app';
-const DEFAULT_IMAGE = SITE_ORIGIN + '/hero.jpg';
+const DEFAULT_IMAGE = SITE_ORIGIN + '/og.png';
 
 export interface PageSeo {
   /** Page title without the site name; omit for the home page. */

@@ -133,7 +133,7 @@ import { plainText, seedOf } from './novo-data';
 
       <!-- Phone: the controls are a persistent bar, always in the same place, icons only — the page
            already shows the title and the lyric line, so they are not repeated here. -->
-      <section [attr.aria-label]="L.s().player" class="no-print md:hidden fixed inset-x-2.5 bottom-[80px] z-40 rounded-2xl bg-[var(--n-raise)] border border-[var(--n-line)] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
+      <section [attr.aria-label]="L.s().player" class="no-print md:hidden fixed inset-x-2.5 bottom-[calc(67px+max(env(safe-area-inset-bottom,0px),14px))] z-40 rounded-2xl bg-[var(--n-raise)] border border-[var(--n-line)] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
         <ng-container [ngTemplateOutlet]="phoneBar" [ngTemplateOutletContext]="{ $implicit: item }" />
       </section>
     }
@@ -141,39 +141,30 @@ import { plainText, seedOf } from './novo-data';
     <ng-template #phoneBar let-item>
       <span class="absolute left-0 top-0 h-[3px] bg-[var(--n-acc)] transition-[width] duration-500 ease-linear" [style.width.%]="player.progress() * 100" aria-hidden="true"></span>
       @if (partSpan(); as ps) { <span class="absolute top-0 h-[4px] bg-[var(--n-acc-tx)] opacity-50 rounded-full" [style.left.%]="ps.left" [style.width.%]="ps.width" aria-hidden="true"></span> }
-      <div class="grid grid-cols-5 items-center px-1 py-1.5">
-        <button type="button" (click)="player.prev()" [disabled]="!player.hasPrev()" [attr.aria-label]="L.s().previous" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="prev" [size]="20" /></button>
+      <div class="flex items-center gap-0.5 px-1.5 py-1.5">
+        <button type="button" (click)="player.prev()" [disabled]="!player.hasPrev()" [attr.aria-label]="L.s().previous" class="flex-1 h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="prev" [size]="20" /></button>
         <button type="button" (click)="barPlay()" [attr.aria-label]="player.playing() ? L.s().pause : L.s().play"
-          class="h-11 mx-auto w-14 rounded-[14px] bg-[var(--n-acc)] text-[#1a1400] flex items-center justify-center"><app-novo-icon [name]="player.playing() ? 'pause' : 'play'" [size]="20" /></button>
-        <button type="button" (click)="player.next()" [disabled]="!player.hasNext()" [attr.aria-label]="L.s().next" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="next" [size]="20" /></button>
+          class="h-11 w-14 mx-0.5 shrink-0 rounded-[14px] bg-[var(--n-acc)] text-[#1a1400] flex items-center justify-center"><app-novo-icon [name]="player.playing() ? 'pause' : 'play'" [size]="20" /></button>
+        <button type="button" (click)="player.next()" [disabled]="!player.hasNext()" [attr.aria-label]="L.s().next" class="flex-1 h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="next" [size]="20" /></button>
+
+        <span class="w-px h-6 bg-[var(--n-line)] mx-1 shrink-0" aria-hidden="true"></span>
+
         <button type="button" (click)="repeatOpen.set(!repeatOpen())" [disabled]="!item.videoId" [attr.aria-expanded]="repeatOpen()" [attr.aria-label]="L.s().repeat" [attr.title]="L.s().repeat"
-          class="relative h-11 rounded-full flex items-center justify-center disabled:opacity-35" [style.color]="player.loop() ? 'var(--n-acc-tx)' : 'var(--n-tx2)'" [style.background]="player.loop() ? 'rgba(255,194,26,0.22)' : null">
+          class="relative flex-1 h-11 rounded-full flex items-center justify-center disabled:opacity-35" [style.color]="player.loop() ? 'var(--n-acc-tx)' : 'var(--n-tx2)'" [style.background]="player.loop() ? 'rgba(255,194,26,0.22)' : null">
           <app-novo-icon name="loop" [size]="18" />
           @if (badge(); as b) { <span class="absolute top-1 right-1.5 rounded-md px-1 text-[9px] leading-[14px] font-extrabold bg-[var(--n-acc-tx)] text-[var(--n-surf)]">{{ b }}</span> }
         </button>
-        <button type="button" (click)="expanded.set(!expanded())" [attr.aria-expanded]="expanded()" [attr.aria-label]="L.s().moreControls" [attr.title]="L.s().moreControls"
-          class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]" [style.background]="expanded() ? 'var(--n-line)' : null"><app-novo-icon name="more" [size]="20" /></button>
+        <button type="button" (click)="player.cycleRate()" [attr.aria-label]="L.s().speed" [attr.title]="L.s().speed"
+          class="flex-1 h-11 rounded-full flex items-center justify-center"><span class="inline-flex items-center justify-center h-7 min-w-[34px] px-1.5 rounded-lg border border-[var(--n-line)] text-xs font-extrabold tabular-nums text-[var(--n-tx)]">{{ rateLabel() }}</span></button>
+        <button type="button" (click)="setMini(!player.mini())" [disabled]="!item.videoId" [attr.aria-label]="player.mini() ? L.s().fullVideo : L.s().miniVideo" [attr.title]="player.mini() ? L.s().fullVideo : L.s().miniVideo"
+          class="flex-1 h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)] disabled:opacity-35"><app-novo-icon [name]="player.mini() ? 'grow' : 'shrink'" [size]="19" /></button>
+        <button type="button" (click)="player.close()" [attr.aria-label]="L.s().closePlayer" [attr.title]="L.s().closePlayer"
+          class="flex-1 h-11 rounded-full flex items-center justify-center text-[var(--n-tx3)]"><app-novo-icon name="close" [size]="18" /></button>
       </div>
       @if (repeatOpen()) {
         <div class="border-t border-[var(--n-line)] bg-[var(--n-surf)] px-3 pt-2.5 pb-3"><ng-container [ngTemplateOutlet]="repeatPanel" /></div>
       } @else if (player.loop()) {
         <div class="px-3 pb-2"><ng-container [ngTemplateOutlet]="repeatStatus" /></div>
-      }
-      @if (expanded()) {
-        <div class="grid grid-cols-6 items-center px-1 pb-2 border-t border-[var(--n-line)]">
-          <button type="button" (click)="player.stepLine(-1)" [disabled]="!player.currentLine()" [attr.aria-label]="L.s().prevLine" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="up" [size]="20" /></button>
-          <button type="button" (click)="player.stepLine(1)" [disabled]="!player.currentLine()" [attr.aria-label]="L.s().nextLine" class="h-11 rounded-full flex items-center justify-center disabled:opacity-35"><app-novo-icon name="down" [size]="20" /></button>
-          <button type="button" (click)="player.cycleRate()" [attr.aria-label]="L.s().speed" class="h-9 mx-auto px-2 rounded-lg border border-[var(--n-line)] text-xs font-extrabold tabular-nums">{{ rateLabel() }}</button>
-          @if (item.videoId && player.videoShown()) {
-            <button type="button" (click)="setMini(!player.mini())" [attr.aria-label]="player.mini() ? L.s().fullVideo : L.s().miniVideo" [attr.title]="player.mini() ? L.s().fullVideo : L.s().miniVideo" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon [name]="player.mini() ? 'grow' : 'shrink'" [size]="19" /></button>
-          } @else { <span></span> }
-          @if (player.tucked() || (item.videoId && !player.videoShown())) {
-            <button type="button" (click)="player.restore()" [attr.aria-label]="L.s().showVideo" [attr.title]="L.s().showVideo" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="video" [size]="20" /></button>
-          } @else if (item.videoId) {
-            <button type="button" (click)="tuckAside()" [attr.aria-label]="L.s().tuckVideo" [attr.title]="L.s().tuckVideo" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx2)]"><app-novo-icon name="min" [size]="20" /></button>
-          } @else { <span></span> }
-          <button type="button" (click)="player.close()" [attr.aria-label]="L.s().closePlayer" class="h-11 rounded-full flex items-center justify-center text-[var(--n-tx3)]"><app-novo-icon name="close" [size]="18" /></button>
-        </div>
       }
     </ng-template>
 
@@ -255,7 +246,6 @@ export class NovoPlayerComponent implements OnDestroy {
     return 'left-1/2 -translate-x-1/2 bottom-[144px] w-[min(356px,calc(100vw-20px))] md:translate-x-0 md:left-6 md:bottom-[112px] md:w-[356px]';
   });
 
-  readonly expanded = signal(false);
   readonly repeatOpen = signal(false);
   /** A short correction under the part buttons ("tap Start here first"), cleared after a moment. */
   readonly repeatMsg = signal('');
